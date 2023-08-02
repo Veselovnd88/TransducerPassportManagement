@@ -8,7 +8,7 @@ services:
     image: "postgres:15.2"
     restart: unless-stopped
     env_file:
-      - database-passport.env
+      - database.env
     ports:
       - "5433:5432"
     networks:

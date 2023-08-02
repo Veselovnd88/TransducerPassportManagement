@@ -6,7 +6,7 @@ spring:
     name: passport
 
   datasource:
-    url: jdbc:postgresql://localhost:5433/PassportDB
+    url: jdbc:postgresql://localhost:5433/PtManagementDB
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
