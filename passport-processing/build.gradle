@@ -23,7 +23,7 @@ repositories {
 
 ext {
 	set('springCloudVersion', "2022.0.4")
-	poi= '5.2.3'
+	poi= "5.2.3"
 }
 
 dependencies {
@@ -36,8 +36,8 @@ dependencies {
 	implementation 'org.liquibase:liquibase-core'
 	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-	implementation 'org.apache.poi:poi-ooxml:${poi}'
-	implementation 'org.apache.poi:poi:${poi}'
+	implementation "org.apache.poi:poi-ooxml:${poi}"
+	implementation "org.apache.poi:poi:${poi}"
 	implementation 'commons-io:commons-io:2.13.0'
 
 	compileOnly 'org.projectlombok:lombok'
