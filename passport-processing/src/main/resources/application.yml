@@ -1,6 +1,11 @@
 server:
   port: 7175
 
+placeholder:
+  upper-serial: NUMBERUP
+  bottom-serial: NUMBERDOWN
+  date: DATE
+
 spring:
   application:
     name: passport
@@ -29,3 +34,8 @@ eureka:
       defaultZone: http://localhost:8761/eureka
     fetch-registry: true
     register-with-eureka: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0

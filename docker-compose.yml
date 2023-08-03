@@ -3,8 +3,8 @@ version: "3.8"
 
 services:
 
-  postgres-passport:
-    container_name: postgres-customer
+  postgres:
+    container_name: postgres
     image: "postgres:15.2"
     restart: unless-stopped
     env_file:
