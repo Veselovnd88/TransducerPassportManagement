@@ -8,9 +8,13 @@ import org.apache.poi.xwpf.usermodel.XWPFParagraph;
 import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
+import org.apache.xmlbeans.XmlRuntimeException;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import org.springframework.stereotype.Service;
+import ru.veselov.passportprocessing.exception.DocToEditNotCreatedException;
+import ru.veselov.passportprocessing.exception.DocxOpenException;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
+import ru.veselov.passportprocessing.service.PlaceholderProperties;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -22,6 +26,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class PassportGeneratorServiceImpl implements PassportGeneratorService {
+
+    private final PlaceholderProperties placeholderProperties;
+
     @Override
     public byte[] generatePassports(List<String> serials, String templateId, String date) {
         log.info("Starting generate [{} passports] from [template {}] on [date {}]", serials.size(), templateId, date);
@@ -47,10 +54,12 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
             //Create baos for writing a doc, and then return ByteArray for sending as MultiPart file
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             mainDoc.write(baos);
+            log.info("ByteArray successfully created");
             return baos.toByteArray();
 
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            log.error("Error occurred during opening inputstreams from .docx file");
+            throw new DocxOpenException(e.getMessage());
         }
     }
 
@@ -58,7 +67,7 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
         if (i % 2 != 0 || (i == serials.size() - 1)) {
             CTBody mainBody = mainDoc.getDocument().getBody();
             if (docToEdit == null) {
-                throw new RuntimeException();
+                throw new DocToEditNotCreatedException("Document to edit wasn't created for generating passport");
             }
             CTBody bodyToAdd = docToEdit.getDocument().getBody();
             appendBody(mainBody, bodyToAdd);
@@ -83,14 +92,14 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
         for (XWPFRun run : runs) {
             if (run != null) {
                 String text = run.getText(0);
-                if (i % 2 == 0 && text != null && text.contains("NUMBERUP")) {
-                    replacePlaceHolder(run, "NUMBERUP", serials.get(i));
+                if (i % 2 == 0 && text != null && text.contains(placeholderProperties.getUpperSerial())) {
+                    replacePlaceHolder(run, placeholderProperties.getUpperSerial(), serials.get(i));
                 }
-                if (i % 2 != 0 && text != null && text.contains("NUMBERDOWN")) {
-                    replacePlaceHolder(run, "NUMBERDOWN", serials.get(i));
+                if (i % 2 != 0 && text != null && text.contains(placeholderProperties.getBottomSerial())) {
+                    replacePlaceHolder(run, placeholderProperties.getBottomSerial(), serials.get(i));
                 }
-                if (text != null && text.contains("DATE")) {
-                    replacePlaceHolder(run, "DATE", date);
+                if (text != null && text.contains(placeholderProperties.getDate())) {
+                    replacePlaceHolder(run, placeholderProperties.getDate(), date);
                 }
             }
         }
@@ -101,6 +110,7 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
         run.setText(text, 0);
     }
 
+    //Method added body of second doc in the end of first
     private void appendBody(CTBody src, CTBody append) {
         XmlOptions optionsOuter = new XmlOptions();
         optionsOuter.setSaveOuter();
@@ -114,9 +124,11 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
         try {
             makeBody = CTBody.Factory.parse(prefix + mainPart + addPart + suffix);
         } catch (XmlException e) {
-            e.printStackTrace();
-            throw new RuntimeException("", e); //FIXME
+            log.error("Error occurred during appending new doc to existing:[{}]", e.getMessage());
+            throw new XmlRuntimeException(
+                    "Error occurred during appending new doc to existing:[%s]".formatted(e.getMessage()));
         }
         src.set(makeBody);
     }
+
 }
