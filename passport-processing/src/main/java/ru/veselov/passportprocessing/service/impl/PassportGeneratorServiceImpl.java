@@ -12,14 +12,14 @@ import org.apache.xmlbeans.XmlRuntimeException;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import org.springframework.stereotype.Service;
 import ru.veselov.passportprocessing.exception.DocToEditNotCreatedException;
-import ru.veselov.passportprocessing.exception.DocxOpenException;
+import ru.veselov.passportprocessing.exception.DocxProcessingException;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
 import ru.veselov.passportprocessing.service.PlaceholderProperties;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.InputStream;
 import java.util.List;
 
 @Service
@@ -30,20 +30,20 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
     private final PlaceholderProperties placeholderProperties;
 
     @Override
-    public byte[] generatePassports(List<String> serials, String templateId, String date) {
-        log.info("Starting generate [{} passports] from [template {}] on [date {}]", serials.size(), templateId, date);
-        Path file = Path.of(templateId);
-        try (XWPFDocument mainDoc = new XWPFDocument(Files.newInputStream(file))) {
-            //First time we load doc as template and change fields here for saving first page
+    public byte[] generatePassports(List<String> serials, InputStream templateInputStream, String date) {
+        log.info("Starting generate [{} passports] on [date {}]", serials.size(), date);
+        ByteArrayOutputStream templateOutputStream = getByteArrayOutputStream(templateInputStream);
+        try (XWPFDocument mainDoc = new XWPFDocument(new ByteArrayInputStream(templateOutputStream.toByteArray()))) {
+            //First time we load doc as template and change fields here for saving first page.
             List<XWPFParagraph> pageOneParagraphs = getParagraphs(mainDoc);
-            //Every new page we load template, then replace placeholders and add to mainDoc
+            //Every new page we load template, then replace placeholders and add to mainDoc.
             XWPFDocument docToEdit = null;
             for (int i = 0; i < serials.size(); i++) {
-                if (i < 2) {//first 2 serials added to first template page
+                if (i < 2) {//first 2 serials added to first template page.
                     replacePlaceholders(serials, date, pageOneParagraphs, i);
                 } else {
-                    if (i % 2 == 0) {//creating new template every 3rd serial
-                        docToEdit = new XWPFDocument(Files.newInputStream(file));
+                    if (i % 2 == 0) {//creating new template every 3rd serial.
+                        docToEdit = new XWPFDocument(new ByteArrayInputStream(templateOutputStream.toByteArray()));
                     }
                     //Replacing placeholders
                     List<XWPFParagraph> paragraphsToEdit = getParagraphs(docToEdit);
@@ -51,16 +51,26 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
                     appendGeneratedPage(serials, mainDoc, docToEdit, i);
                 }
             }
-            //Create baos for writing a doc, and then return ByteArray for sending as MultiPart file
+            //Create baos for writing a doc, and then return ByteArray for sending as MultiPart file.
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             mainDoc.write(baos);
             log.info("ByteArray successfully created");
             return baos.toByteArray();
-
         } catch (IOException e) {
-            log.error("Error occurred during opening inputstreams from .docx file");
-            throw new DocxOpenException(e.getMessage());
+            log.error("Error occurred during opening processing input and output streams");
+            throw new DocxProcessingException(e.getMessage());
         }
+    }
+
+    //Get baos for further creating InputStream for independent processing.
+    private ByteArrayOutputStream getByteArrayOutputStream(InputStream templateInputStream) {
+        ByteArrayOutputStream templateOutputStream = new ByteArrayOutputStream();
+        try {
+            templateInputStream.transferTo(templateOutputStream);
+        } catch (IOException e) {
+            throw new DocxProcessingException(e.getMessage());
+        }
+        return templateOutputStream;
     }
 
     private void appendGeneratedPage(List<String> serials, XWPFDocument mainDoc, XWPFDocument docToEdit, int i) {

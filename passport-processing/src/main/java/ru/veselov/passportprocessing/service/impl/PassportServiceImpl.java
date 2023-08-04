@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
+import ru.veselov.passportprocessing.exception.DocxProcessingException;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
 import ru.veselov.passportprocessing.service.PassportService;
 
@@ -17,6 +18,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -40,8 +43,15 @@ public class PassportServiceImpl implements PassportService {
         String path =
                 "C:\\Users\\VeselovND\\git\\PTPassportProject\\document-processing\\document-processing\\src\\main\\resources\\file.docx";
         //  "/home/nikolay/git/PTPassportProject/document-processing/document-processing/src/main/resources/file.docx";
-
-        byte[] bytes = passportGeneratorService.generatePassports(serials, path, LocalDate.now().toString());
+        Path file = Path.of(path);
+        InputStream inputStream = null;
+        try {
+            inputStream = Files.newInputStream(file);
+        } catch (IOException e) {
+            log.error("Error occurred during opening inputstreams from .docx file");
+            throw new DocxProcessingException(e.getMessage());
+        }
+        byte[] bytes = passportGeneratorService.generatePassports(serials, inputStream, LocalDate.now().toString());
         createPdf(bytes);
 
 
