@@ -2,6 +2,7 @@ package ru.veselov.passportprocessing.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -56,9 +57,9 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
             mainDoc.write(baos);
             log.info("ByteArray successfully created");
             return baos.toByteArray();
-        } catch (IOException e) {
+        } catch (IOException | NotOfficeXmlFileException e) {
             log.error("Error occurred during opening processing input and output streams");
-            throw new DocxProcessingException(e.getMessage());
+            throw new DocxProcessingException(e.getMessage(), e);
         }
     }
 
@@ -68,7 +69,7 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
         try {
             templateInputStream.transferTo(templateOutputStream);
         } catch (IOException e) {
-            throw new DocxProcessingException(e.getMessage());
+            throw new DocxProcessingException(e.getMessage(), e);
         }
         return templateOutputStream;
     }
@@ -90,23 +91,23 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
         return extractor.getDocument().getParagraphs();
     }
 
-    private void replacePlaceholders(List<String> serials, String date, List<XWPFParagraph> paragraphs, int i) {
-        log.debug("Replacing placeholder for [serial {}]", serials.get(i));
+    private void replacePlaceholders(List<String> serials, String date, List<XWPFParagraph> paragraphs, int number) {
+        log.debug("Replacing placeholder for [serial {}]", serials.get(number));
         for (XWPFParagraph paragraph : paragraphs) {
             List<XWPFRun> runs = paragraph.getRuns();
-            replacePlaceholdersInRuns(serials, date, i, runs);
+            replacePlaceholdersInRuns(serials, date, number, runs);
         }
     }
 
-    private void replacePlaceholdersInRuns(List<String> serials, String date, int i, List<XWPFRun> runs) {
+    private void replacePlaceholdersInRuns(List<String> serials, String date, int number, List<XWPFRun> runs) {
         for (XWPFRun run : runs) {
             if (run != null) {
                 String text = run.getText(0);
-                if (i % 2 == 0 && text != null && text.contains(placeholderProperties.getUpperSerial())) {
-                    replacePlaceHolder(run, placeholderProperties.getUpperSerial(), serials.get(i));
+                if (number % 2 == 0 && text != null && text.contains(placeholderProperties.getUpperSerial())) {
+                    replacePlaceHolder(run, placeholderProperties.getUpperSerial(), serials.get(number));
                 }
-                if (i % 2 != 0 && text != null && text.contains(placeholderProperties.getBottomSerial())) {
-                    replacePlaceHolder(run, placeholderProperties.getBottomSerial(), serials.get(i));
+                if (number % 2 != 0 && text != null && text.contains(placeholderProperties.getBottomSerial())) {
+                    replacePlaceHolder(run, placeholderProperties.getBottomSerial(), serials.get(number));
                 }
                 if (text != null && text.contains(placeholderProperties.getDate())) {
                     replacePlaceHolder(run, placeholderProperties.getDate(), date);

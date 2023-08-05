@@ -3,17 +3,13 @@ package ru.veselov.passportprocessing.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
-import org.springframework.core.io.buffer.DataBuffer;
-import org.springframework.http.MediaType;
-import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.BodyInserters;
-import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 import ru.veselov.passportprocessing.exception.DocxProcessingException;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
 import ru.veselov.passportprocessing.service.PassportService;
+import ru.veselov.passportprocessing.service.PdfService;
 
+import java.io.ByteArrayInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,9 +26,9 @@ import java.util.List;
 @Slf4j
 public class PassportServiceImpl implements PassportService {
 
-    private final WebClient webClient = WebClient.create();
-
     private final PassportGeneratorService passportGeneratorService;
+
+    private final PdfService pdfService;
 
     private List<String> serials = new ArrayList<>();
 
@@ -49,36 +45,24 @@ public class PassportServiceImpl implements PassportService {
             inputStream = Files.newInputStream(file);
         } catch (IOException e) {
             log.error("Error occurred during opening inputstreams from .docx file");
-            throw new DocxProcessingException(e.getMessage());
+            throw new DocxProcessingException(e.getMessage(), e);
         }
-        byte[] bytes = passportGeneratorService.generatePassports(serials, inputStream, LocalDate.now().toString());
-        createPdf(bytes);
-
-
+        byte[] sourceBytes = passportGeneratorService
+                .generatePassports(serials, inputStream, LocalDate.now().toString());
+        byte[] pdf = pdfService.createPdf(sourceBytes);
+        creatFile(pdf);
     }
 
-
-    private void createPdf(byte[] bytes) {
-        MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-        bodyBuilder.part("file", bytes).header("Content-Disposition",
-                "form-data; name=file").filename("file.docx");
-        Mono<DataBuffer> dataBufferMono = webClient.post().uri("http://localhost:3000/forms/libreoffice/convert")
-                .contentType(MediaType.MULTIPART_FORM_DATA)
-                .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
-                .retrieve().bodyToMono(DataBuffer.class);
-
-        //convert receivedByteArrayToPdfFile
-        DataBuffer block = dataBufferMono.block();
-        InputStream inputStream = block.asInputStream();
+    private void creatFile(byte[] pdfBytes) {
         OutputStream os = null;
         try {
             os = new FileOutputStream("sample.pdf");
-            IOUtils.copy(inputStream, os);
+            ByteArrayInputStream bais = new ByteArrayInputStream(pdfBytes);
+            IOUtils.copy(bais, os);
             os.close();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
     }
 
 

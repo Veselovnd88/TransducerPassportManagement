@@ -1,5 +1,6 @@
 package ru.veselov.passportprocessing.service.impl;
 
+import lombok.SneakyThrows;
 import org.apache.poi.xwpf.extractor.XWPFWordExtractor;
 import org.apache.poi.xwpf.usermodel.XWPFDocument;
 import org.apache.poi.xwpf.usermodel.XWPFParagraph;
@@ -7,10 +8,10 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import ru.veselov.passportprocessing.exception.DocxProcessingException;
 import ru.veselov.passportprocessing.service.PlaceholderProperties;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
@@ -18,6 +19,8 @@ import java.util.List;
 class PassportGeneratorServiceImplTest {
 
     PassportGeneratorServiceImpl passportGeneratorService;
+
+    private static final List<String> SERIALS = List.of("one", "two", "three", "four", "five", "six");
 
     @BeforeEach
     void init() {
@@ -29,12 +32,12 @@ class PassportGeneratorServiceImplTest {
     }
 
     @Test
-    void shouldGenerateByteArrayWithReplacingOfPlaceholders() throws IOException {
+    @SneakyThrows
+    void shouldGenerateByteArrayWithReplacingOfPlaceholders() {
         //given
         InputStream templateInputStream = getClass().getClassLoader().getResourceAsStream("file.docx");
-        List<String> serials = List.of("one", "two", "three", "four", "five", "six");
         //when
-        byte[] bytes = passportGeneratorService.generatePassports(serials, templateInputStream, LocalDate.now().toString());
+        byte[] bytes = passportGeneratorService.generatePassports(SERIALS, templateInputStream, LocalDate.now().toString());
 
         //then
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
@@ -48,6 +51,13 @@ class PassportGeneratorServiceImplTest {
         List<XWPFParagraph> sourceParagraphs = getParagraphs(sourceDoc);
         int placeholdersCountSource = countPlaceholdersInDoc(sourceParagraphs);
         Assertions.assertThat(placeholdersCountSource).isEqualTo(4);
+    }
+
+    @Test
+    void shouldThrowDocxProcessingException() {
+        InputStream is = new ByteArrayInputStream(new byte[]{1, 2, 3, 4, 5});
+        Assertions.assertThatThrownBy(() -> passportGeneratorService.generatePassports(SERIALS, is, "15.01.2023")
+        ).isInstanceOf(DocxProcessingException.class);
     }
 
     private static int countPlaceholdersInDoc(List<XWPFParagraph> paragraphs) {

@@ -40,8 +40,9 @@ dependencies {
 	implementation "org.apache.poi:poi-ooxml:${poi}"
 	implementation "org.apache.poi:poi:${poi}"
 	implementation 'commons-io:commons-io:2.13.0'
+    testImplementation 'org.projectlombok:lombok:1.18.22'
 
-	compileOnly 'org.projectlombok:lombok'
+    compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'org.postgresql:postgresql'
 	annotationProcessor 'org.projectlombok:lombok'
 	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
