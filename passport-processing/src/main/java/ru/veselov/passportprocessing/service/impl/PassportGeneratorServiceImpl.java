@@ -28,6 +28,10 @@ import java.util.List;
 @Slf4j
 public class PassportGeneratorServiceImpl implements PassportGeneratorService {
 
+    private static final String NUM_PREFIX = "Заводской номер: SN ";
+
+    private static final String DATE_PREFIX = "Дата изготовления: ";
+
     private final PlaceholderProperties placeholderProperties;
 
     @Override
@@ -104,13 +108,16 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
             if (run != null) {
                 String text = run.getText(0);
                 if (number % 2 == 0 && text != null && text.contains(placeholderProperties.getUpperSerial())) {
-                    replacePlaceHolder(run, placeholderProperties.getUpperSerial(), serials.get(number));
+                    replacePlaceHolder(run, placeholderProperties.getUpperSerial(),
+                            NUM_PREFIX + serials.get(number));
                 }
                 if (number % 2 != 0 && text != null && text.contains(placeholderProperties.getBottomSerial())) {
-                    replacePlaceHolder(run, placeholderProperties.getBottomSerial(), serials.get(number));
+                    replacePlaceHolder(run, placeholderProperties.getBottomSerial(),
+                            NUM_PREFIX + serials.get(number));
                 }
                 if (text != null && text.contains(placeholderProperties.getDate())) {
-                    replacePlaceHolder(run, placeholderProperties.getDate(), date);
+                    replacePlaceHolder(run, placeholderProperties.getDate(),
+                            DATE_PREFIX + date + " г.");
                 }
             }
         }

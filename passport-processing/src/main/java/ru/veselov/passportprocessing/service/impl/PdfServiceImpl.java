@@ -31,6 +31,7 @@ public class PdfServiceImpl implements PdfService {
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
                 .retrieve().bodyToMono(DataBuffer.class);
+        //200 - ok, 400 - bad request, 503 - service unavailable
         DataBuffer pdfDatabuffer = dataBufferMono.block();
         if (pdfDatabuffer == null) {
             throw new RuntimeException();

@@ -30,31 +30,35 @@ public class PassportServiceImpl implements PassportService {
 
     private final PdfService pdfService;
 
-    private List<String> serials = new ArrayList<>();
+    private List<String> testSerials = new ArrayList<>();
 
-    public void createPassportsPdf() {
+    @Override
+    public byte[] createPassportsPdf(List<String> serials, String templateId, String date) {
         for (int i = 1; i < 20; i++) {
-            serials.add(i + "+number+" + i);
+            testSerials.add(i + "+number+" + i);
         }
+        serials=testSerials;
         String path =
-                "C:\\Users\\VeselovND\\git\\PTPassportProject\\document-processing\\document-processing\\src\\main\\resources\\file.docx";
+             //   "C:\\Users\\VeselovND\\git\\PTPassportProject\\document-processing\\document-processing\\src\\main\\resources\\file.docx";
         //  "/home/nikolay/git/PTPassportProject/document-processing/document-processing/src/main/resources/file.docx";
+        "C:\\Users\\Nikolay\\IdeaProjects\\TransducerPassportManagement\\passport-processing\\src\\main\\resources\\file.docx";
         Path file = Path.of(path);
-        InputStream inputStream = null;
+        InputStream inputStream;
         try {
             inputStream = Files.newInputStream(file);
         } catch (IOException e) {
-            log.error("Error occurred during opening inputstreams from .docx file");
+            log.error("Error occurred during opening input streams from .docx file");
             throw new DocxProcessingException(e.getMessage(), e);
         }
         byte[] sourceBytes = passportGeneratorService
                 .generatePassports(serials, inputStream, LocalDate.now().toString());
-        byte[] pdf = pdfService.createPdf(sourceBytes);
-        creatFile(pdf);
+        byte[] pdfBytes = pdfService.createPdf(sourceBytes);
+        creatFile(pdfBytes);
+        return pdfBytes;
     }
 
     private void creatFile(byte[] pdfBytes) {
-        OutputStream os = null;
+        OutputStream os;
         try {
             os = new FileOutputStream("sample.pdf");
             ByteArrayInputStream bais = new ByteArrayInputStream(pdfBytes);
