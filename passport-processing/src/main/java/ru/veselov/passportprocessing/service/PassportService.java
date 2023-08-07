@@ -1,8 +1,8 @@
 package ru.veselov.passportprocessing.service;
 
-import java.util.List;
+import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 
 public interface PassportService {
 
-    byte[] createPassportsPdf(List<String> serials, String templateId, String date);
+    byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto);
 }

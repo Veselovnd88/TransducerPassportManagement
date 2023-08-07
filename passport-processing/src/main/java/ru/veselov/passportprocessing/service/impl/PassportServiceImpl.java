@@ -2,23 +2,16 @@ package ru.veselov.passportprocessing.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.io.IOUtils;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import ru.veselov.passportprocessing.exception.DocxProcessingException;
+import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
 import ru.veselov.passportprocessing.service.PassportService;
 import ru.veselov.passportprocessing.service.PdfService;
 
-import java.io.ByteArrayInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.format.DateTimeFormatter;
 
 
 @Service
@@ -26,38 +19,33 @@ import java.util.List;
 @Slf4j
 public class PassportServiceImpl implements PassportService {
 
+    @Value("${}")
+    private String dateFormat;
+
     private final PassportGeneratorService passportGeneratorService;
 
     private final PdfService pdfService;
 
-    private List<String> testSerials = new ArrayList<>();
+    private final PassportTemplateService passportTemplateService;
 
     @Override
-    public byte[] createPassportsPdf(List<String> serials, String templateId, String date) {
-        for (int i = 1; i < 20; i++) {
-            testSerials.add(i + "+number+" + i);
-        }
-        serials=testSerials;
-        String path =
-                "C:\\Users\\VeselovND\\git\\PTPassportProject\\document-processing\\document-processing\\src\\main\\resources\\file.docx";
-        //  "/home/nikolay/git/PTPassportProject/document-processing/document-processing/src/main/resources/file.docx";
-        //  "C:\\Users\\Nikolay\\IdeaProjects\\TransducerPassportManagement\\passport-processing\\src\\main\\resources\\file.docx";
-        Path file = Path.of(path);
-        InputStream inputStream;
-        try {
-            inputStream = Files.newInputStream(file);
-        } catch (IOException e) {
-            log.error("Error occurred during opening input streams from .docx file");
-            throw new DocxProcessingException(e.getMessage(), e);
-        }
+    public byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
+        log.info("Starting process of generating passports");
+        InputStream templateInputStream = passportTemplateService.getTemplate(generatePassportsDto.getTemplateId());
         byte[] sourceBytes = passportGeneratorService
-                .generatePassports(serials, inputStream, LocalDate.now().toString());
-        byte[] pdfBytes = pdfService.createPdf(sourceBytes);
-        creatFile(pdfBytes);
-        return pdfBytes;
+                .generatePassports(
+                        generatePassportsDto.getSerials(),
+                        templateInputStream,
+                        getFormattedDate(generatePassportsDto.getDate()));
+        return pdfService.createPdf(sourceBytes);
     }
 
-    private void creatFile(byte[] pdfBytes) {
+    private String getFormattedDate(LocalDate localDate) {
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
+        return dateTimeFormatter.format(localDate);
+    }
+
+    /*private void creatFile(byte[] pdfBytes) {
         OutputStream os;
         try {
             os = new FileOutputStream("sample.pdf");
@@ -67,7 +55,7 @@ public class PassportServiceImpl implements PassportService {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
+    }*/
 
 
 }

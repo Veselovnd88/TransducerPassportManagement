@@ -12,7 +12,6 @@ import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlRuntimeException;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import org.springframework.stereotype.Service;
-import ru.veselov.passportprocessing.exception.DocToEditNotCreatedException;
 import ru.veselov.passportprocessing.exception.DocxProcessingException;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
 import ru.veselov.passportprocessing.service.PlaceholderProperties;
@@ -28,7 +27,7 @@ import java.util.List;
 @Slf4j
 public class PassportGeneratorServiceImpl implements PassportGeneratorService {
 
-    private static final String NUM_PREFIX = "Заводской номер: SN ";
+    private static final String NUM_PREFIX = "Заводской номер: SN ";//FIXME on ubuntu replace noy only placeholder
 
     private static final String DATE_PREFIX = "Дата изготовления: ";
 
@@ -82,7 +81,7 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
         if (i % 2 != 0 || (i == serials.size() - 1)) {
             CTBody mainBody = mainDoc.getDocument().getBody();
             if (docToEdit == null) {
-                throw new DocToEditNotCreatedException("Document to edit wasn't created for generating passport");
+                throw new DocxProcessingException("Document to edit wasn't created for generating passport");
             }
             CTBody bodyToAdd = docToEdit.getDocument().getBody();
             appendBody(mainBody, bodyToAdd);
