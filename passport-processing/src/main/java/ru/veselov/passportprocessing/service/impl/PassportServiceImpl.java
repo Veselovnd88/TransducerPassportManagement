@@ -39,9 +39,9 @@ public class PassportServiceImpl implements PassportService {
         }
         serials=testSerials;
         String path =
-             //   "C:\\Users\\VeselovND\\git\\PTPassportProject\\document-processing\\document-processing\\src\\main\\resources\\file.docx";
+                "C:\\Users\\VeselovND\\git\\PTPassportProject\\document-processing\\document-processing\\src\\main\\resources\\file.docx";
         //  "/home/nikolay/git/PTPassportProject/document-processing/document-processing/src/main/resources/file.docx";
-        "C:\\Users\\Nikolay\\IdeaProjects\\TransducerPassportManagement\\passport-processing\\src\\main\\resources\\file.docx";
+        //  "C:\\Users\\Nikolay\\IdeaProjects\\TransducerPassportManagement\\passport-processing\\src\\main\\resources\\file.docx";
         Path file = Path.of(path);
         InputStream inputStream;
         try {
