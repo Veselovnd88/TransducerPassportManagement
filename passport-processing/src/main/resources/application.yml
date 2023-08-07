@@ -5,11 +5,11 @@ placeholder:
   upper-serial: NUMBERUP
   bottom-serial: NUMBERDOWN
   date: DATE
-
+  date-format: "dd-MM-yyyy"
 pdf-service:
   url: "http://localhost:3000/forms/libreoffice/convert"
-  filename: "fileToConvert
-  "
+  filename: "fileToConvert"
+
 spring:
   application:
     name: passport

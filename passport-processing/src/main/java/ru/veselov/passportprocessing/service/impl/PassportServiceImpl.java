@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
 import ru.veselov.passportprocessing.service.PassportService;
+import ru.veselov.passportprocessing.service.PassportTemplateService;
 import ru.veselov.passportprocessing.service.PdfService;
 
 import java.io.InputStream;
@@ -19,7 +20,7 @@ import java.time.format.DateTimeFormatter;
 @Slf4j
 public class PassportServiceImpl implements PassportService {
 
-    @Value("${}")
+    @Value("${placeholder.date-format}")
     private String dateFormat;
 
     private final PassportGeneratorService passportGeneratorService;

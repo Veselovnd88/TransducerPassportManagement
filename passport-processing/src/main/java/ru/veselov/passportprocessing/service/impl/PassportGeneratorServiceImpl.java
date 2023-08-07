@@ -27,10 +27,6 @@ import java.util.List;
 @Slf4j
 public class PassportGeneratorServiceImpl implements PassportGeneratorService {
 
-    private static final String NUM_PREFIX = "Заводской номер: SN ";//FIXME on ubuntu replace noy only placeholder
-
-    private static final String DATE_PREFIX = "Дата изготовления: ";
-
     private final PlaceholderProperties placeholderProperties;
 
     @Override
@@ -107,24 +103,21 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
             if (run != null) {
                 String text = run.getText(0);
                 if (number % 2 == 0 && text != null && text.contains(placeholderProperties.getUpperSerial())) {
-                    replacePlaceHolder(run, placeholderProperties.getUpperSerial(),
-                            NUM_PREFIX + serials.get(number));
+                    replacePlaceHolder(run, placeholderProperties.getUpperSerial(), serials.get(number));
                 }
                 if (number % 2 != 0 && text != null && text.contains(placeholderProperties.getBottomSerial())) {
-                    replacePlaceHolder(run, placeholderProperties.getBottomSerial(),
-                            NUM_PREFIX + serials.get(number));
+                    replacePlaceHolder(run, placeholderProperties.getBottomSerial(), serials.get(number));
                 }
                 if (text != null && text.contains(placeholderProperties.getDate())) {
-                    replacePlaceHolder(run, placeholderProperties.getDate(),
-                            DATE_PREFIX + date + " г.");
+                    replacePlaceHolder(run, placeholderProperties.getDate(), date);
                 }
             }
         }
     }
 
     private void replacePlaceHolder(XWPFRun run, String placeHolder, String text) {
-        text = text.replace(placeHolder, text);
-        run.setText(text, 0);
+        String replacedText = text.replace(placeHolder, text);
+        run.setText(replacedText, 0);
     }
 
     //Method added body of second doc in the end of first

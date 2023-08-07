@@ -1,4 +1,4 @@
-package ru.veselov.passportprocessing.service.impl;
+package ru.veselov.passportprocessing.service;
 
 import java.io.InputStream;
 
