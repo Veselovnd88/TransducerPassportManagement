@@ -1,64 +1,70 @@
 plugins {
-	id 'java'
-	id 'org.springframework.boot' version '3.1.2'
-	id 'io.spring.dependency-management' version '1.1.2'
+    id 'java'
+    id 'org.springframework.boot' version '3.1.2'
+    id 'io.spring.dependency-management' version '1.1.2'
 }
 
 group = 'ru.veselov'
 version = '1.0-SNAPSHOT'
 
 java {
-	sourceCompatibility = '17'
+    sourceCompatibility = '17'
 }
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 ext {
-	set('springCloudVersion', "2022.0.4")
-	poi= "5.2.3"
+    set('springCloudVersion', "2022.0.4")
+    poi = "5.2.3"
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-actuator'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
-	implementation 'io.micrometer:micrometer-tracing-bridge-brave'
-	implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-	implementation 'org.liquibase:liquibase-core'
-	implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
-	implementation "org.apache.poi:poi-ooxml:${poi}"
-	implementation "org.apache.poi:poi:${poi}"
-	implementation 'commons-io:commons-io:2.13.0'
-    testImplementation 'org.projectlombok:lombok:1.18.22'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
+    implementation 'io.micrometer:micrometer-tracing-bridge-brave'
+    implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
+    implementation 'org.liquibase:liquibase-core'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation "org.apache.poi:poi-ooxml:${poi}"
+    implementation "org.apache.poi:poi:${poi}"
+    implementation 'commons-io:commons-io:2.13.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+   // implementation 'io.micrometer:micrometer-registry-prometheus:1.11.2'
+
 
     compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'org.postgresql:postgresql'
-	annotationProcessor 'org.projectlombok:lombok'
-	annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    runtimeOnly 'org.postgresql:postgresql'
+    annotationProcessor 'org.projectlombok:lombok'
+    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
 
-	testAnnotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
-	testImplementation 'org.projectlombok:lombok:1.18.22'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.projectlombok:lombok:1.18.22'
+    testImplementation 'com.squareup.okhttp3:okhttp:5.0.0-alpha.11'
+    testImplementation 'com.squareup.okhttp3:mockwebserver:5.0.0-alpha.11'
+
+
 }
 
 dependencyManagement {
-	imports {
-		mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
-	}
+    imports {
+        mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
+    }
 }
 
 tasks.named('test') {
-	useJUnitPlatform()
+    useJUnitPlatform()
 }

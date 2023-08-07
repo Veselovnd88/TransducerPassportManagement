@@ -117,6 +117,7 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
 
     private void replacePlaceHolder(XWPFRun run, String placeHolder, String text) {
         String replacedText = text.replace(placeHolder, text);
+        log.debug("Replacing [{}] for [{}]", run.text(), text);
         run.setText(replacedText, 0);
     }
 
