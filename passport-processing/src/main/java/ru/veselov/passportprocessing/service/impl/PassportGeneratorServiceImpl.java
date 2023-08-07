@@ -59,7 +59,7 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
             //Create baos for writing a doc, and then return ByteArray for sending as MultiPart file.
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             mainDoc.write(baos);
-            log.info("ByteArray successfully created");
+            log.info("Byte array of source .docx document successfully created");
             return baos.toByteArray();
         } catch (IOException | NotOfficeXmlFileException e) {
             log.error("Error occurred during opening processing input and output streams");

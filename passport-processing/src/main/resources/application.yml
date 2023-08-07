@@ -6,6 +6,10 @@ placeholder:
   bottom-serial: NUMBERDOWN
   date: DATE
 
+pdf-service:
+  url: "http://localhost:3000/forms/libreoffice/convert"
+  filename: "fileToConvert
+  "
 spring:
   application:
     name: passport

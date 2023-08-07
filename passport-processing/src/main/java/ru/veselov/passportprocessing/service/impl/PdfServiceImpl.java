@@ -2,6 +2,7 @@ package ru.veselov.passportprocessing.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -24,14 +25,22 @@ import java.io.InputStream;
 @RequiredArgsConstructor
 public class PdfServiceImpl implements PdfService {
 
+    public static final String CONTENT_DISPOSITION = "Content-Disposition";
+
+    @Value("${pdf-service.url}")
+    private String pdfConverterUrl;
+
+    @Value("${pdf-service.filename}")
+    private String filename;
+
     private final WebClient webClient = WebClient.create();
 
     @Override
     public byte[] createPdf(byte[] source) {
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-        bodyBuilder.part("file", source).header("Content-Disposition",
-                "form-data; name=file").filename("file.docx");
-        Mono<DataBuffer> dataBufferMono = webClient.post().uri("http://localhost:3000/forms/libreoffice/convert")
+        bodyBuilder.part("file", source)
+                .header(CONTENT_DISPOSITION, "form-data; name=" + filename).filename(filename + ".docx");
+        Mono<DataBuffer> dataBufferMono = webClient.post().uri(pdfConverterUrl)
                 .contentType(MediaType.MULTIPART_FORM_DATA)
                 .body(BodyInserters.fromMultipartData(bodyBuilder.build()))
                 .retrieve()
@@ -57,20 +66,27 @@ public class PdfServiceImpl implements PdfService {
                 .onErrorResume(WebClientRequestException.class::isInstance, e -> {
                     throw new ServiceUnavailableException("Pdf server is down: %s".formatted(e.getMessage()));
                 });
-
-
         DataBuffer pdfDatabuffer = dataBufferMono.block();
+        log.info("Document successfully converted to pdf");
+        return convertToByteArray(pdfDatabuffer);
+    }
+
+    private byte[] convertToByteArray(DataBuffer pdfDatabuffer) {
         if (pdfDatabuffer == null) {
-            throw new RuntimeException();
+            String errorMessage = "Pdf Service doesn't return correct byte array";
+            log.error(errorMessage);
+            throw new PdfProcessingException(errorMessage);
         }
-        InputStream pdfInputStream = pdfDatabuffer.asInputStream();
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
+        try (InputStream pdfInputStream = pdfDatabuffer.asInputStream();
+             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             pdfInputStream.transferTo(baos);
+            log.info("Pdf converted to byte array");
+            return baos.toByteArray();
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            String errorMessage = "Can't create byte array from pdf input stream";
+            log.error(errorMessage + ": " + e.getMessage());
+            throw new PdfProcessingException(errorMessage + ": " + e.getMessage());
         }
-        return baos.toByteArray();
     }
 
 }
