@@ -19,6 +19,7 @@ import ru.veselov.passportprocessing.service.PdfService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Service
 @Slf4j
@@ -66,6 +67,8 @@ public class PdfServiceImpl implements PdfService {
                 .onErrorResume(WebClientRequestException.class::isInstance, e -> {
                     throw new ServiceUnavailableException("Pdf server is down: %s".formatted(e.getMessage()));
                 });
+
+
         DataBuffer pdfDatabuffer = dataBufferMono.block();
         log.info("Document successfully converted to pdf");
         return convertToByteArray(pdfDatabuffer);

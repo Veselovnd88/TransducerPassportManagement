@@ -1,9 +1,8 @@
 package ru.veselov.passportprocessing.service.impl;
 
+import com.github.tomakehurst.wiremock.WireMockServer;
+import com.github.tomakehurst.wiremock.client.WireMock;
 import lombok.SneakyThrows;
-import mockwebserver3.MockWebServer;
-import mockwebserver3.RecordedRequest;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,37 +12,43 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 class PdfServiceImplTest {
 
-    public static MockWebServer mockPdfServer;
+    public static WireMockServer wireMockServer;
+
+    public static int PORT = 30001;
 
     public PdfServiceImpl pdfService;
+
+    private String pdfConverterUrl;
 
     @BeforeAll
     @SneakyThrows
     static void setUp() {
-        mockPdfServer = new MockWebServer();
-        mockPdfServer.start();
+        wireMockServer = new WireMockServer(PORT);
+        wireMockServer.start();
     }
 
     @AfterAll
     @SneakyThrows
     static void shutdown() {
-        mockPdfServer.shutdown();
+        wireMockServer.shutdown();
     }
 
     @BeforeEach
     void init() {
         WebClient webClient = WebClient.create();
-        String pdfConverterUrl = "http://localhost:%s".formatted(mockPdfServer.getPort());
+        pdfConverterUrl = "http://localhost:%d".formatted(PORT);
         pdfService = new PdfServiceImpl(webClient);
         ReflectionTestUtils.setField(pdfService, "pdfConverterUrl", pdfConverterUrl, String.class);
     }
 
     @Test
     @SneakyThrows
-    void shouldCallWebServer() {
+    void shouldCallPdfService() {
+        WireMock.configureFor("localhost", PORT);
+        WireMock.stubFor(WireMock.post("/")
+                .willReturn(WireMock.aResponse().withStatus(200).withBody(new byte[]{1, 2, 3, 4})));
         pdfService.createPdf(new byte[]{1, 2, 3, 4, 5});
-        RecordedRequest request = mockPdfServer.takeRequest();
-        Assertions.assertThat(request.getMethod()).isEqualTo("POST");
+        WireMock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo("/")));
     }
 
 }
