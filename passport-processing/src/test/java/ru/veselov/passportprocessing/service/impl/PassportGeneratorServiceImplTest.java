@@ -8,6 +8,7 @@ import org.apache.poi.xwpf.usermodel.XWPFRun;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ByteArrayResource;
 import ru.veselov.passportprocessing.exception.DocxProcessingException;
 import ru.veselov.passportprocessing.service.PlaceholderProperties;
 
@@ -36,8 +37,11 @@ class PassportGeneratorServiceImplTest {
     void shouldGenerateByteArrayWithReplacingOfPlaceholders() {
         //given
         InputStream templateInputStream = getClass().getClassLoader().getResourceAsStream("file.docx");
+        assert templateInputStream != null;
+        ByteArrayResource templateByteArrayResource = new ByteArrayResource(templateInputStream.readAllBytes());
+        templateInputStream.close();
         //when
-        byte[] bytes = passportGeneratorService.generatePassports(SERIALS, templateInputStream, LocalDate.now().toString());
+        byte[] bytes = passportGeneratorService.generatePassports(SERIALS, templateByteArrayResource, LocalDate.now().toString());
 
         //then
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
@@ -55,8 +59,9 @@ class PassportGeneratorServiceImplTest {
 
     @Test
     void shouldThrowDocxProcessingException() {
-        InputStream is = new ByteArrayInputStream(new byte[]{1, 2, 3, 4, 5});
-        Assertions.assertThatThrownBy(() -> passportGeneratorService.generatePassports(SERIALS, is, "15.01.2023")
+        ByteArrayResource templateByteArrayResource = new ByteArrayResource(new byte[]{1, 2, 3, 4, 5});
+        Assertions.assertThatThrownBy(() -> passportGeneratorService
+                .generatePassports(SERIALS, templateByteArrayResource, "15.01.2023")
         ).isInstanceOf(DocxProcessingException.class);
     }
 

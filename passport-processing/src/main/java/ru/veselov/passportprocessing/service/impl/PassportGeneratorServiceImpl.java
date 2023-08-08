@@ -11,12 +11,12 @@ import org.apache.xmlbeans.XmlException;
 import org.apache.xmlbeans.XmlOptions;
 import org.apache.xmlbeans.XmlRuntimeException;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import ru.veselov.passportprocessing.exception.DocxProcessingException;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
 import ru.veselov.passportprocessing.service.PlaceholderProperties;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,47 +30,44 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
     private final PlaceholderProperties placeholderProperties;
 
     @Override
-    public byte[] generatePassports(List<String> serials, InputStream templateInputStream, String date) {
+    public byte[] generatePassports(List<String> serials, ByteArrayResource templateByteArrayResource, String date) {
         log.info("Starting generate [{} passports] on [date {}]", serials.size(), date);
-        ByteArrayOutputStream templateOutputStream = getByteArrayOutputStream(templateInputStream);
-        try (XWPFDocument mainDoc = new XWPFDocument(new ByteArrayInputStream(templateOutputStream.toByteArray()))) {
-            //First time we load doc as template and change fields here for saving first page.
-            List<XWPFParagraph> pageOneParagraphs = getParagraphs(mainDoc);
-            //Every new page we load template, then replace placeholders and add to mainDoc.
-            XWPFDocument docToEdit = null;
-            for (int i = 0; i < serials.size(); i++) {
-                if (i < 2) {//first 2 serials added to first template page.
-                    replacePlaceholders(serials, date, pageOneParagraphs, i);
-                } else {
-                    if (i % 2 == 0) {//creating new template every 3rd serial.
-                        docToEdit = new XWPFDocument(new ByteArrayInputStream(templateOutputStream.toByteArray()));
+        try (InputStream templateInputStreamFirst = templateByteArrayResource.getInputStream()) {
+            try (XWPFDocument mainDoc = new XWPFDocument(templateInputStreamFirst)) {
+                //First time we load doc as template and change fields here for saving first page.
+                List<XWPFParagraph> pageOneParagraphs = getParagraphs(mainDoc);
+                //Every new page we load template, then replace placeholders and add to mainDoc.
+                XWPFDocument docToEdit = null;
+                for (int i = 0; i < serials.size(); i++) {
+                    if (i < 2) {//first 2 serials added to first template page.
+                        replacePlaceholders(serials, date, pageOneParagraphs, i);
+                    } else {
+                        if (i % 2 == 0) {//creating new template every 3rd serial.
+                            try (InputStream templateInputStreamNext = templateByteArrayResource.getInputStream()) {
+                                docToEdit = new XWPFDocument(templateInputStreamNext);
+                            }
+                        }
+                        //Replacing placeholders
+                        List<XWPFParagraph> paragraphsToEdit = getParagraphs(docToEdit);
+                        replacePlaceholders(serials, date, paragraphsToEdit, i);
+                        appendGeneratedPage(serials, mainDoc, docToEdit, i);
                     }
-                    //Replacing placeholders
-                    List<XWPFParagraph> paragraphsToEdit = getParagraphs(docToEdit);
-                    replacePlaceholders(serials, date, paragraphsToEdit, i);
-                    appendGeneratedPage(serials, mainDoc, docToEdit, i);
                 }
+                //Create baos for writing a doc, and then return ByteArray for sending as MultiPart file.
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                mainDoc.write(baos);
+                if (docToEdit != null) {
+                    docToEdit.close();
+                }
+                byte[] docBytes = baos.toByteArray();
+                baos.close();
+                log.info("Byte array of source .docx document successfully created");
+                return docBytes;
             }
-            //Create baos for writing a doc, and then return ByteArray for sending as MultiPart file.
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            mainDoc.write(baos);
-            log.info("Byte array of source .docx document successfully created");
-            return baos.toByteArray();
         } catch (IOException | NotOfficeXmlFileException e) {
             log.error("Error occurred during opening processing input and output streams");
             throw new DocxProcessingException(e.getMessage(), e);
         }
-    }
-
-    //Get baos for further creating InputStream for independent processing.
-    private ByteArrayOutputStream getByteArrayOutputStream(InputStream templateInputStream) {
-        ByteArrayOutputStream templateOutputStream = new ByteArrayOutputStream();
-        try {
-            templateInputStream.transferTo(templateOutputStream);
-        } catch (IOException e) {
-            throw new DocxProcessingException(e.getMessage(), e);
-        }
-        return templateOutputStream;
     }
 
     private void appendGeneratedPage(List<String> serials, XWPFDocument mainDoc, XWPFDocument docToEdit, int i) {
@@ -101,23 +98,24 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
     private void replacePlaceholdersInRuns(List<String> serials, String date, int number, List<XWPFRun> runs) {
         for (XWPFRun run : runs) {
             if (run != null) {
-                String text = run.getText(0);
-                if (number % 2 == 0 && text != null && text.contains(placeholderProperties.getUpperSerial())) {
+                String runText = run.getText(0);
+                if (number % 2 == 0 && runText != null && runText.contains(placeholderProperties.getUpperSerial())) {
                     replacePlaceHolder(run, placeholderProperties.getUpperSerial(), serials.get(number));
                 }
-                if (number % 2 != 0 && text != null && text.contains(placeholderProperties.getBottomSerial())) {
+                if (number % 2 != 0 && runText != null && runText.contains(placeholderProperties.getBottomSerial())) {
                     replacePlaceHolder(run, placeholderProperties.getBottomSerial(), serials.get(number));
                 }
-                if (text != null && text.contains(placeholderProperties.getDate())) {
+                if (runText != null && runText.contains(placeholderProperties.getDate())) {
                     replacePlaceHolder(run, placeholderProperties.getDate(), date);
                 }
             }
         }
     }
 
-    private void replacePlaceHolder(XWPFRun run, String placeHolder, String text) {
-        String replacedText = text.replace(placeHolder, text);
-        log.debug("Replacing [{}] for [{}]", run.text(), text);
+    private void replacePlaceHolder(XWPFRun run, String placeHolder, String newText) {
+        String runText = run.getText(0);
+        String replacedText = runText.replace(placeHolder, newText);
+        log.debug("Replacing [{}] for [{}]", run.text(), newText);
         run.setText(replacedText, 0);
     }
 

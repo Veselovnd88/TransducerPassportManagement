@@ -1,10 +1,11 @@
 package ru.veselov.passportprocessing.service;
 
-import java.io.InputStream;
+import org.springframework.core.io.ByteArrayResource;
+
 import java.util.List;
 
 public interface PassportGeneratorService {
 
-    byte[] generatePassports(List<String> serials, InputStream templateInputStream, String date);
+    byte[] generatePassports(List<String> serials, ByteArrayResource templateByteArrayResource, String date);
 
 }
