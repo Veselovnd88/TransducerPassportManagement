@@ -11,7 +11,6 @@ import ru.veselov.passportprocessing.service.PassportService;
 import ru.veselov.passportprocessing.service.PassportTemplateService;
 import ru.veselov.passportprocessing.service.PdfService;
 
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
@@ -33,7 +32,8 @@ public class PassportServiceImpl implements PassportService {
     @Override
     public byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
         log.info("Starting process of generating passports");
-        ByteArrayResource templateByteArrayResource = passportTemplateService.getTemplate(generatePassportsDto.getTemplateId());
+        ByteArrayResource templateByteArrayResource = passportTemplateService
+                .getTemplate(generatePassportsDto.getTemplateId());
         byte[] sourceBytes = passportGeneratorService
                 .generatePassports(
                         generatePassportsDto.getSerials(),

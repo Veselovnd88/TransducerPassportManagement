@@ -33,7 +33,7 @@ public class PdfServiceImpl implements PdfService {
     @Value("${pdf-service.filename}")
     private String filename;
 
-    private final WebClient webClient = WebClient.create();
+    private final WebClient webClient;
 
     @Override
     public byte[] createPdf(byte[] source) {
@@ -78,10 +78,10 @@ public class PdfServiceImpl implements PdfService {
             throw new PdfProcessingException(errorMessage);
         }
         try (InputStream pdfInputStream = pdfDatabuffer.asInputStream();
-             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            pdfInputStream.transferTo(baos);
+             ByteArrayOutputStream pdfOutputStream = new ByteArrayOutputStream()) {
+            pdfInputStream.transferTo(pdfOutputStream);
             log.info("Pdf converted to byte array");
-            return baos.toByteArray();
+            return pdfOutputStream.toByteArray();
         } catch (IOException e) {
             String errorMessage = "Can't create byte array from pdf input stream";
             log.error(errorMessage + ": " + e.getMessage());

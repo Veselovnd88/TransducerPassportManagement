@@ -31,7 +31,7 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
 
     @Override
     public byte[] generatePassports(List<String> serials, ByteArrayResource templateByteArrayResource, String date) {
-        log.info("Starting generate [{} passports] on [date {}]", serials.size(), date);
+        log.info("Starting generate [{} passports] at [date {}]", serials.size(), date);
         try (InputStream templateInputStreamFirst = templateByteArrayResource.getInputStream()) {
             try (XWPFDocument mainDoc = new XWPFDocument(templateInputStreamFirst)) {
                 //First time we load doc as template and change fields here for saving first page.
@@ -53,15 +53,15 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
                         appendGeneratedPage(serials, mainDoc, docToEdit, i);
                     }
                 }
-                //Create baos for writing a doc, and then return ByteArray for sending as MultiPart file.
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                mainDoc.write(baos);
-                if (docToEdit != null) {
+                //Create byte output for writing a doc, and then return ByteArray for sending as MultiPart file.
+                ByteArrayOutputStream generatedDocOutputStream = new ByteArrayOutputStream();
+                mainDoc.write(generatedDocOutputStream);
+                byte[] docBytes = generatedDocOutputStream.toByteArray();
+                if (docToEdit != null) {//closing opened resources
                     docToEdit.close();
                 }
-                byte[] docBytes = baos.toByteArray();
-                baos.close();
-                log.info("Byte array of source .docx document successfully created");
+                generatedDocOutputStream.close();
+                log.info("Byte array for generated .docx successfully created, [{} serials]", serials.size());
                 return docBytes;
             }
         } catch (IOException | NotOfficeXmlFileException e) {

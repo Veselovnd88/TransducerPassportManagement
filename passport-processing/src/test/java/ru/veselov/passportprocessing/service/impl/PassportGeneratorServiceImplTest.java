@@ -40,6 +40,7 @@ class PassportGeneratorServiceImplTest {
         assert templateInputStream != null;
         ByteArrayResource templateByteArrayResource = new ByteArrayResource(templateInputStream.readAllBytes());
         templateInputStream.close();
+
         //when
         byte[] bytes = passportGeneratorService.generatePassports(SERIALS, templateByteArrayResource, LocalDate.now().toString());
 
@@ -55,6 +56,9 @@ class PassportGeneratorServiceImplTest {
         List<XWPFParagraph> sourceParagraphs = getParagraphs(sourceDoc);
         int placeholdersCountSource = countPlaceholdersInDoc(sourceParagraphs);
         Assertions.assertThat(placeholdersCountSource).isEqualTo(4);
+        generatedDoc.close();
+        sourceDoc.close();
+        bais.close();
     }
 
     @Test
