@@ -8,11 +8,13 @@ import org.springframework.stereotype.Service;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
 import ru.veselov.passportprocessing.service.PassportService;
+import ru.veselov.passportprocessing.service.PassportStorageService;
 import ru.veselov.passportprocessing.service.PassportTemplateService;
 import ru.veselov.passportprocessing.service.PdfService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.concurrent.CompletableFuture;
 
 
 @Service
@@ -29,22 +31,32 @@ public class PassportServiceImpl implements PassportService {
 
     private final PassportTemplateService passportTemplateService;
 
+    private final PassportStorageService passportStorageService;
+
     @Override
     public byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
         log.info("Starting process of generating passports");
         ByteArrayResource templateByteArrayResource = passportTemplateService
-                .getTemplate(generatePassportsDto.getTemplateId());
+                .getTemplate(generatePassportsDto.getTemplateId().toString());
         byte[] sourceBytes = passportGeneratorService
                 .generatePassports(
                         generatePassportsDto.getSerials(),
                         templateByteArrayResource,
                         getFormattedDate(generatePassportsDto.getDate()));
-        return pdfService.createPdf(sourceBytes);
+
+        byte[] pdfBytes = pdfService.createPdf(sourceBytes);
+        saveJobResult(generatePassportsDto);
+        return pdfBytes;
     }
 
     private String getFormattedDate(LocalDate localDate) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
         return dateTimeFormatter.format(localDate);
+    }
+
+    private void saveJobResult(GeneratePassportsDto generatePassportsDto) {
+        log.info("Job for saving generated results launched");
+        CompletableFuture.supplyAsync(() -> passportStorageService.savePassports(generatePassportsDto));
     }
 
 }

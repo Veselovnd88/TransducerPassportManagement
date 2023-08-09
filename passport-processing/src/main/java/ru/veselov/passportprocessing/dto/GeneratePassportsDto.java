@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @Data
 @NoArgsConstructor
@@ -20,8 +21,9 @@ public class GeneratePassportsDto {
     private List<String> serials = new ArrayList<>();
 
     @NotNull
-    private String templateId;
+    private UUID templateId;
 
+    private String ptArt;
 
     private LocalDate date;
 
