@@ -56,3 +56,6 @@ management:
 logging:
   level:
     ru.veselov.passportprocessing: debug
+
+template:
+  stub: enabled

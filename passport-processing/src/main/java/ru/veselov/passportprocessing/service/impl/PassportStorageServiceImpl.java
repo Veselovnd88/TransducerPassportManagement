@@ -16,7 +16,6 @@ import java.util.concurrent.CompletableFuture;
 @Slf4j
 @RequiredArgsConstructor
 public class PassportStorageServiceImpl implements PassportStorageService {
-
     private final PassportRepository passportRepository;
 
     @Override

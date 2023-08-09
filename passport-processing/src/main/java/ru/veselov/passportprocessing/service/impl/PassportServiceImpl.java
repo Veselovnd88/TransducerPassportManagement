@@ -16,7 +16,6 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.CompletableFuture;
 
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -43,9 +42,8 @@ public class PassportServiceImpl implements PassportService {
                         generatePassportsDto.getSerials(),
                         templateByteArrayResource,
                         getFormattedDate(generatePassportsDto.getDate()));
-
         byte[] pdfBytes = pdfService.createPdf(sourceBytes);
-        saveJobResult(generatePassportsDto);
+        saveGeneratedResult(generatePassportsDto);
         return pdfBytes;
     }
 
@@ -54,8 +52,8 @@ public class PassportServiceImpl implements PassportService {
         return dateTimeFormatter.format(localDate);
     }
 
-    private void saveJobResult(GeneratePassportsDto generatePassportsDto) {
-        log.info("Job for saving generated results launched");
+    private void saveGeneratedResult(GeneratePassportsDto generatePassportsDto) {
+        log.info("Saving generated results");
         CompletableFuture.supplyAsync(() -> passportStorageService.savePassports(generatePassportsDto));
     }
 
