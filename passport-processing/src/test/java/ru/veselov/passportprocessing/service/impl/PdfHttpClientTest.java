@@ -2,10 +2,8 @@ package ru.veselov.passportprocessing.service.impl;
 
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import lombok.SneakyThrows;
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -14,6 +12,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import ru.veselov.passportprocessing.exception.PdfProcessingException;
 import ru.veselov.passportprocessing.exception.ServiceUnavailableException;
 
+@WireMockTest(httpPort = 30001)
 class PdfHttpClientTest {
 
     public static WireMockServer wireMockServer;
@@ -21,19 +20,6 @@ class PdfHttpClientTest {
     public static int PORT = 30001;
 
     public PdfHttpClientImpl pdfHttpClient;
-
-    @BeforeAll
-    @SneakyThrows
-    static void setUp() {
-        wireMockServer = new WireMockServer(PORT);
-        wireMockServer.start();
-    }
-
-    @AfterAll
-    @SneakyThrows
-    static void shutdown() {
-        wireMockServer.shutdown();
-    }
 
     @BeforeEach
     void init() {
