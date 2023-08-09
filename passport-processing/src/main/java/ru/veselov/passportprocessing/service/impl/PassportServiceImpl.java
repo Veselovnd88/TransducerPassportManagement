@@ -47,17 +47,4 @@ public class PassportServiceImpl implements PassportService {
         return dateTimeFormatter.format(localDate);
     }
 
-    /*private void creatFile(byte[] pdfBytes) {
-        OutputStream os;
-        try {
-            os = new FileOutputStream("sample.pdf");
-            ByteArrayInputStream bais = new ByteArrayInputStream(pdfBytes);
-            IOUtils.copy(bais, os);
-            os.close();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }*/
-
-
 }

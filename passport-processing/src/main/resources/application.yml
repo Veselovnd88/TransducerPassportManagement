@@ -13,6 +13,8 @@ pdf-service:
 spring:
   application:
     name: passport
+  cache:
+    cache-names: template
 
   datasource:
     url: jdbc:postgresql://localhost:5433/PtManagementDB
