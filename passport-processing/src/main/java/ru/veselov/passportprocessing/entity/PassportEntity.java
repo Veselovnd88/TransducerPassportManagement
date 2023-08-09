@@ -4,9 +4,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import java.time.LocalDate;
@@ -18,6 +22,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(exclude = {"id"})
 @ToString(exclude = {"id"})
+@NoArgsConstructor
 public class PassportEntity {
 
     @Id
@@ -35,9 +40,11 @@ public class PassportEntity {
     private String ptArt;
 
     @Column(name = "print_date")
+    @Temporal(TemporalType.DATE)
     private LocalDate printDate;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
+    @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
     public PassportEntity(UUID templateId, String serial, String ptArt, LocalDate printDate) {
@@ -46,4 +53,10 @@ public class PassportEntity {
         this.ptArt = ptArt;
         this.printDate = printDate;
     }
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = LocalDateTime.now();
+    }
+
 }
