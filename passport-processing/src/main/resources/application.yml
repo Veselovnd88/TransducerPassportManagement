@@ -5,7 +5,7 @@ placeholder:
   upper-serial: NUMBERUP
   bottom-serial: NUMBERDOWN
   date: DATE
-  date-format: "dd-MM-yyyy"
+  date-format: "dd.MM.yyyy"
 
 task-executor:
   core-pool-size: 10

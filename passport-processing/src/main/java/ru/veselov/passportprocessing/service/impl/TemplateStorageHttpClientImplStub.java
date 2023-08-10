@@ -25,8 +25,9 @@ public class TemplateStorageHttpClientImplStub implements TemplateStorageHttpCli
     @Override
     public ByteArrayResource sendRequestToGetTemplate(String templateId) {
         String path =
-                "C:\\Users\\VeselovND\\git\\TransducerPassportManagement\\passport-processing\\src\\main\\resources\\file-temp.docx";
-        // "/home/nikolay/git/PTPassportProject/document-processing/document-processing/src/main/resources/file-temp.docx";
+        // "C:\\Users\\VeselovND\\git\\TransducerPassportManagement\\passport-processing\\src\\main\\resources\\file-temp.docx";
+                "C:\\Users\\VeselovND\\git\\TransducerPassportManagement\\passport-processing\\src\\main\\resources\\803751 10.0 1 бар М20 2РМД.docx";
+                // "/home/nikolay/git/PTPassportProject/document-processing/document-processing/src/main/resources/file-temp.docx";
         //  "C:\\Users\\Nikolay\\IdeaProjects\\TransducerPassportManagement\\passport-processing\\src\\main\\resources\\file-temp.docx";
         Path file = Path.of(path);
         try {

@@ -36,7 +36,7 @@ public class PassportServiceImpl implements PassportService {
     public byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
         log.info("Starting process of generating passports");
         ByteArrayResource templateByteArrayResource = passportTemplateService
-                .getTemplate(generatePassportsDto.getTemplateId().toString());
+                .getTemplate(generatePassportsDto.getTemplateId());
         byte[] sourceBytes = passportGeneratorService
                 .generatePassports(
                         generatePassportsDto.getSerials(),
