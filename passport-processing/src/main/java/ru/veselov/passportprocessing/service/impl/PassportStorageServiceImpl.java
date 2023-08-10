@@ -10,6 +10,7 @@ import ru.veselov.passportprocessing.repository.PassportRepository;
 import ru.veselov.passportprocessing.service.PassportStorageService;
 
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 
 @Service
@@ -22,7 +23,7 @@ public class PassportStorageServiceImpl implements PassportStorageService {
     @Async("taskExecutor")
     public CompletableFuture<List<PassportEntity>> savePassports(GeneratePassportsDto generatePassportsDto) {
         List<PassportEntity> passportsToSave = generatePassportsDto.getSerials().stream().map(serial ->
-                new PassportEntity(generatePassportsDto.getTemplateId(),
+                new PassportEntity(UUID.fromString(generatePassportsDto.getTemplateId()),
                         serial,
                         generatePassportsDto.getPtArt(),
                         generatePassportsDto.getDate()

@@ -2,15 +2,17 @@ package ru.veselov.passportprocessing.exception.error;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor
-public class ApiErrorResponse {
+public class ViolationError implements Serializable {
 
-    private ErrorCode errorCode;
+    private String fieldName;
 
     private String message;
+
+    private String currentValue;
 
 }

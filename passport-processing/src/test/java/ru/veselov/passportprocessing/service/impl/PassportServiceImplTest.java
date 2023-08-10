@@ -59,7 +59,7 @@ class PassportServiceImplTest {
     @Test
     void shouldCallServicesForReturningByteArray() {
         GeneratePassportsDto generatePassportsDto = new GeneratePassportsDto(
-                SERIALS, UUID.randomUUID(), PT_ART, DATE
+                SERIALS, UUID.randomUUID().toString(), PT_ART, DATE
         );
         ByteArrayResource byteArrayResource = new ByteArrayResource(SOURCE);
         Mockito.when(passportTemplateService.getTemplate(ArgumentMatchers.anyString()))
