@@ -1,1 +1,25 @@
+server:
+  port: 8083
 
+spring:
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      routes:
+        - id: passport
+          uri: lb://PASSPORT
+          predicates:
+            - Path=/api/v1/passport/**
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
