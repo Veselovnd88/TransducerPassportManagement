@@ -14,7 +14,6 @@ services:
     networks:
       - postgres
     volumes:
-      - /var/docker-volumes/docker-postgresql-multiple-databases:/docker-entrypoint-initdb.d
       - /var/docker-volumes/pg-pt-management-ps:/var/lib/postgresql/data/
 
   pdfConverter:
