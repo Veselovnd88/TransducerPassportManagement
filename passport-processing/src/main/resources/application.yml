@@ -36,9 +36,7 @@ spring:
         format_sql: false
         hbm2ddl:
           auto: validate
-  liquibase:
-    enabled: true
-    change-log: db/changelog/db.changelog-master.yaml
+
 
 eureka:
   client:
