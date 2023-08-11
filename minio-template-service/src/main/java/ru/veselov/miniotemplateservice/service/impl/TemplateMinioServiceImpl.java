@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import ru.veselov.miniotemplateservice.exception.MinioException;
-import ru.veselov.miniotemplateservice.service.TemplateService;
+import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -24,7 +24,7 @@ import java.security.NoSuchAlgorithmException;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class TemplateServiceImpl implements TemplateService {
+public class TemplateMinioServiceImpl implements TemplateMinioService {
 
     @Value("${minio.bucket-name}")
     private String bucketName;

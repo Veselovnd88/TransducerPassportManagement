@@ -12,6 +12,6 @@ create table passport
     print_date    DATE    NOT NULL,
     created_at    TIMESTAMP without time zone DEFAULT CURRENT_TIMESTAMP,
 
-    CONSTRAINT passport_pk PRIMARY KEY (id)
+    CONSTRAINT template_pk PRIMARY KEY (id)
 )
     GO
