@@ -36,6 +36,8 @@ dependencies {
 	implementation 'com.github.ben-manes.caffeine:caffeine:3.1.7'
 	implementation 'io.minio:minio:8.5.4'
 
+	implementation project(':liquibase-migration')
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
