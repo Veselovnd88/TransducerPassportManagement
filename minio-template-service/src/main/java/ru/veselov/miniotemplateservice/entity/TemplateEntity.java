@@ -31,6 +31,9 @@ public class TemplateEntity {
     @Column(name = "pt_art", nullable = false)
     private String ptArt;
 
+    @Column(name = "template_name", nullable = false, unique = true)
+    private String templateName;
+
     @Column(name = "filename", nullable = false)
     private String filename;
 
