@@ -9,6 +9,9 @@ import lombok.NoArgsConstructor;
 public class TemplateDto {
 
     @NotNull
+    private String filename;
+
+    @NotNull
     private String ptArt;
 
     @NotNull
