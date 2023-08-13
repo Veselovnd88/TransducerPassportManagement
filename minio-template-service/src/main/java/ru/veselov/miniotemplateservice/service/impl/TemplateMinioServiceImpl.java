@@ -13,9 +13,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import ru.veselov.miniotemplateservice.dto.TemplateDto;
 import ru.veselov.miniotemplateservice.exception.MinioException;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
+import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -31,6 +34,8 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
 
     private final MinioClient minioClient;
 
+    private final TemplateValidator templateValidator;
+
     @Override
     public ByteArrayResource getTemplateByName(String name) {
         GetObjectArgs objectArgs = GetObjectArgs.builder().bucket(bucketName).object(name).build();
@@ -43,5 +48,11 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
                  InternalException e) {
             throw new MinioException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void saveTemplate(Resource resource, TemplateDto templateInfo) {
+        templateValidator.validateFileExtension(resource.getFilename());
+        log.info("Template saved");
     }
 }

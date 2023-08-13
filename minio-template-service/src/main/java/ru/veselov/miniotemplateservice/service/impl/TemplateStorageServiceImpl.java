@@ -9,6 +9,7 @@ import ru.veselov.miniotemplateservice.mapper.TemplateMapper;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.repository.TemplateRepository;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
+import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
 @Service
 @RequiredArgsConstructor
@@ -20,10 +21,14 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
 
     private final TemplateMapper templateMapper;
 
+    private final TemplateValidator templateValidator;
+
     @Override
     @Transactional
     public void saveTemplate(Template template) {
+        templateValidator.validateTemplateName(template.getTemplateName());
         TemplateEntity templateEntity = templateMapper.toEntity(template);
+
         templateRepository.save(templateEntity);
     }
 

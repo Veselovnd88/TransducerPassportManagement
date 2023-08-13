@@ -2,6 +2,8 @@ package ru.veselov.miniotemplateservice.validator;
 
 public interface TemplateValidator {
 
-    void validateFilename(String filename);
+    void validateTemplateName(String templateName);
+
+    void validateFileExtension(String filename);
 
 }

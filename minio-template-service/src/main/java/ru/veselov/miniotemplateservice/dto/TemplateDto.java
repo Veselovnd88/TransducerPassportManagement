@@ -8,8 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TemplateDto {
 
-    @NotNull
-    private String filename;
+    private String templateName;
 
     @NotNull
     private String ptArt;

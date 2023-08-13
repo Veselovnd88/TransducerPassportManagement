@@ -12,6 +12,8 @@ public class Template {
 
     private String ptArt;
 
+    private String templateName;
+
     private String filename;
 
     private String bucket;
