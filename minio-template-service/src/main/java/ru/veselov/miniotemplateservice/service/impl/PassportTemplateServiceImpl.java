@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.miniotemplateservice.dto.TemplateDto;
+import ru.veselov.miniotemplateservice.mapper.TemplateMapper;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.PassportTemplateService;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
@@ -23,26 +24,20 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
 
     private final TemplateStorageService templateStorageService;
 
+    private final TemplateMapper templateMapper;
+
     @Override
     @Transactional
     public void saveTemplate(MultipartFile file, TemplateDto templateInfo) {
         Resource resource = file.getResource();
-        Template template = convertToTemplateModel(templateInfo);
+        Template template = templateMapper.dtoToTemplate(templateInfo);
+        template.setFilename(generateFileName(templateInfo));
         templateMinioService.saveTemplate(resource, template);
         templateStorageService.saveTemplate(template);
-    }
-
-
-    private Template convertToTemplateModel(TemplateDto templateDto) {
-        Template template = new Template();
-        template.setTemplateName(templateDto.getTemplateName());
-        template.setBucket(templateDto.getBucket());
-        template.setPtArt(templateDto.getPtArt());
-        template.setFilename(generateFileName(templateDto));
-        return template;
     }
 
     private String generateFileName(TemplateDto templateDto) {
         return templateDto.getPtArt() + "-" + templateDto.getTemplateName() + FILE_EXT;
     }
+
 }
