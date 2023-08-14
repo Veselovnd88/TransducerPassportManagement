@@ -35,8 +35,8 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
     private final MinioClient minioClient;
 
     @Override
-    public ByteArrayResource getTemplateByName(String name) {
-        GetObjectArgs objectArgs = GetObjectArgs.builder().bucket(bucketName).object(name).build();
+    public ByteArrayResource getTemplateByName(String filename) {
+        GetObjectArgs objectArgs = GetObjectArgs.builder().bucket(bucketName).object(filename).build();
         try {
             GetObjectResponse object = minioClient.getObject(objectArgs);
             byte[] bytes = object.readAllBytes();
@@ -65,4 +65,5 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
         log.info("Template saved to MinIO storage: [bucket:{}, filename:{}]",
                 template.getBucket(), template.getFilename());
     }
+
 }

@@ -1,6 +1,7 @@
 package ru.veselov.miniotemplateservice.service.impl;
 
 import jakarta.persistence.EntityExistsException;
+import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
 import org.instancio.Select;
@@ -22,10 +23,15 @@ import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.repository.TemplateRepository;
 import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
+import java.util.Optional;
+import java.util.UUID;
+
 @ExtendWith(MockitoExtension.class)
 class TemplateStorageServiceImplTest {
 
     public static final String BUCKET = "templates";
+
+    public static final UUID ID = UUID.randomUUID();
 
     @Mock
     TemplateRepository templateRepository;
@@ -77,6 +83,26 @@ class TemplateStorageServiceImplTest {
                 .isInstanceOf(EntityExistsException.class);
 
         Mockito.verify(templateRepository, Mockito.never()).save(templateArgumentCaptor.capture());
+    }
+
+    @Test
+    void shouldFindTemplateById() {
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setId(ID);
+        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.of(templateEntity));
+
+        TemplateEntity foundTemplateEntity = templateStorageService.findTemplateById(ID);
+
+        Mockito.verify(templateRepository, Mockito.times(1)).findById(ID);
+        Assertions.assertThat(foundTemplateEntity.getId()).isEqualTo(ID);
+    }
+
+    @Test
+    void shouldThrowNotFoundException() {
+        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> templateStorageService.findTemplateById(ID))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
 }

@@ -13,6 +13,7 @@ public interface TemplateMapper {
     TemplateEntity toEntity(Template template);
 
     @Mapping(target = "filename", ignore = true)
+    @Mapping(target = "templateName", ignore = true)
     Template dtoToTemplate(TemplateDto templateDto);
 
 }

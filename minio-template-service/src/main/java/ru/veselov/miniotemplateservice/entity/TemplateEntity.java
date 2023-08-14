@@ -34,7 +34,7 @@ public class TemplateEntity {
     @Column(name = "template_name", nullable = false, unique = true)
     private String templateName;
 
-    @Column(name = "filename", nullable = false)
+    @Column(name = "filename", nullable = false, unique = true)
     private String filename;
 
     @Column(name = "bucket", nullable = false)

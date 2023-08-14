@@ -1,5 +1,6 @@
 package ru.veselov.miniotemplateservice.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +11,9 @@ import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.repository.TemplateRepository;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
 import ru.veselov.miniotemplateservice.validator.TemplateValidator;
+
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +33,16 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
         templateValidator.validateTemplateName(template.getTemplateName());
         TemplateEntity templateEntity = templateMapper.toEntity(template);
         templateRepository.save(templateEntity);
+        log.info("New [template:art-{}, name-{}] saved to repo", template.getPtArt(), template.getTemplateName());
+    }
+
+    @Override
+    public TemplateEntity findTemplateById(UUID templateId) {//TODO TESTME
+        Optional<TemplateEntity> optionalTemplate = templateRepository.findById(templateId);
+        return optionalTemplate.orElseThrow(() -> {
+            log.error("Template with [id: {}] not found", templateId);
+            throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));
+        });
     }
 
 }

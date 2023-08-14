@@ -2,6 +2,7 @@ package ru.veselov.miniotemplateservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.UUID;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -17,22 +18,19 @@ import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.miniotemplateservice.annotation.Docx;
 import ru.veselov.miniotemplateservice.dto.TemplateDto;
 import ru.veselov.miniotemplateservice.service.PassportTemplateService;
-import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 
 @RestController
 @RequestMapping("api/v1/template")
 @Validated
 @RequiredArgsConstructor
 public class TemplateController {
-
-    private final TemplateMinioService templateMinioService;
-
+    //TODO TEST ALL
     private final PassportTemplateService passportTemplateService;
 
-    @GetMapping(value = "/{templateId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
-    public ResponseEntity<byte[]> getTemplate(@PathVariable("templateId") String templateId) {
-        ByteArrayResource templateByName = templateMinioService.getTemplateByName(templateId + ".docx");//FIXME
-        return new ResponseEntity<>(templateByName.getByteArray(), HttpStatus.OK);
+    @GetMapping(value = "/source/{templateId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    public ResponseEntity<byte[]> getTemplateSource(@PathVariable("templateId") @UUID String templateId) {
+        ByteArrayResource template = passportTemplateService.getTemplate(templateId);
+        return new ResponseEntity<>(template.getByteArray(), HttpStatus.OK);
     }
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)

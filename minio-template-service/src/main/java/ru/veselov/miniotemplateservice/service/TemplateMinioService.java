@@ -6,7 +6,7 @@ import ru.veselov.miniotemplateservice.model.Template;
 
 public interface TemplateMinioService {
 
-    ByteArrayResource getTemplateByName(String name);
+    ByteArrayResource getTemplateByName(String filename);
 
     void saveTemplate(Resource resource, Template template);
 
