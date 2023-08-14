@@ -44,7 +44,7 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     }
 
     @Override
-    public ByteArrayResource getTemplate(String templateId) {//TODO TESTME
+    public ByteArrayResource getTemplate(String templateId) {
         UUID templateUUID = UUID.fromString(templateId);
         TemplateEntity templateById = templateStorageService.findTemplateById(templateUUID);
         log.info("Information for [template: {}] retrieved from DB", templateById);

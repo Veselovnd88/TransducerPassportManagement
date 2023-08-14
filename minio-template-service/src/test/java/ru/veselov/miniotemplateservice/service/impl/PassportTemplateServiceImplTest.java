@@ -1,5 +1,6 @@
 package ru.veselov.miniotemplateservice.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,18 +12,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.miniotemplateservice.dto.TemplateDto;
+import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapper;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapperImpl;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
 
+import java.util.UUID;
+
 @ExtendWith(MockitoExtension.class)
 class PassportTemplateServiceImplTest {
+
+    private static final byte[] BYTES = new byte[]{1, 2, 3};
 
     @Mock
     TemplateMinioService templateMinioService;
@@ -43,7 +50,7 @@ class PassportTemplateServiceImplTest {
     }
 
     @Test
-    void shouldCallServices() {
+    void shouldCallServicesToSave() {
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
                 MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
         TemplateDto templateDto = new TemplateDto("name", "801877", "templates");
@@ -55,6 +62,36 @@ class PassportTemplateServiceImplTest {
                 .saveTemplate(ArgumentMatchers.any(), templateArgumentCaptor.capture());
         Template captured = templateArgumentCaptor.getValue();
         Assertions.assertThat(captured.getFilename()).isEqualTo("801877-name.docx");
+    }
+
+    @Test
+    void shouldCallServicesToGetTemplate() {
+        UUID id = UUID.randomUUID();
+        String filename = "filename";
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setId(id);
+        templateEntity.setFilename(filename);
+        ByteArrayResource byteArrayResource = new ByteArrayResource(BYTES);
+        Mockito.when(templateStorageService.findTemplateById(id)).thenReturn(templateEntity);
+        Mockito.when(templateMinioService.getTemplateByName(filename)).thenReturn(byteArrayResource);
+
+        ByteArrayResource sourceBytes = passportTemplateService.getTemplate(id.toString());
+
+        Mockito.verify(templateStorageService, Mockito.times(1)).findTemplateById(id);
+        Mockito.verify(templateMinioService, Mockito.times(1)).getTemplateByName(filename);
+        Assertions.assertThat(sourceBytes.getByteArray()).isEqualTo(BYTES);
+    }
+
+    @Test
+    void shouldNotGetTemplateIfNoDataInDB() {
+        UUID id = UUID.randomUUID();
+        String idString = id.toString();
+        Mockito.doThrow(EntityNotFoundException.class).when(templateStorageService).findTemplateById(id);
+
+        Assertions.assertThatThrownBy(() -> passportTemplateService.getTemplate(idString))
+                .isInstanceOf(EntityNotFoundException.class);
+
+        Mockito.verify(templateMinioService, Mockito.never()).getTemplateByName(ArgumentMatchers.anyString());
     }
 
 }

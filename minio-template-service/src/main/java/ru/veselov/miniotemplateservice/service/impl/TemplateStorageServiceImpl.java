@@ -37,7 +37,7 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
     }
 
     @Override
-    public TemplateEntity findTemplateById(UUID templateId) {//TODO TESTME
+    public TemplateEntity findTemplateById(UUID templateId) {
         Optional<TemplateEntity> optionalTemplate = templateRepository.findById(templateId);
         return optionalTemplate.orElseThrow(() -> {
             log.error("Template with [id: {}] not found", templateId);
