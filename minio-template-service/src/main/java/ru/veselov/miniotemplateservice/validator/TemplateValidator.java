@@ -4,6 +4,4 @@ public interface TemplateValidator {
 
     void validateTemplateName(String templateName);
 
-    void validateFileExtension(String filename);
-
 }

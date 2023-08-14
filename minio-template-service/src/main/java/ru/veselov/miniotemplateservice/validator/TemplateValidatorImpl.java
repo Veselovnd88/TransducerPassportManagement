@@ -5,7 +5,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import ru.veselov.miniotemplateservice.entity.TemplateEntity;
-import ru.veselov.miniotemplateservice.exception.WrongFileExtensionException;
 import ru.veselov.miniotemplateservice.repository.TemplateRepository;
 
 import java.util.Optional;
@@ -14,8 +13,6 @@ import java.util.Optional;
 @RequiredArgsConstructor
 @Slf4j
 public class TemplateValidatorImpl implements TemplateValidator {
-
-    private static final String FILE_EXT = ".docx";
 
     private final TemplateRepository templateRepository;
 
@@ -28,11 +25,4 @@ public class TemplateValidatorImpl implements TemplateValidator {
         }
     }
 
-    @Override
-    public void validateFileExtension(String filename) {
-        if (!filename.toLowerCase().endsWith(FILE_EXT)) {
-            log.error("File has no [{}] extension", FILE_EXT);
-            throw new WrongFileExtensionException("File has no %s extension".formatted(FILE_EXT));
-        }
-    }
 }

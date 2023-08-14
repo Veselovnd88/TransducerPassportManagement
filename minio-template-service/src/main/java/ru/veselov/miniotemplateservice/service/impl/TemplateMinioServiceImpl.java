@@ -34,8 +34,6 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
 
     private final MinioClient minioClient;
 
-    private final TemplateValidator templateValidator;
-
     @Override
     public ByteArrayResource getTemplateByName(String name) {
         GetObjectArgs objectArgs = GetObjectArgs.builder().bucket(bucketName).object(name).build();
@@ -52,7 +50,6 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
 
     @Override
     public void saveTemplate(Resource resource, TemplateDto templateInfo) {
-        templateValidator.validateFileExtension(resource.getFilename());
         log.info("Template saved");
     }
 }
