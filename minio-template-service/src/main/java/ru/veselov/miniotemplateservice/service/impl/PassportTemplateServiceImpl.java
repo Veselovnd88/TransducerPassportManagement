@@ -27,8 +27,9 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     @Transactional
     public void saveTemplate(MultipartFile file, TemplateDto templateInfo) {
         Resource resource = file.getResource();
-        templateMinioService.saveTemplate(resource, templateInfo);
-        templateStorageService.saveTemplate(convertToTemplateModel(templateInfo));
+        Template template = convertToTemplateModel(templateInfo);
+        templateMinioService.saveTemplate(resource, template);
+        templateStorageService.saveTemplate(template);
     }
 
 
