@@ -24,7 +24,7 @@ import ru.veselov.miniotemplateservice.service.PassportTemplateService;
 @Validated
 @RequiredArgsConstructor
 public class TemplateController {
-    //TODO TEST ALL
+
     private final PassportTemplateService passportTemplateService;
 
     @GetMapping(value = "/source/{templateId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
