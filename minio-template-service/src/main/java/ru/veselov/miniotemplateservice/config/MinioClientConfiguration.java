@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.event.EventListener;
-import ru.veselov.miniotemplateservice.exception.MinioException;
+import ru.veselov.miniotemplateservice.exception.CommonMinioException;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -48,7 +48,7 @@ public class MinioClientConfiguration {
                  InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException |
                  XmlParserException e) {
             log.error("Error during MinIO client constructing caused [{}]", e.getMessage());
-            throw new MinioException(e.getMessage(), e);
+            throw new CommonMinioException(e.getMessage(), e);
         }
     }
 

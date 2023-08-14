@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import ru.veselov.miniotemplateservice.exception.MinioException;
+import ru.veselov.miniotemplateservice.exception.CommonMinioException;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 
@@ -44,7 +44,7 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
         } catch (ErrorResponseException | InvalidKeyException | InvalidResponseException | IOException |
                  NoSuchAlgorithmException | ServerException | XmlParserException | InsufficientDataException |
                  InternalException e) {
-            throw new MinioException(e.getMessage(), e);
+            throw new CommonMinioException(e.getMessage(), e);
         }
     }
 
@@ -60,7 +60,7 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
                  InvalidKeyException | InvalidResponseException | NoSuchAlgorithmException | ServerException |
                  XmlParserException e) {
             log.error("Error with minio occurred during saving: {}", e.getMessage());
-            throw new MinioException(e.getMessage(), e);
+            throw new CommonMinioException(e.getMessage(), e);
         }
         log.info("Template saved to MinIO storage: [bucket:{}, filename:{}]",
                 template.getBucket(), template.getFilename());
