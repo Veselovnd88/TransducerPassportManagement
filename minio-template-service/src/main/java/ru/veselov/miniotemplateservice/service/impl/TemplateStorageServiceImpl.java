@@ -28,7 +28,6 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
     public void saveTemplate(Template template) {
         templateValidator.validateTemplateName(template.getTemplateName());
         TemplateEntity templateEntity = templateMapper.toEntity(template);
-
         templateRepository.save(templateEntity);
     }
 
