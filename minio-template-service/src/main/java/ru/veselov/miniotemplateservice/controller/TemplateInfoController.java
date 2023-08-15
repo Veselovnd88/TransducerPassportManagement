@@ -20,7 +20,7 @@ public class TemplateInfoController {
 
     private final TemplateStorageService templateStorageService;
 
-    @GetMapping("/info/{templateId}")
+    @GetMapping("/{templateId}")
     public ResponseEntity<Template> getTemplateInfo(@PathVariable("templateId") @UUID String templateId) {
         Template foundTemplate = templateStorageService.findTemplateById(templateId);
         return new ResponseEntity<>(foundTemplate, HttpStatus.OK);
