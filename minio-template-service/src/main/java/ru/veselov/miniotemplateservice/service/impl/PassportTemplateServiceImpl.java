@@ -13,6 +13,9 @@ import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.PassportTemplateService;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
+import ru.veselov.miniotemplateservice.validator.TemplateValidator;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -25,11 +28,14 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
 
     private final TemplateStorageService templateStorageService;
 
+    private final TemplateValidator templateValidator;
+
     private final TemplateMapper templateMapper;
 
     @Override
     @Transactional
     public void saveTemplate(MultipartFile file, TemplateDto templateInfo) {
+        templateValidator.validateTemplateName(generateTemplateName(templateInfo));
         Resource resource = file.getResource();
         Template template = templateMapper.dtoToTemplate(templateInfo);
         template.setTemplateName(generateTemplateName(templateInfo));
@@ -46,6 +52,15 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
         ByteArrayResource templateBytes = templateMinioService.getTemplateByName(templateById.getFilename());
         log.info("Template source bytes with [id: {}] retrieved from storage", templateId);
         return templateBytes;
+    }
+
+    @Override
+    @Transactional
+    public void updateTemplate(MultipartFile file, String templateId) {
+        Template templateToUpdate = templateStorageService.findTemplateById(templateId);
+        templateMinioService.updateTemplate(file.getResource(), templateToUpdate);
+        templateToUpdate.setEditedAt(LocalDateTime.now());
+        templateStorageService.saveTemplate(templateToUpdate);
     }
 
 

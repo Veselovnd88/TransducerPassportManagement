@@ -10,4 +10,6 @@ public interface PassportTemplateService {
 
     ByteArrayResource getTemplate(String templateId);
 
+    void updateTemplate(MultipartFile file, String templateId);
+
 }

@@ -4,6 +4,7 @@ import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.miniotemplateservice.exception.CommonMinioException;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
@@ -59,11 +61,31 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
         } catch (IOException | ErrorResponseException | InsufficientDataException | InternalException |
                  InvalidKeyException | InvalidResponseException | NoSuchAlgorithmException | ServerException |
                  XmlParserException e) {
-            log.error("Error with minio occurred during saving: {}", e.getMessage());
+            log.error("Error with minio occurred during [saving: {}]", e.getMessage());
             throw new CommonMinioException(e.getMessage(), e);
         }
-        log.info("Template saved to MinIO storage: [bucket:{}, filename:{}]",
+        log.info("Template saved to MinIO storage: [bucket: {}, filename: {}]",
                 template.getBucket(), template.getFilename());
+    }
+
+    @Override
+    @Transactional
+    public void updateTemplate(Resource resource, Template template) {
+        RemoveObjectArgs removeObjectArgs = RemoveObjectArgs.builder().bucket(bucketName).object(template.getFilename())
+                .build();
+        try {
+            minioClient.removeObject(removeObjectArgs);
+            log.info("Template deleted from MinIO storage: [bucket: {}, filename: {}]",
+                    template.getBucket(), template.getFilename());
+            saveTemplate(resource, template);
+            log.info("Template successfully updated in MinIO storage: [bucket: {}, filename: {}]",
+                    template.getBucket(), template.getFilename());
+        } catch (ErrorResponseException | InsufficientDataException | InvalidResponseException | InternalException |
+                 InvalidKeyException | IOException | ServerException | NoSuchAlgorithmException |
+                 XmlParserException e) {
+            log.error("Error with minio occurred during [updating: {}]", e.getMessage());
+            throw new CommonMinioException(e.getMessage(), e);
+        }
     }
 
 }

@@ -10,4 +10,6 @@ public interface TemplateMinioService {
 
     void saveTemplate(Resource resource, Template template);
 
+    void updateTemplate(Resource resource, Template template);
+
 }

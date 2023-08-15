@@ -18,7 +18,6 @@ import ru.veselov.miniotemplateservice.mapper.TemplateMapper;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.repository.TemplateRepository;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
-import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
 import java.util.List;
 import java.util.Optional;
@@ -37,12 +36,9 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
 
     private final TemplateMapper templateMapper;
 
-    private final TemplateValidator templateValidator;
-
     @Override
     @Transactional
     public void saveTemplate(Template template) {
-        templateValidator.validateTemplateName(template.getTemplateName());
         TemplateEntity templateEntity = templateMapper.toEntity(template);
         templateRepository.save(templateEntity);
         log.info("New [template:art-{}, name-{}] saved to repo", template.getPtArt(), template.getTemplateName());

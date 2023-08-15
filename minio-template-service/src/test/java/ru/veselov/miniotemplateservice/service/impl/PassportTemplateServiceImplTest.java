@@ -1,5 +1,6 @@
 package ru.veselov.miniotemplateservice.service.impl;
 
+import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,6 +23,7 @@ import ru.veselov.miniotemplateservice.mapper.TemplateMapperImpl;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
+import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
 import java.util.UUID;
 
@@ -35,6 +37,9 @@ class PassportTemplateServiceImplTest {
 
     @Mock
     TemplateStorageService templateStorageService;
+
+    @Mock
+    TemplateValidator templateValidator;
 
     @InjectMocks
     PassportTemplateServiceImpl passportTemplateService;
@@ -61,6 +66,20 @@ class PassportTemplateServiceImplTest {
                 .saveTemplate(ArgumentMatchers.any(), templateArgumentCaptor.capture());
         Template captured = templateArgumentCaptor.getValue();
         Assertions.assertThat(captured.getFilename()).isEqualTo("801877-name.docx");
+    }
+
+    @Test
+    void shouldNotSaveIfNameExists() {
+        MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
+                MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
+        TemplateDto templateDto = new TemplateDto("name", "801877", "templates");
+        Mockito.doThrow(EntityExistsException.class).when(templateValidator)
+                .validateTemplateName(ArgumentMatchers.anyString());
+
+        Assertions.assertThatThrownBy(() -> passportTemplateService.saveTemplate(multipartFile, templateDto))
+                .isInstanceOf(EntityExistsException.class);
+
+        Mockito.verify(templateStorageService, Mockito.never()).saveTemplate(ArgumentMatchers.any());
     }
 
     @Test
