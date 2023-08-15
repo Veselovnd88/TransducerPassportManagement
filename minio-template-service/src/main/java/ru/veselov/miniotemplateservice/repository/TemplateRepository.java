@@ -28,4 +28,12 @@ public interface TemplateRepository extends JpaRepository<TemplateEntity, UUID> 
     @Query("SELECT COUNT(t) FROM TemplateEntity t")
     long countAll();
 
+    @Query(value = "SELECT t FROM TemplateEntity t where t.ptArt LIKE %:ptArt%",
+            countQuery = "SELECT COUNT(t) FROM TemplateEntity t where t.ptArt LIKE %:ptArt%")
+        //or CONCAT('%', :ptArt, '%')
+    Page<TemplateEntity> findAllByPtArt(@Param("ptArt") String ptArt, Pageable pageable);
+
+    @Query("SELECT COUNT(t) FROM TemplateEntity t where t.ptArt LIKE %:ptArt%")
+    long countAllByPtArt(@Param("ptArt") String ptArt);
+
 }

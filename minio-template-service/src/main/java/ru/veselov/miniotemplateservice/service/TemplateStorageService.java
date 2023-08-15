@@ -13,4 +13,6 @@ public interface TemplateStorageService {
 
     List<Template> findAll(SortingParams sortingParams);
 
+    List<Template> findAllByPtArt(String ptArt, SortingParams sortingParams);
+
 }

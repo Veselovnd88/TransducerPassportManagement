@@ -37,4 +37,11 @@ public class TemplateInfoController {
         return new ResponseEntity<>(templates, HttpStatus.OK);
     }
 
+    @GetMapping("/all/{ptArt}")
+    public ResponseEntity<List<Template>> getTemplatesByPtArt(@PathVariable("ptArt") String ptArt,
+                                                              @Valid @SortingParam SortingParams sortingParams) {
+        List<Template> templates = templateStorageService.findAllByPtArt(ptArt, sortingParams);
+        return new ResponseEntity<>(templates, HttpStatus.OK);
+    }
+
 }

@@ -135,11 +135,45 @@ class TemplateStorageServiceImplTest {
     }
 
     @Test
-    void shouldThrowPageExceedsMaximumException() {
+    void shouldThrowPageExceedsMaximumExceptionFindAll() {
         Mockito.when(templateRepository.countAll()).thenReturn(1L);
         SortingParams sortingParams = new SortingParams(1, "ptArt", "asc");
 
         Assertions.assertThatThrownBy(() -> templateStorageService.findAll(sortingParams))
+                .isInstanceOf(PageExceedsMaximumValueException.class);
+    }
+
+    @Test
+    void shouldReturnListOfTemplatesWithPtArtAndSortingParams() {
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setId(ID);
+        String ptArt = "ptArt";
+        List<TemplateEntity> templateEntities = List.of(templateEntity);
+        Page page = Mockito.mock(Page.class);
+        Mockito.when(page.getContent()).thenReturn(templateEntities);
+        Mockito.when(templateRepository.countAllByPtArt(ptArt)).thenReturn(1L);
+        Mockito.when(templateRepository
+                        .findAllByPtArt(ArgumentMatchers.anyString(), ArgumentMatchers.any(Pageable.class)))
+                .thenReturn(page);
+        SortingParams sortingParams = new SortingParams(0, "ptArt", "asc");
+
+        List<Template> all = templateStorageService.findAllByPtArt(ptArt, sortingParams);
+
+        Template template = new Template();
+        template.setId(ID);
+        Assertions.assertThat(all).contains(template).hasSize(1);
+        Mockito.verify(templateRepository, Mockito.times(1)).countAllByPtArt(ptArt);
+        Mockito.verify(templateRepository, Mockito.times(1))
+                .findAllByPtArt(ArgumentMatchers.anyString(), ArgumentMatchers.any(Pageable.class));
+    }
+
+    @Test
+    void shouldThrowPageExceedsMaximumExceptionFindAllByPtArt() {
+        String ptArt = "ptArt";
+        Mockito.when(templateRepository.countAllByPtArt(ptArt)).thenReturn(1L);
+        SortingParams sortingParams = new SortingParams(1, "ptArt", "asc");
+
+        Assertions.assertThatThrownBy(() -> templateStorageService.findAllByPtArt(ptArt, sortingParams))
                 .isInstanceOf(PageExceedsMaximumValueException.class);
     }
 

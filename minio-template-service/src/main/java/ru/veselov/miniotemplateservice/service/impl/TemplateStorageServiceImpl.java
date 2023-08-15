@@ -67,8 +67,18 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
         validatePageNumber(sortingParams.getPage(), count);
         Pageable pageable = createPageable(sortingParams.getPage(), sortingParams.getSort(), sortingParams.getOrder());
         Page<TemplateEntity> templatesPage = templateRepository.findAll(pageable);
-        log.info("Retrieved list of templates with sorting params: {}", sortingParams);
+        log.info("Retrieved list of templates with [sorting params: {}]", sortingParams);
         return templateMapper.toModels(templatesPage.getContent());
+    }
+
+    @Override
+    public List<Template> findAllByPtArt(String ptArt, SortingParams sortingParams) {
+        long count = templateRepository.countAllByPtArt(ptArt);
+        validatePageNumber(sortingParams.getPage(), count);
+        Pageable pageable = createPageable(sortingParams.getPage(), sortingParams.getSort(), sortingParams.getOrder());
+        Page<TemplateEntity> templatePage = templateRepository.findAllByPtArt(ptArt, pageable);
+        log.info("Retrieved list of templates with [ptArt: {} and sorting params: {}]", ptArt, sortingParams);
+        return templateMapper.toModels(templatePage.getContent());
     }
 
     private Pageable createPageable(int page, String sort, String order) {
