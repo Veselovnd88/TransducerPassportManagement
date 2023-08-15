@@ -21,13 +21,14 @@ spring:
         hbm2ddl:
           auto: validate
 
-
 minio:
   url: http://localhost:9000
   accessKey: admin
   secretKey: secretsecret
   bucket-name: templates
 
+template:
+  templates-per-page: 5
 eureka:
   client:
     service-url:
