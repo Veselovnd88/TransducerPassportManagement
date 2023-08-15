@@ -28,7 +28,7 @@ minio:
   bucket-name: templates
 
 template:
-  templates-per-page: 5
+  templates-per-page: 10
 eureka:
   client:
     service-url:
