@@ -37,12 +37,16 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
     }
 
     @Override
-    public TemplateEntity findTemplateById(UUID templateId) {
-        Optional<TemplateEntity> optionalTemplate = templateRepository.findById(templateId);
-        return optionalTemplate.orElseThrow(() -> {
+    public Template findTemplateById(String templateId) {
+        UUID templateUUID = UUID.fromString(templateId);
+        Optional<TemplateEntity> optionalTemplate = templateRepository.findById(templateUUID);
+        if (optionalTemplate.isPresent()) {
+            log.info("[Template: {}] retrieved from DB", templateId);
+            return templateMapper.toModel(optionalTemplate.get());
+        } else {
             log.error("Template with [id: {}] not found", templateId);
             throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));
-        });
+        }
     }
 
 }

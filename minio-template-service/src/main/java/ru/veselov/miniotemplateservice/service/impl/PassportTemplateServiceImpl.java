@@ -8,14 +8,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.miniotemplateservice.dto.TemplateDto;
-import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapper;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.PassportTemplateService;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
-
-import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -45,9 +42,7 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
 
     @Override
     public ByteArrayResource getTemplate(String templateId) {
-        UUID templateUUID = UUID.fromString(templateId);
-        TemplateEntity templateById = templateStorageService.findTemplateById(templateUUID);
-        log.info("Information for [template: {}] retrieved from DB", templateById);
+        Template templateById = templateStorageService.findTemplateById(templateId);
         ByteArrayResource templateBytes = templateMinioService.getTemplateByName(templateById.getFilename());
         log.info("Template source bytes with [id: {}] retrieved from storage", templateId);
         return templateBytes;

@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.miniotemplateservice.dto.TemplateDto;
-import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapper;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapperImpl;
 import ru.veselov.miniotemplateservice.model.Template;
@@ -68,25 +67,24 @@ class PassportTemplateServiceImplTest {
     void shouldCallServicesToGetTemplate() {
         UUID id = UUID.randomUUID();
         String filename = "filename";
-        TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setId(id);
-        templateEntity.setFilename(filename);
+        Template template = new Template();
+        template.setId(id);
+        template.setFilename(filename);
         ByteArrayResource byteArrayResource = new ByteArrayResource(BYTES);
-        Mockito.when(templateStorageService.findTemplateById(id)).thenReturn(templateEntity);
+        Mockito.when(templateStorageService.findTemplateById(id.toString())).thenReturn(template);
         Mockito.when(templateMinioService.getTemplateByName(filename)).thenReturn(byteArrayResource);
 
         ByteArrayResource sourceBytes = passportTemplateService.getTemplate(id.toString());
 
-        Mockito.verify(templateStorageService, Mockito.times(1)).findTemplateById(id);
+        Mockito.verify(templateStorageService, Mockito.times(1)).findTemplateById(id.toString());
         Mockito.verify(templateMinioService, Mockito.times(1)).getTemplateByName(filename);
         Assertions.assertThat(sourceBytes.getByteArray()).isEqualTo(BYTES);
     }
 
     @Test
     void shouldNotGetTemplateIfNoDataInDB() {
-        UUID id = UUID.randomUUID();
-        String idString = id.toString();
-        Mockito.doThrow(EntityNotFoundException.class).when(templateStorageService).findTemplateById(id);
+        String idString = UUID.randomUUID().toString();
+        Mockito.doThrow(EntityNotFoundException.class).when(templateStorageService).findTemplateById(idString);
 
         Assertions.assertThatThrownBy(() -> passportTemplateService.getTemplate(idString))
                 .isInstanceOf(EntityNotFoundException.class);

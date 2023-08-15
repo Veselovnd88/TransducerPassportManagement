@@ -89,19 +89,21 @@ class TemplateStorageServiceImplTest {
     void shouldFindTemplateById() {
         TemplateEntity templateEntity = new TemplateEntity();
         templateEntity.setId(ID);
+        Template template = new Template();
+        template.setId(ID);
         Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.of(templateEntity));
 
-        TemplateEntity foundTemplateEntity = templateStorageService.findTemplateById(ID);
+        Template foundTemplate = templateStorageService.findTemplateById(ID.toString());
 
         Mockito.verify(templateRepository, Mockito.times(1)).findById(ID);
-        Assertions.assertThat(foundTemplateEntity.getId()).isEqualTo(ID);
+        Assertions.assertThat(foundTemplate.getId()).isEqualTo(ID);
     }
 
     @Test
     void shouldThrowNotFoundException() {
         Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
-
-        Assertions.assertThatThrownBy(() -> templateStorageService.findTemplateById(ID))
+        String idString = ID.toString();
+        Assertions.assertThatThrownBy(() -> templateStorageService.findTemplateById(idString))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
