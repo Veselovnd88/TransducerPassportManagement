@@ -15,8 +15,6 @@ import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
 import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
-import java.time.LocalDateTime;
-
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -59,8 +57,7 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     public void updateTemplate(MultipartFile file, String templateId) {
         Template templateToUpdate = templateStorageService.findTemplateById(templateId);
         templateMinioService.updateTemplate(file.getResource(), templateToUpdate);
-        templateToUpdate.setEditedAt(LocalDateTime.now());
-        templateStorageService.saveTemplate(templateToUpdate);
+        templateStorageService.updateTemplate(templateToUpdate);
     }
 
 

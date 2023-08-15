@@ -19,6 +19,7 @@ import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.repository.TemplateRepository;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -77,6 +78,21 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
         return templateMapper.toModels(templatePage.getContent());
     }
 
+    @Transactional
+    public void updateTemplate(Template template) {
+        UUID templateId = template.getId();
+        Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findById(templateId);
+        if (optionalTemplateEntity.isPresent()) {
+            TemplateEntity templateEntity = optionalTemplateEntity.get();
+            templateEntity.setEditedAt(LocalDateTime.now());
+            templateRepository.save(templateEntity);
+            log.info("Edited date was update for [template: {}]", templateId);
+        } else {
+            log.error("Template with [id: {}] not found", templateId);
+            throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));
+        }
+    }
+
     private Pageable createPageable(int page, String sort, String order) {
         Sort sortOrder;
         if (StringUtils.equals(order, "asc")) {
@@ -95,5 +111,6 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
                     .formatted(totalPages, page), page);
         }
     }
+
 
 }

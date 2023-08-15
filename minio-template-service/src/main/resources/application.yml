@@ -45,4 +45,5 @@ management:
 logging:
   level:
     ru.veselov.ru.veselov.miniotemplateservice: debug
+    org.hibernate: info
 

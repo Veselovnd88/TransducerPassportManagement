@@ -78,7 +78,7 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
             log.info("Template deleted from MinIO storage: [bucket: {}, filename: {}]",
                     template.getBucket(), template.getFilename());
             saveTemplate(resource, template);
-            log.info("Template successfully updated in MinIO storage: [bucket: {}, filename: {}]",
+            log.info("Template updated in MinIO storage: [bucket: {}, filename: {}]",
                     template.getBucket(), template.getFilename());
         } catch (ErrorResponseException | InsufficientDataException | InvalidResponseException | InternalException |
                  InvalidKeyException | IOException | ServerException | NoSuchAlgorithmException |
