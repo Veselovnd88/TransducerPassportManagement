@@ -3,6 +3,7 @@ package ru.veselov.miniotemplateservice.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -12,6 +13,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
 
+import java.util.List;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -39,6 +41,15 @@ class TemplateInfoControllerTest {
         Mockito.when(templateStorageService.findTemplateById(templateId)).thenReturn(new Template());
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/" + templateId).build())
                 .exchange().expectStatus().isOk().expectBody(Template.class);
+    }
+
+    @Test
+    void shouldReturnTemplatesWithSortingParams() {
+        List<Template> templates = List.of(new Template());
+        Mockito.when(templateStorageService.findAll(ArgumentMatchers.any())).thenReturn(templates);
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all").queryParam("page", 1).build())
+                .exchange().expectStatus().isOk()
+                .expectBody(List.class);
     }
 
 

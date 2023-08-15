@@ -15,18 +15,24 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
+import ru.veselov.miniotemplateservice.dto.SortingParams;
 import ru.veselov.miniotemplateservice.entity.TemplateEntity;
+import ru.veselov.miniotemplateservice.exception.PageExceedsMaximumValueException;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapper;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapperImpl;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.repository.TemplateRepository;
 import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings({"rawtypes", "unchecked"})
 class TemplateStorageServiceImplTest {
 
     public static final String BUCKET = "templates";
@@ -49,6 +55,7 @@ class TemplateStorageServiceImplTest {
     void init() {
         TemplateMapper templateMapper = new TemplateMapperImpl();
         ReflectionTestUtils.setField(templateStorageService, "templateMapper", templateMapper, TemplateMapper.class);
+        ReflectionTestUtils.setField(templateStorageService, "templatesPerPage", 5, int.class);
     }
 
     @Test
@@ -105,6 +112,35 @@ class TemplateStorageServiceImplTest {
         String idString = ID.toString();
         Assertions.assertThatThrownBy(() -> templateStorageService.findTemplateById(idString))
                 .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void shouldReturnListOfTemplatesWithSortingParams() {
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setId(ID);
+        List<TemplateEntity> templateEntities = List.of(templateEntity);
+        Page page = Mockito.mock(Page.class);
+        Mockito.when(page.getContent()).thenReturn(templateEntities);
+        Mockito.when(templateRepository.countAll()).thenReturn(1L);
+        Mockito.when(templateRepository.findAll(ArgumentMatchers.any(Pageable.class))).thenReturn(page);
+        SortingParams sortingParams = new SortingParams(0, "ptArt", "asc");
+
+        List<Template> all = templateStorageService.findAll(sortingParams);
+
+        Template template = new Template();
+        template.setId(ID);
+        Assertions.assertThat(all).contains(template).hasSize(1);
+        Mockito.verify(templateRepository, Mockito.times(1)).countAll();
+        Mockito.verify(templateRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Pageable.class));
+    }
+
+    @Test
+    void shouldThrowPageExceedsMaximumException() {
+        Mockito.when(templateRepository.countAll()).thenReturn(1L);
+        SortingParams sortingParams = new SortingParams(1, "ptArt", "asc");
+
+        Assertions.assertThatThrownBy(() -> templateStorageService.findAll(sortingParams))
+                .isInstanceOf(PageExceedsMaximumValueException.class);
     }
 
 }
