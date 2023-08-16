@@ -86,6 +86,7 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             TemplateEntity templateEntity = optionalTemplateEntity.get();
             templateEntity.setEditedAt(LocalDateTime.now());
             TemplateEntity updated = templateRepository.save(templateEntity);
+            log.info("Template [id: {}] info updated in DB", templateId);
             return templateMapper.toModel(updated);
         } else {
             log.error("Template with [id: {}] not found", templateId);
