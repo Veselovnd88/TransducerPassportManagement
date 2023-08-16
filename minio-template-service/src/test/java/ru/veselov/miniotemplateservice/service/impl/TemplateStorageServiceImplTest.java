@@ -156,4 +156,32 @@ class TemplateStorageServiceImplTest {
                 .isInstanceOf(PageExceedsMaximumValueException.class);
     }
 
+    @Test
+    void shouldUpdateTemplate() {
+        String templateIdUUID = ID.toString();
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setId(ID);
+        templateEntity.setFilename("filename");
+        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.of(templateEntity));
+        Mockito.when(templateRepository.save(ArgumentMatchers.any())).thenReturn(templateEntity);
+        Template template = templateStorageService.updateTemplate(templateIdUUID);
+
+        Mockito.verify(templateRepository, Mockito.times(1)).findById(ID);
+        Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
+        TemplateEntity captured = templateArgumentCaptor.getValue();
+        Assertions.assertThat(captured.getId()).isEqualTo(templateEntity.getId());
+        Assertions.assertThat(captured.getEditedAt()).isNotNull();
+        Assertions.assertThat(template.getId()).isEqualTo(captured.getId());
+        Assertions.assertThat(template.getFilename()).isEqualTo(templateEntity.getFilename());
+    }
+
+    @Test
+    void shouldThrowExceptionIfNotFoundDuringUpdate() {
+        String templateIdUUID = ID.toString();
+        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> templateStorageService.updateTemplate(templateIdUUID))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
 }

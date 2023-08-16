@@ -3,6 +3,7 @@ package ru.veselov.miniotemplateservice.service.impl;
 import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -109,6 +110,37 @@ class PassportTemplateServiceImplTest {
                 .isInstanceOf(EntityNotFoundException.class);
 
         Mockito.verify(templateMinioService, Mockito.never()).getTemplateByName(ArgumentMatchers.anyString());
+    }
+
+    @Test
+    void shouldCallServicesToUpdate() {
+        String templateId = UUID.randomUUID().toString();
+        MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
+                MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
+        Template template = Instancio.create(Template.class);
+        Mockito.when(templateStorageService.updateTemplate(templateId)).thenReturn(template);
+
+        passportTemplateService.updateTemplate(multipartFile, templateId);
+
+        Mockito.verify(templateStorageService, Mockito.times(1)).updateTemplate(templateId);
+        Mockito.verify(templateMinioService, Mockito.times(1))
+                .updateTemplate(ArgumentMatchers.any(), templateArgumentCaptor.capture());
+        Template captured = templateArgumentCaptor.getValue();
+        Assertions.assertThat(captured.getFilename()).isEqualTo(template.getFilename());
+    }
+
+    @Test
+    void shouldNotCallMinioServiceToUpdateIfException() {
+        String templateId = UUID.randomUUID().toString();
+        Mockito.doThrow(EntityNotFoundException.class).when(templateStorageService).updateTemplate(templateId);
+        MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
+                MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
+
+        Assertions.assertThatThrownBy(() -> passportTemplateService.updateTemplate(multipartFile, templateId))
+                .isInstanceOf(EntityNotFoundException.class);
+
+        Mockito.verify(templateMinioService, Mockito.never())
+                .updateTemplate(ArgumentMatchers.any(), ArgumentMatchers.any());
     }
 
 }

@@ -48,5 +48,4 @@ public class TemplateController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-
 }

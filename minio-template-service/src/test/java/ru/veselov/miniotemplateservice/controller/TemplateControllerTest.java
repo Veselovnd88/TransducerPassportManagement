@@ -44,6 +44,9 @@ class TemplateControllerTest {
     @Captor
     ArgumentCaptor<TemplateDto> templateDtoArgumentCaptor;
 
+    @Captor
+    ArgumentCaptor<String> templateIdCaptor;
+
     @BeforeEach
     void init() {
         webTestClient = MockMvcWebTestClient.bindToController(templateController).build();
@@ -78,6 +81,26 @@ class TemplateControllerTest {
         Assertions.assertThat(capturedMultipart.getBytes()).isEqualTo(BYTES);
         Assertions.assertThat(capturedMultipart.getOriginalFilename()).isEqualTo("filename.docx");
         Assertions.assertThat(capturedTemplateDto).isEqualTo(templateDto);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldCallPassportTemplateServiceToUpdateTemplate() {
+        String templateId = UUID.randomUUID().toString();
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("file", BYTES).filename("filename.docx");
+
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL).path("/upload").path("/" + templateId).build())
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange().expectStatus().isAccepted();
+
+        Mockito.verify(passportTemplateService, Mockito.times(1))
+                .updateTemplate(multipartFileArgumentCaptor.capture(), templateIdCaptor.capture());
+        MultipartFile capturedMultipart = multipartFileArgumentCaptor.getValue();
+        String capturedTemplateId = templateIdCaptor.getValue();
+        Assertions.assertThat(capturedMultipart.getBytes()).isEqualTo(BYTES);
+        Assertions.assertThat(capturedMultipart.getOriginalFilename()).isEqualTo("filename.docx");
+        Assertions.assertThat(capturedTemplateId).isEqualTo(templateId);
     }
 
 }

@@ -1,5 +1,7 @@
 package ru.veselov.miniotemplateservice.service.impl;
 
+import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.errors.ErrorResponseException;
@@ -39,7 +41,10 @@ class TemplateMinioServiceImplTest {
     TemplateMinioServiceImpl templateMinioService;
 
     @Captor
-    ArgumentCaptor<PutObjectArgs> argumentCaptor;
+    ArgumentCaptor<PutObjectArgs> argumentPutObjCaptor;
+
+    @Captor
+    ArgumentCaptor<GetObjectArgs> argumentGetObjCaptor;
 
     @BeforeEach
     void init() {
@@ -58,8 +63,8 @@ class TemplateMinioServiceImplTest {
 
         templateMinioService.saveTemplate(resource, template);
 
-        Mockito.verify(minioClient, Mockito.times(1)).putObject(argumentCaptor.capture());
-        PutObjectArgs captured = argumentCaptor.getValue();
+        Mockito.verify(minioClient, Mockito.times(1)).putObject(argumentPutObjCaptor.capture());
+        PutObjectArgs captured = argumentPutObjCaptor.getValue();
         Assertions.assertThat(captured.object()).isEqualTo(template.getFilename());
         Assertions.assertThat(captured.bucket()).isEqualTo(BUCKET);
         try (BufferedInputStream stream = captured.stream()) {
@@ -80,6 +85,44 @@ class TemplateMinioServiceImplTest {
 
         Assertions.assertThatThrownBy(() -> templateMinioService.saveTemplate(resource, template))
                 .isInstanceOf(CommonMinioException.class);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldUpdateTemplateToMinioStorage() {
+        Resource resource = new ByteArrayResource(BYTES);
+        Template template = Instancio.of(Template.class)
+                .ignore(Select.field(Template::getId))
+                .ignore(Select.field(Template::getCreatedAt))
+                .ignore(Select.field(Template::getEditedAt))
+                .set(Select.field(Template::getBucket), BUCKET).create();
+
+        templateMinioService.updateTemplate(resource, template);
+
+        Mockito.verify(minioClient, Mockito.times(1)).putObject(argumentPutObjCaptor.capture());
+        PutObjectArgs captured = argumentPutObjCaptor.getValue();
+        Assertions.assertThat(captured.object()).isEqualTo(template.getFilename());
+        Assertions.assertThat(captured.bucket()).isEqualTo(BUCKET);
+        try (BufferedInputStream stream = captured.stream()) {
+            Assertions.assertThat(stream.readAllBytes()).isEqualTo(resource.getContentAsByteArray());
+        }
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGetTemplateFromMinioStorage() {
+        String filename = "filename";
+        GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
+        Mockito.when(getObjectResponse.readAllBytes()).thenReturn(BYTES);
+        Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
+
+        ByteArrayResource byteArrayResource = templateMinioService.getTemplateByName(filename);
+
+        Mockito.verify(minioClient, Mockito.times(1)).getObject(argumentGetObjCaptor.capture());
+        GetObjectArgs captured = argumentGetObjCaptor.getValue();
+
+        Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(BYTES);
+        Assertions.assertThat(captured.object()).isEqualTo(filename);
     }
 
 }

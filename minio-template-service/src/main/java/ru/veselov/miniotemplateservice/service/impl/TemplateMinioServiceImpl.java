@@ -51,10 +51,7 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
     @Override
     public void saveTemplate(Resource resource, Template template) {
         try {
-            PutObjectArgs saveArgs = PutObjectArgs.builder().bucket(template.getBucket())
-                    .object(template.getFilename())
-                    .stream(resource.getInputStream(), resource.contentLength(), 0)
-                    .build();
+            PutObjectArgs saveArgs = createSaveArgs(resource, template);
             minioClient.putObject(saveArgs);
         } catch (IOException | ErrorResponseException | InsufficientDataException | InternalException |
                  InvalidKeyException | InvalidResponseException | NoSuchAlgorithmException | ServerException |
@@ -69,11 +66,8 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
     @Override
     public void updateTemplate(Resource resource, Template template) {
         try {
-            PutObjectArgs saveArgsNewVersion = PutObjectArgs.builder().bucket(template.getBucket())
-                    .object(template.getFilename())
-                    .stream(resource.getInputStream(), resource.contentLength(), 0)
-                    .build();
-            minioClient.putObject(saveArgsNewVersion);
+            PutObjectArgs saveArgs = createSaveArgs(resource, template);
+            minioClient.putObject(saveArgs);
             log.info("Template updated in MinIO storage: [bucket: {}, filename: {}]",
                     template.getBucket(), template.getFilename());
         } catch (ErrorResponseException | InsufficientDataException | InvalidResponseException | InternalException |
@@ -82,6 +76,13 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
             log.error("Error with minio occurred during [updating: {}]", e.getMessage());
             throw new CommonMinioException(e.getMessage(), e);
         }
+    }
+
+    private PutObjectArgs createSaveArgs(Resource resource, Template template) throws IOException {
+        return PutObjectArgs.builder().bucket(template.getBucket())
+                .object(template.getFilename())
+                .stream(resource.getInputStream(), resource.contentLength(), 0)
+                .build();
     }
 
 }
