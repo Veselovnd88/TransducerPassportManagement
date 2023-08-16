@@ -184,5 +184,23 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         Mockito.verify(minioClient, Mockito.times(1)).putObject(putObjectArgsCaptor.capture());
     }
 
+    @Test
+    @SneakyThrows
+    void shouldRollbackTxIfFileWasNotUpdated() {
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("file", SOURCE_BYTES).filename("filename.docx");
+        Mockito.doThrow(CommonMinioException.class).when(minioClient).putObject(ArgumentMatchers.any());
+
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").path("/" + templateId).build())
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange().expectStatus().is5xxServerError()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_FILE_STORAGE.toString());
+
+        Optional<TemplateEntity> templateEntityOptional = templateRepository.findById(templateId);
+        Assertions.assertThat(templateEntityOptional).isPresent();
+        Assertions.assertThat(templateEntityOptional.get().getEditedAt()).isNull();
+        Mockito.verify(minioClient, Mockito.times(1)).putObject(ArgumentMatchers.any());
+    }
+
 
 }
