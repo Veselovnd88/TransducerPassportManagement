@@ -4,7 +4,6 @@ import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -69,13 +68,12 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
 
     @Override
     public void updateTemplate(Resource resource, Template template) {
-        RemoveObjectArgs removeObjectArgs = RemoveObjectArgs.builder().bucket(bucketName).object(template.getFilename())
-                .build();
         try {
-            minioClient.removeObject(removeObjectArgs);
-            log.info("Template deleted from MinIO storage: [bucket: {}, filename: {}]",
-                    template.getBucket(), template.getFilename());
-            saveTemplate(resource, template);
+            PutObjectArgs saveArgsNewVersion = PutObjectArgs.builder().bucket(template.getBucket())
+                    .object(template.getFilename())
+                    .stream(resource.getInputStream(), resource.contentLength(), 0)
+                    .build();
+            minioClient.putObject(saveArgsNewVersion);
             log.info("Template updated in MinIO storage: [bucket: {}, filename: {}]",
                     template.getBucket(), template.getFilename());
         } catch (ErrorResponseException | InsufficientDataException | InvalidResponseException | InternalException |
