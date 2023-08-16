@@ -55,11 +55,10 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     @Override
     @Transactional
     public void updateTemplate(MultipartFile file, String templateId) {
-        Template templateToUpdate = templateStorageService.findTemplateById(templateId);
-        templateMinioService.updateTemplate(file.getResource(), templateToUpdate);
-        templateStorageService.updateTemplate(templateToUpdate);
+        Template template = templateStorageService.updateTemplate(templateId);
+        templateMinioService.updateTemplate(file.getResource(), template);
+        log.info("Template for [id: {}] successfully updated", templateId);
     }
-
 
     private String generateFileName(TemplateDto templateDto) {
         return generateTemplateName(templateDto) + FILE_EXT;

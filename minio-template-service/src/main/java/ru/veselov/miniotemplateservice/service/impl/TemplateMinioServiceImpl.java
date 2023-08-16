@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.miniotemplateservice.exception.CommonMinioException;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
@@ -69,7 +68,6 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
     }
 
     @Override
-    @Transactional
     public void updateTemplate(Resource resource, Template template) {
         RemoveObjectArgs removeObjectArgs = RemoveObjectArgs.builder().bucket(bucketName).object(template.getFilename())
                 .build();

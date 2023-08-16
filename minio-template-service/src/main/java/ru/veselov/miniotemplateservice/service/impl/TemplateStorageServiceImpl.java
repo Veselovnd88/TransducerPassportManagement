@@ -79,14 +79,14 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
     }
 
     @Transactional
-    public void updateTemplate(Template template) {
-        UUID templateId = template.getId();
-        Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findById(templateId);
+    public Template updateTemplate(String templateId) {
+        UUID templateIdUUID = UUID.fromString(templateId);
+        Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findById(templateIdUUID);
         if (optionalTemplateEntity.isPresent()) {
             TemplateEntity templateEntity = optionalTemplateEntity.get();
             templateEntity.setEditedAt(LocalDateTime.now());
-            templateRepository.save(templateEntity);
-            log.info("Edited date was update for [template: {}]", templateId);
+            TemplateEntity updated = templateRepository.save(templateEntity);
+            return templateMapper.toModel(updated);
         } else {
             log.error("Template with [id: {}] not found", templateId);
             throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));

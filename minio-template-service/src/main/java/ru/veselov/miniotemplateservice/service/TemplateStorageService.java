@@ -15,6 +15,6 @@ public interface TemplateStorageService {
 
     List<Template> findAllByPtArt(String ptArt, SortingParams sortingParams);
 
-    void updateTemplate(Template template);
+    Template updateTemplate(String templateId);
 
 }
