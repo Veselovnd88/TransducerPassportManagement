@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,6 +47,12 @@ public class TemplateController {
                                                      @RequestPart("file") @Docx MultipartFile file) {
         passportTemplateService.updateTemplate(file, templateId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
+
+    @DeleteMapping("/delete/{templateId}")
+    public ResponseEntity<Void> deleteTemplate(@PathVariable("templateId") @UUID String templateId) {
+        passportTemplateService.deleteTemplate(templateId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }

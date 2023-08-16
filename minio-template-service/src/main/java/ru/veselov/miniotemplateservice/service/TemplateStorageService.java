@@ -4,6 +4,7 @@ import ru.veselov.miniotemplateservice.dto.SortingParams;
 import ru.veselov.miniotemplateservice.model.Template;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TemplateStorageService {
 
@@ -16,5 +17,7 @@ public interface TemplateStorageService {
     List<Template> findAllByPtArt(String ptArt, SortingParams sortingParams);
 
     Template updateTemplate(String templateId);
+
+    Optional<Template> deleteTemplate(String templateId);
 
 }

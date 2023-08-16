@@ -12,4 +12,6 @@ public interface PassportTemplateService {
 
     void updateTemplate(MultipartFile file, String templateId);
 
+    void deleteTemplate(String templateId);
+
 }

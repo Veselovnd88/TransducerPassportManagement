@@ -4,6 +4,7 @@ import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import io.minio.errors.ErrorResponseException;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
@@ -45,6 +46,9 @@ class TemplateMinioServiceImplTest {
 
     @Captor
     ArgumentCaptor<GetObjectArgs> argumentGetObjCaptor;
+
+    @Captor
+    ArgumentCaptor<RemoveObjectArgs> argumentRemoveObjCaptor;
 
     @BeforeEach
     void init() {
@@ -122,6 +126,18 @@ class TemplateMinioServiceImplTest {
         GetObjectArgs captured = argumentGetObjCaptor.getValue();
 
         Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(BYTES);
+        Assertions.assertThat(captured.object()).isEqualTo(filename);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldDeleteTemplateFromMinioStorage() {
+        String filename = "filename";
+
+        templateMinioService.deleteTemplate(filename);
+
+        Mockito.verify(minioClient, Mockito.times(1)).removeObject(argumentRemoveObjCaptor.capture());
+        RemoveObjectArgs captured = argumentRemoveObjCaptor.getValue();
         Assertions.assertThat(captured.object()).isEqualTo(filename);
     }
 

@@ -4,6 +4,7 @@ import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
+import io.minio.RemoveObjectArgs;
 import io.minio.errors.ErrorResponseException;
 import io.minio.errors.InsufficientDataException;
 import io.minio.errors.InternalException;
@@ -74,6 +75,20 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
                  InvalidKeyException | IOException | ServerException | NoSuchAlgorithmException |
                  XmlParserException e) {
             log.error("Error with minio occurred during [updating: {}]", e.getMessage());
+            throw new CommonMinioException(e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public void deleteTemplate(String filename) {
+        RemoveObjectArgs removeObjectArgs = RemoveObjectArgs.builder().object(filename).bucket(bucketName).build();
+        try {
+            minioClient.removeObject(removeObjectArgs);
+            log.info("Template deleted from MinIO storage: [bucket: {}, filename: {}]", bucketName, filename);
+        } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
+                 IOException | NoSuchAlgorithmException | ServerException | XmlParserException |
+                 InvalidResponseException e) {
+            log.error("Error with minio occurred during [deleting: {}]", e.getMessage());
             throw new CommonMinioException(e.getMessage(), e);
         }
     }

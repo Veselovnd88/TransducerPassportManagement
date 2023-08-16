@@ -12,4 +12,6 @@ public interface TemplateMinioService {
 
     void updateTemplate(Resource resource, Template template);
 
+    void deleteTemplate(String filename);
+
 }

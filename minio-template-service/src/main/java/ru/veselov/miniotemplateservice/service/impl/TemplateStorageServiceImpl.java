@@ -94,6 +94,20 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
         }
     }
 
+    @Override
+    public Optional<Template> deleteTemplate(String templateId) {
+        UUID templateIdUUID = UUID.fromString(templateId);
+        Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findById(templateIdUUID);
+        if (optionalTemplateEntity.isPresent()) {
+            TemplateEntity templateEntity = optionalTemplateEntity.get();
+            templateRepository.delete(templateEntity);
+            log.info("Template with [id: {}] deleted from DB", templateId);
+            return Optional.of(templateMapper.toModel(templateEntity));
+        } else {
+            return Optional.empty();
+        }
+    }
+
     private Pageable createPageable(int page, String sort, String order) {
         Sort sortOrder;
         if (StringUtils.equals(order, "asc")) {

@@ -103,4 +103,16 @@ class TemplateControllerTest {
         Assertions.assertThat(capturedTemplateId).isEqualTo(templateId);
     }
 
+    @Test
+    void shouldCallTemplateServiceToDelete() {
+        String templateId = UUID.randomUUID().toString();
+
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL).path("/delete").path("/" + templateId).build())
+                .exchange().expectStatus().isOk();
+
+        Mockito.verify(passportTemplateService, Mockito.times(1)).deleteTemplate(templateIdCaptor.capture());
+        String captured = templateIdCaptor.getValue();
+        Assertions.assertThat(captured).isEqualTo(templateId);
+    }
+
 }

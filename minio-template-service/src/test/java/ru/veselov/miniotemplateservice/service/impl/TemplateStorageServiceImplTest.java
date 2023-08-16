@@ -177,11 +177,37 @@ class TemplateStorageServiceImplTest {
 
     @Test
     void shouldThrowExceptionIfNotFoundDuringUpdate() {
-        String templateIdUUID = ID.toString();
+        String templateId = ID.toString();
         Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> templateStorageService.updateTemplate(templateIdUUID))
+        Assertions.assertThatThrownBy(() -> templateStorageService.updateTemplate(templateId))
                 .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void shouldDeleteTemplate() {
+        String templateId = ID.toString();
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setId(ID);
+        templateEntity.setFilename("filename");
+        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.of(templateEntity));
+
+        Optional<Template> templateOptional = templateStorageService.deleteTemplate(templateId);
+
+        Mockito.verify(templateRepository, Mockito.times(1)).delete(templateEntity);
+        Assertions.assertThat(templateOptional).isPresent();
+        Template template = templateOptional.get();
+        Assertions.assertThat(template.getFilename()).isEqualTo(templateEntity.getFilename());
+    }
+
+    @Test
+    void shouldReturnEmptyOptionalIfTemplateNotExists() {
+        String templateId = ID.toString();
+        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
+
+        Optional<Template> templateOptional = templateStorageService.deleteTemplate(templateId);
+
+        Assertions.assertThat(templateOptional).isNotPresent();
     }
 
 }

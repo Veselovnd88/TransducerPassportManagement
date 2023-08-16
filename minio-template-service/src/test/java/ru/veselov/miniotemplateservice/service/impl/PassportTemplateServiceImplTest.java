@@ -4,6 +4,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
+import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,6 +27,7 @@ import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
 import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -141,6 +143,29 @@ class PassportTemplateServiceImplTest {
 
         Mockito.verify(templateMinioService, Mockito.never())
                 .updateTemplate(ArgumentMatchers.any(), ArgumentMatchers.any());
+    }
+
+    @Test
+    void shouldCallServicesToDeleteTemplate() {
+        String templateId = UUID.randomUUID().toString();
+        Template template = Instancio.of(Template.class)
+                .set(Select.field(Template.class, "id"), UUID.fromString(templateId))
+                .create();
+        Mockito.when(templateStorageService.deleteTemplate(templateId)).thenReturn(Optional.of(template));
+        passportTemplateService.deleteTemplate(templateId);
+
+        Mockito.verify(templateStorageService, Mockito.times(1)).deleteTemplate(templateId);
+        Mockito.verify(templateMinioService, Mockito.times(1)).deleteTemplate(template.getFilename());
+    }
+
+    @Test
+    void shouldNotCallServicesToDeleteTemplate() {
+        String templateId = UUID.randomUUID().toString();
+        Mockito.when(templateStorageService.deleteTemplate(templateId)).thenReturn(Optional.empty());
+        passportTemplateService.deleteTemplate(templateId);
+
+        Mockito.verify(templateStorageService, Mockito.times(1)).deleteTemplate(templateId);
+        Mockito.verify(templateMinioService, Mockito.never()).deleteTemplate(ArgumentMatchers.anyString());
     }
 
 }

@@ -15,6 +15,8 @@ import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
 import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -58,6 +60,19 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
         Template template = templateStorageService.updateTemplate(templateId);
         templateMinioService.updateTemplate(file.getResource(), template);
         log.info("Template for [id: {}] successfully updated", templateId);
+    }
+
+    @Override
+    @Transactional
+    public void deleteTemplate(String templateId) {
+        Optional<Template> templateOptional = templateStorageService.deleteTemplate(templateId);
+        if (templateOptional.isPresent()) {
+            String filename = templateOptional.get().getFilename();
+            templateMinioService.deleteTemplate(filename);
+            log.info("Template for [id: {}] successfully deleted", templateId);
+        } else {
+            log.info("Template with [id: {}] not found, nothing to delete", templateId);
+        }
     }
 
     private String generateFileName(TemplateDto templateDto) {
