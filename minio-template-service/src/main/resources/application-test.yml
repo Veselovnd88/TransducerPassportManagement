@@ -19,9 +19,9 @@ spring:
         show_sql: true
         format_sql: false
         hbm2ddl:
-          auto: validate
+          auto: none
   liquibase:
-    enabled: true
+    enabled: false
 
 minio:
   url: http://localhost:9000
