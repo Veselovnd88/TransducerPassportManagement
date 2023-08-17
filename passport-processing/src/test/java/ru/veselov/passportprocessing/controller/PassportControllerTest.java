@@ -25,7 +25,7 @@ class PassportControllerTest {
 
     public static final byte[] BYTES_OUT = new byte[]{1, 2, 4};
 
-    WebTestClient webTestClient;
+    static WebTestClient webTestClient;
 
     @Mock
     PassportService passportService;

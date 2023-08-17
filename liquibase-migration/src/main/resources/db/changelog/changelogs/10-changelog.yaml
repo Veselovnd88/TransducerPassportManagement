@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: createTemplateTable
+      author: Veselov Nikolay
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/10-create-template-table.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/10-drop-template-table.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
