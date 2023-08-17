@@ -1,5 +1,6 @@
 package ru.veselov.miniotemplateservice.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -24,8 +25,10 @@ public class Template {
 
     private String bucket;
 
+    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime editedAt;
 
+    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
 }
