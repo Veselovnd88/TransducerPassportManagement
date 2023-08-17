@@ -30,6 +30,12 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
 
     public static final String URL_PREFIX = "/api/v1/template/info";
 
+    public static final String PAGE = "page";
+
+    public static final String SORT = "sort";
+
+    public static final String ORDER = "order";
+
     @Value("${minio.bucket-name}")
     String bucketName;
 
@@ -101,8 +107,8 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         //sort by templateName, descending
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
-                        .queryParam("page", 0)
-                        .queryParam("sort", "templateName")
+                        .queryParam(PAGE, 0)
+                        .queryParam(SORT, "templateName")
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
@@ -115,9 +121,9 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         //sort by createdAt, asc
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
-                        .queryParam("page", 0)
-                        .queryParam("sort", "templateName")
-                        .queryParam("order", "asc")
+                        .queryParam(PAGE, 0)
+                        .queryParam(SORT, "templateName")
+                        .queryParam(ORDER, "asc")
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
@@ -130,9 +136,9 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         //sort by ptArt, desc
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
-                        .queryParam("page", 0)
-                        .queryParam("sort", "ptArt")
-                        .queryParam("order", "desc")
+                        .queryParam(PAGE, 0)
+                        .queryParam(SORT, "ptArt")
+                        .queryParam(ORDER, "desc")
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
@@ -145,9 +151,9 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         //sort by ptArt, asc
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
-                        .queryParam("page", 0)
-                        .queryParam("sort", "ptArt")
-                        .queryParam("order", "asc")
+                        .queryParam(PAGE, 0)
+                        .queryParam(SORT, "ptArt")
+                        .queryParam(ORDER, "asc")
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
@@ -157,7 +163,64 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
 
     @Test
     void shouldReturnTemplatesWithPartialArt() {
+        saveTwoMoreEntities();
+        // try to find with 801
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").path("/801")
+                        .queryParam(PAGE, 0).build())
+                .exchange().expectStatus().isOk()
+                .expectBody().jsonPath("$").isArray()
+                .jsonPath("$.size()").isEqualTo(2);
+        //try to find full 801877
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").path("/801877")
+                        .queryParam(PAGE, 0).build())
+                .exchange().expectStatus().isOk()
+                .expectBody().jsonPath("$").isArray()
+                .jsonPath("$.size()").isEqualTo(1);
+        //try to find 01
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").path("/01")
+                        .queryParam(PAGE, 0).build())
+                .exchange().expectStatus().isOk()
+                .expectBody().jsonPath("$").isArray()
+                .jsonPath("$.size()").isEqualTo(3);
+    }
 
+    @Test
+    void shouldReturnValidationErrorWhenPassNegativePage() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").queryParam(PAGE, -1).build())
+                .exchange().expectStatus().isBadRequest()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo(PAGE);
+    }
+
+    @Test
+    void shouldReturnPageExceedsMaxError() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").queryParam(PAGE, 100).build())
+                .exchange().expectStatus().isBadRequest()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_MAX_PAGE.toString());
+    }
+
+    @Test
+    void shouldReturnValidationErrorPassingNotCorrectSortSortByField() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
+                        .queryParam(PAGE, 0)
+                        .queryParam(SORT, "tort")
+                        .queryParam(ORDER, "asc")
+                        .build())
+                .exchange().expectStatus().isBadRequest()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo(SORT);
+    }
+
+    @Test
+    void shouldReturnValidationErrorPassingNotCorrectSortOrderField() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
+                        .queryParam(PAGE, 0)
+                        .queryParam(SORT, "ptArt")
+                        .queryParam(ORDER, "pasc")
+                        .build())
+                .exchange().expectStatus().isBadRequest()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo(ORDER);
     }
 
     private void saveTwoMoreEntities() {

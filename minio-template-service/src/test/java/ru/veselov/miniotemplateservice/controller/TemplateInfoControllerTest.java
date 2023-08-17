@@ -52,5 +52,14 @@ class TemplateInfoControllerTest {
                 .expectBody(List.class);
     }
 
+    @Test
+    void shouldReturnTemplatesByPtArtWithSortingParams() {
+        List<Template> templates = List.of(new Template());
+        Mockito.when(templateStorageService.findAllByPtArt(ArgumentMatchers.anyString(),
+                ArgumentMatchers.any())).thenReturn(templates);
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all/801877").queryParam("page", 1).build())
+                .exchange().expectStatus().isOk()
+                .expectBody(List.class);
+    }
 
 }

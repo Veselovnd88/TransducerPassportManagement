@@ -9,7 +9,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = true)
 public class ValidationErrorResponse extends ApiErrorResponse {
 
-    private ErrorCode error = ErrorCode.ERROR_VALIDATION;
+    private ErrorCode errorCode = ErrorCode.ERROR_VALIDATION;
 
     private List<ViolationError> violations;
 
