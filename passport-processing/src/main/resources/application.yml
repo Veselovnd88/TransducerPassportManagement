@@ -16,6 +16,9 @@ pdf-service:
   url: "http://localhost:3000/forms/libreoffice/convert"
   filename: "fileToConvert"
 
+template-storage:
+  url: "http://localhost:7176/api/v1/template"
+
 spring:
   application:
     name: passport
@@ -56,4 +59,4 @@ logging:
     ru.veselov.passportprocessing: debug
 
 template:
-  stub: enabled
+  stub: disabled
