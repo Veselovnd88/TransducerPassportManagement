@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class TemplateDto {
 
+    @NotNull
     private String templateDescription;
 
     @NotNull

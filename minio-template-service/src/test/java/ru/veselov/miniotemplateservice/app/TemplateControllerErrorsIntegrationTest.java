@@ -1,14 +1,13 @@
 package ru.veselov.miniotemplateservice.app;
 
 import io.minio.GetObjectArgs;
-import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -40,7 +39,7 @@ import java.util.UUID;
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 @DirtiesContext
-class TemplateControllerIntegrationTest extends PostgresContainersConfig {
+class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
 
     public static final String URL_PREFIX = "/api/v1/template/";
 
@@ -74,17 +73,6 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     @Captor
     ArgumentCaptor<RemoveObjectArgs> removeObjectArgsCaptor;
 
-    @BeforeEach
-    void init() {
-        TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setFilename(SAMPLE_FILENAME);
-        templateEntity.setTemplateName("801877-filename");
-        templateEntity.setBucket(bucketName);
-        templateEntity.setPtArt("801877");
-        TemplateEntity save = templateRepository.save(templateEntity);
-        templateId = save.getId();
-
-    }
 
     @AfterEach
     void clear() {
@@ -92,41 +80,87 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     }
 
     @Test
-    @SneakyThrows
-    void shouldGetSourceById() {
-        GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
-        Mockito.when(getObjectResponse.readAllBytes()).thenReturn(SOURCE_BYTES);
-        Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
-
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").path("/" + templateId).build())
-                .exchange().expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
-                .expectBody(byte[].class);
-
-        Mockito.verify(minioClient, Mockito.times(1)).getObject(getObjectArgsCaptor.capture());
-        GetObjectArgs captured = getObjectArgsCaptor.getValue();
-        Assertions.assertThat(captured.object()).isEqualTo(SAMPLE_FILENAME);
-        Assertions.assertThat(captured.bucket()).isEqualTo(bucketName);
+    void shouldReturnNotFoundError() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").path("/" + UUID.randomUUID())
+                        .build())
+                .exchange().expectStatus().is4xxClientError()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }
 
     @Test
-    @SneakyThrows
-    void shouldUploadTemplate() {
-        TemplateDto templateDto = new TemplateDto("name", "801877", "templates");
+    void shouldReturnValidationErrorForUUIDFieldWhenGetTemplate() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").path("/" + "not_UUID")
+                        .build())
+                .exchange().expectStatus().is4xxClientError()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("templateId");
+    }
+
+
+    @Test
+    void shouldReturnErrorIfEntityAlreadyExists() {
+        TemplateEntity templateEntity = saveTemplate();
+        TemplateDto templateDto = new TemplateDto(
+                "filename",
+                templateEntity.getPtArt(),
+                "templates");
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part("file", SOURCE_BYTES).filename("filename.docx");
         multipartBodyBuilder.part("template-info", templateDto);
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
-                .exchange().expectStatus().isAccepted();
+                .exchange().expectStatus().is4xxClientError()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_TEMPLATE_EXISTS.toString());
+    }
 
-        Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findByName("801877-name");
-        Assertions.assertThat(optionalTemplateEntity).isPresent();
-        Mockito.verify(minioClient, Mockito.times(1)).putObject(putObjectArgsCaptor.capture());
-        PutObjectArgs captured = putObjectArgsCaptor.getValue();
-        Assertions.assertThat(captured.bucket()).isEqualTo(bucketName);
-        Assertions.assertThat(captured.object()).isEqualTo("801877-name.docx");
+    @Test
+    void shouldReturnValidationErrorNoDocxFile() {
+        TemplateEntity templateEntity = saveTemplate();
+        TemplateDto templateDto = new TemplateDto(
+                "filename",
+                templateEntity.getPtArt(),
+                "templates");
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("file", SOURCE_BYTES).filename("filename.pox");
+        multipartBodyBuilder.part("template-info", templateDto);
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange().expectStatus().is4xxClientError()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("file");
+    }
+
+    @Test
+    void shouldReturnValidationErrorForWrongTemplateFields() {
+        saveTemplate();
+        TemplateDto templateDto = new TemplateDto(
+                null,
+                null,
+                null);
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("file", SOURCE_BYTES).filename("filename.docx");
+        multipartBodyBuilder.part("template-info", templateDto);
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange().expectStatus().is4xxClientError()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName")
+                .value(Matchers.anyOf(Matchers.containsString("templateDescription"),
+                        Matchers.containsString("ptArt"), Matchers.containsString("bucket")))
+                .jsonPath("$.violations[1].fieldName")
+                .value(Matchers.anyOf(Matchers.containsString("templateDescription"),
+                        Matchers.containsString("ptArt"), Matchers.containsString("bucket")))
+                .jsonPath("$.violations[2].fieldName")
+                .value(Matchers.anyOf(Matchers.containsString("templateDescription"),
+                        Matchers.containsString("ptArt"), Matchers.containsString("bucket")));
     }
 
     @Test
@@ -211,6 +245,15 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
 
         Optional<TemplateEntity> templateEntityOptional = templateRepository.findById(templateId);
         Assertions.assertThat(templateEntityOptional).isPresent();
+    }
+
+    private TemplateEntity saveTemplate() {
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setFilename(SAMPLE_FILENAME);
+        templateEntity.setTemplateName("801877-filename");
+        templateEntity.setBucket(bucketName);
+        templateEntity.setPtArt("801877");
+        return templateRepository.save(templateEntity);
     }
 
 }
