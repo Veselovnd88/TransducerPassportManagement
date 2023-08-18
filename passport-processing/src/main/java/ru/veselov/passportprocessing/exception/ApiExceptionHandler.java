@@ -37,6 +37,12 @@ public class ApiExceptionHandler {
         return new ApiErrorResponse(ErrorCode.ERROR_SERVICE_UNAVAILABLE, e.getMessage());
     }
 
+    @ExceptionHandler(TemplateNotExistsException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiErrorResponse handleTemplateNotExistsException(TemplateNotExistsException e) {
+        return new ApiErrorResponse(ErrorCode.ERROR_NOT_FOUND, e.getMessage());
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleConstraintViolationException(ConstraintViolationException exception) {

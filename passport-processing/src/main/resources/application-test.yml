@@ -1,0 +1,64 @@
+server:
+  port: 7175
+
+placeholder:
+  upper-serial: NUMBERUP
+  bottom-serial: NUMBERDOWN
+  date: DATE
+  date-format: "dd.MM.yyyy"
+
+task-executor:
+  core-pool-size: 10
+  max-pool-size: 10
+  queue-capacity: 15
+
+pdf-service:
+  url: "http://localhost:3000/forms/libreoffice/convert"
+  filename: "fileToConvert"
+
+template-storage:
+  url: "http://localhost:7176/api/v1/template"
+
+spring:
+  application:
+    name: passport
+  cache:
+    cache-names: template
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/PtManagementDB
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: false
+        hbm2ddl:
+          auto: none
+  liquibase:
+    enabled: false
+
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: false
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+logging:
+  level:
+    ru.veselov.passportprocessing: debug
+
+template:
+  stub: disabled

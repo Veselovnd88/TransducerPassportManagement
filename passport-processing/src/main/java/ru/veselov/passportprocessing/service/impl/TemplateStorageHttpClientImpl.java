@@ -43,7 +43,7 @@ public class TemplateStorageHttpClientImpl implements TemplateStorageHttpClient 
                     throw new ServiceUnavailableException("Error occurred during retrieving template with [id: %s]"
                             .formatted(templateId));
                 }).bodyToMono(DataBuffer.class)
-                .doOnError(t -> log.error("Error occurred during retrieving template: [{}]", t.getMessage()))
+                .doOnError(t -> log.error(t.getMessage()))
                 .onErrorResume(WebClientRequestException.class::isInstance, e -> {
                     throw new ServiceUnavailableException("Template Storage server is down: %s".formatted(e.getMessage()));
                 });

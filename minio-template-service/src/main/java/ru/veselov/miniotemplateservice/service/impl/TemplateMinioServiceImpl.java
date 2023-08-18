@@ -41,10 +41,12 @@ public class TemplateMinioServiceImpl implements TemplateMinioService {
         try {
             GetObjectResponse object = minioClient.getObject(objectArgs);
             byte[] bytes = object.readAllBytes();
+            log.info("Retrieved [file: {}] from storage", filename);
             return new ByteArrayResource(bytes);
         } catch (ErrorResponseException | InvalidKeyException | InvalidResponseException | IOException |
                  NoSuchAlgorithmException | ServerException | XmlParserException | InsufficientDataException |
                  InternalException e) {
+            log.error("Error occurred during getting file from storage: {}", e.getMessage());
             throw new CommonMinioException(e.getMessage(), e);
         }
     }
