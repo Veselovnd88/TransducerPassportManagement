@@ -3,8 +3,10 @@ package ru.veselov.passportprocessing.app;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import lombok.SneakyThrows;
+import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
 import org.instancio.Select;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +20,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.passportprocessing.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
+import ru.veselov.passportprocessing.entity.PassportEntity;
+import ru.veselov.passportprocessing.repository.PassportRepository;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -45,14 +50,22 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
     @Autowired
     WebTestClient webTestClient;
 
+    @Autowired
+    PassportRepository passportRepository;
+
     @BeforeEach
     @SneakyThrows
     void init() {
         WireMock.configureFor("localhost", SIDE_PORT);
-        try (InputStream templateInputStream = getClass().getClassLoader().getResourceAsStream("file.docx");) {
+        try (InputStream templateInputStream = getClass().getClassLoader().getResourceAsStream("file.docx")) {
             assert templateInputStream != null;
             DOCX_BYTES = templateInputStream.readAllBytes();
         }
+    }
+
+    @AfterEach
+    void clear() {
+        passportRepository.deleteAll();
     }
 
     @DynamicPropertySource
@@ -67,7 +80,6 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.OK.value()).withBody(DOCX_BYTES)));
         WireMock.stubFor(WireMock.post("/")
                 .willReturn(WireMock.aResponse().withStatus(200).withBody(BYTES)));
-
         GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
                 .create();
@@ -77,7 +89,16 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(BYTES.length)
                 .expectBody(byte[].class);
+
+        List<PassportEntity> savedPassports = passportRepository.findAll();
+        Assertions.assertThat(savedPassports).hasSize(generatePassportsDto.getSerials().size());
+        Assertions.assertThat(savedPassports.get(0).getPtArt()).isEqualTo(generatePassportsDto.getPtArt());
+        Assertions.assertThat(savedPassports.get(0).getTemplateId())
+                .isEqualTo(UUID.fromString(generatePassportsDto.getTemplateId()));
+        Assertions.assertThat(savedPassports.get(0).getSerial()).isIn(generatePassportsDto.getSerials());
+        Assertions.assertThat(savedPassports.get(0).getId()).isNotNull();
+        Assertions.assertThat(savedPassports.get(0).getCreatedAt()).isNotNull();
+        Assertions.assertThat(savedPassports.get(0).getPrintDate()).isNotNull();
     }
 
 }
-
