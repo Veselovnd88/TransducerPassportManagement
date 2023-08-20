@@ -53,7 +53,6 @@ public class PassportServiceImpl implements PassportService {
     }
 
     private void saveGeneratedResult(GeneratePassportsDto generatePassportsDto) {
-        log.info("Saving generated results");
         CompletableFuture.supplyAsync(() -> passportStorageService.savePassports(generatePassportsDto));
     }
 
