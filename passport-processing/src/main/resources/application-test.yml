@@ -23,7 +23,7 @@ spring:
   application:
     name: passport
   cache:
-    cache-names: template
+    cache-names: templates
 
   datasource:
     url: jdbc:postgresql://localhost:5433/PtManagementDB

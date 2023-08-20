@@ -16,7 +16,7 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     private final TemplateStorageHttpClient templateStorageHttpClient;
 
     @Override
-    @Cacheable(value = "templates")//TODO test caching
+    @Cacheable(value = "templates")
     public ByteArrayResource getTemplate(String templateId) {
         log.info("Retrieving template with [id:{}]", templateId);
         return templateStorageHttpClient.sendRequestToGetTemplate(templateId);

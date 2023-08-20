@@ -11,9 +11,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -53,6 +56,9 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
 
     public byte[] DOCX_BYTES;
 
+    @Value("${spring.cache.cache-names}")
+    public String cache;
+
     @Autowired
     WebTestClient webTestClient;
 
@@ -78,7 +84,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
     @AfterEach
     void clear() {
         passportRepository.deleteAll();
-        Objects.requireNonNull(cacheManager.getCache("templates")).clear();
+        Objects.requireNonNull(cacheManager.getCache(cache)).clear();
     }
 
     @DynamicPropertySource
@@ -113,6 +119,12 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
         Assertions.assertThat(savedPassports.get(0).getId()).isNotNull();
         Assertions.assertThat(savedPassports.get(0).getCreatedAt()).isNotNull();
         Assertions.assertThat(savedPassports.get(0).getPrintDate()).isNotNull();
+        Cache myCache = cacheManager.getCache(cache);
+        Assertions.assertThat(myCache).isNotNull();
+        Cache.ValueWrapper valueWrapper = myCache.get(TEMPLATE_ID);
+        Assertions.assertThat(valueWrapper).isNotNull();
+        ByteArrayResource byteArrayResource = new ByteArrayResource(DOCX_BYTES);
+        Assertions.assertThat(valueWrapper.get()).isEqualTo(byteArrayResource);
     }
 
     @Test
