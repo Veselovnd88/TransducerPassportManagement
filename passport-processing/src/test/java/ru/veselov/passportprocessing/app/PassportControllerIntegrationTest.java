@@ -32,6 +32,7 @@ import ru.veselov.passportprocessing.service.PassportStorageService;
 
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -194,6 +195,32 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_SERVICE_UNAVAILABLE.toString());
+    }
+
+    @Test
+    void shouldReturnTemplateStorageErrorIfStorageServiceReturnNullBytesArray() {
+        WireMock.stubFor(WireMock.get("/" + templatePath)
+                .willReturn(WireMock.aResponse().withStatus(HttpStatus.OK.value()).withBody(new byte[]{})));
+        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
+                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
+                .create();
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+                .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_DOC_PROCESSING.toString());
+    }
+
+    @Test
+    void shouldReturnValidationErrorForEmptyList() {
+        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
+                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
+                .set(Select.field(GeneratePassportsDto.class, "serials"), Collections.emptyList())
+                .create();
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+                .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("serials");//FIXME
     }
 
 }

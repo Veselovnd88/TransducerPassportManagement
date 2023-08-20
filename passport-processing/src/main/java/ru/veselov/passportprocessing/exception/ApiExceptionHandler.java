@@ -37,6 +37,12 @@ public class ApiExceptionHandler {
         return new ApiErrorResponse(ErrorCode.ERROR_SERVICE_UNAVAILABLE, e.getMessage());
     }
 
+    @ExceptionHandler(TemplateStorageException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiErrorResponse handleTemplateStorageException(TemplateStorageException e) {
+        return new ApiErrorResponse(ErrorCode.ERROR_DOC_PROCESSING, e.getMessage());
+    }
+
     @ExceptionHandler(TemplateNotExistsException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiErrorResponse handleTemplateNotExistsException(TemplateNotExistsException e) {
