@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 import ru.veselov.passportprocessing.entity.PassportEntity;
 import ru.veselov.passportprocessing.repository.PassportRepository;
@@ -21,6 +22,7 @@ public class PassportStorageServiceImpl implements PassportStorageService {
 
     @Override
     @Async("taskExecutor")
+    @Transactional
     public CompletableFuture<List<PassportEntity>> savePassports(GeneratePassportsDto generatePassportsDto) {
         List<PassportEntity> passportsToSave = generatePassportsDto.getSerials().stream().map(serial ->
                 new PassportEntity(UUID.fromString(generatePassportsDto.getTemplateId()),

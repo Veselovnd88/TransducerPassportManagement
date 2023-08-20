@@ -4,6 +4,7 @@ import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
+import org.awaitility.Awaitility;
 import org.instancio.Instancio;
 import org.instancio.Select;
 import org.junit.jupiter.api.AfterEach;
@@ -24,8 +25,10 @@ import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 import ru.veselov.passportprocessing.entity.PassportEntity;
 import ru.veselov.passportprocessing.exception.error.ErrorCode;
 import ru.veselov.passportprocessing.repository.PassportRepository;
+import ru.veselov.passportprocessing.service.PassportStorageService;
 
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -55,6 +58,9 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
 
     @Autowired
     CacheManager cacheManager;
+
+    @Autowired
+    PassportStorageService passportStorageService;
 
     @Autowired
     PassportRepository passportRepository;
@@ -97,7 +103,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(BYTES.length)
                 .expectBody(byte[].class);
-        Thread.sleep(100);//TODO replace with awaitility
+        Awaitility.await().pollDelay(Duration.ofMillis(2000)).until(() -> true);
         List<PassportEntity> savedPassports = passportRepository.findAll();
         Assertions.assertThat(savedPassports).hasSize(generatePassportsDto.getSerials().size());
         Assertions.assertThat(savedPassports.get(0).getPtArt()).isEqualTo(generatePassportsDto.getPtArt());
@@ -107,7 +113,6 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
         Assertions.assertThat(savedPassports.get(0).getId()).isNotNull();
         Assertions.assertThat(savedPassports.get(0).getCreatedAt()).isNotNull();
         Assertions.assertThat(savedPassports.get(0).getPrintDate()).isNotNull();
-        //TODO check why there is no entities during check
     }
 
     @Test
@@ -178,6 +183,5 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_SERVICE_UNAVAILABLE.toString());
     }
-
 
 }
