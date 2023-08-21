@@ -1,9 +1,11 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/changelogs/01-changelog.yaml
+      file: db/changelog/changelogs/01-changelog-passport.yaml
   - include:
-      file: db/changelog/changelogs/10-changelog.yaml
+      file: db/changelog/changelogs/10-changelog-template.yaml
   - include:
-      file: db/changelog/changelogs/11-changelog.yaml
+      file: db/changelog/changelogs/11-changelog-column-template-name.yaml
   - include:
-      file: db/changelog/changelogs/20-changelog.yaml
+      file: db/changelog/changelogs/20-changelog-transducer.yaml
+  - include:
+      file: db/changelog/changelogs/21-changelog-serial.yaml
