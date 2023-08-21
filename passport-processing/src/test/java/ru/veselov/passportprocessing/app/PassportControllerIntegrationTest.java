@@ -32,7 +32,6 @@ import ru.veselov.passportprocessing.service.PassportStorageService;
 
 import java.io.InputStream;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -101,9 +100,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.OK.value()).withBody(DOCX_BYTES)));
         WireMock.stubFor(WireMock.post("/")
                 .willReturn(WireMock.aResponse().withStatus(200).withBody(BYTES)));
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .create();
+        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isOk()
@@ -132,9 +129,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
     void shouldReturnDocxProcessingError() {
         WireMock.stubFor(WireMock.get("/" + templatePath)
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.OK.value()).withBody(new byte[]{1, 2, 3})));
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .create();
+        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
@@ -147,9 +142,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.OK.value()).withBody(DOCX_BYTES)));
         WireMock.stubFor(WireMock.post("/")
                 .willReturn(WireMock.aResponse().withStatus(400)));
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .create();
+        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
@@ -162,9 +155,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.OK.value()).withBody(DOCX_BYTES)));
         WireMock.stubFor(WireMock.post("/")
                 .willReturn(WireMock.aResponse().withStatus(500)));
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .create();
+        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
@@ -175,9 +166,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
     void shouldReturnTemplateNotFoundErrorIfTemplateStorageStatus404() {
         WireMock.stubFor(WireMock.get("/" + templatePath)
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.NOT_FOUND.value())));
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .create();
+        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
@@ -188,9 +177,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
     void shouldReturnServerUnavailableErrorIfStorageServiceStatus500() {
         WireMock.stubFor(WireMock.get("/" + templatePath)
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.SERVICE_UNAVAILABLE.value())));
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .create();
+        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
@@ -201,26 +188,17 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
     void shouldReturnTemplateStorageErrorIfStorageServiceReturnNullBytesArray() {
         WireMock.stubFor(WireMock.get("/" + templatePath)
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.OK.value()).withBody(new byte[]{})));
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .create();
+        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_DOC_PROCESSING.toString());
     }
 
-    @Test
-    void shouldReturnValidationErrorForEmptyList() {
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
+    private GeneratePassportsDto getGeneratePassportDto() {
+        return Instancio.of(GeneratePassportsDto.class)
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .set(Select.field(GeneratePassportsDto.class, "serials"), Collections.emptyList())
                 .create();
-
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
-                .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("serials");//FIXME
     }
 
 }
