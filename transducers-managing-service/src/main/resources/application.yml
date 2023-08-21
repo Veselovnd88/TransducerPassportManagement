@@ -18,9 +18,9 @@ spring:
         show_sql: true
         format_sql: false
         hbm2ddl:
-          auto: none
+          auto: validate
   liquibase:
-    enabled: false
+    enabled: true
 
 eureka:
   client:

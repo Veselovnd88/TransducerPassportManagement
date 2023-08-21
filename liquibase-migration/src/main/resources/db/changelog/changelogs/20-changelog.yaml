@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: addPressureTransducerTable
+      author: Veselov Nikolay
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/20-create-pt-table.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/20-drop-pt-table.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true

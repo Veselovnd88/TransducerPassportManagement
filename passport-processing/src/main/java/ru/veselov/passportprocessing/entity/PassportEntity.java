@@ -11,7 +11,6 @@ import jakarta.persistence.TemporalType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.ToString;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,7 +19,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "passport")
 @Data
-@EqualsAndHashCode(exclude = {"id"})
+@EqualsAndHashCode(exclude = {"id", "createdAt"})
 @NoArgsConstructor
 public class PassportEntity {
 
