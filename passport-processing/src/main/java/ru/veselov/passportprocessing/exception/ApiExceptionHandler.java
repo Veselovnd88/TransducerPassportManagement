@@ -37,6 +37,18 @@ public class ApiExceptionHandler {
         return new ApiErrorResponse(ErrorCode.ERROR_SERVICE_UNAVAILABLE, e.getMessage());
     }
 
+    @ExceptionHandler(TemplateStorageException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiErrorResponse handleTemplateStorageException(TemplateStorageException e) {
+        return new ApiErrorResponse(ErrorCode.ERROR_DOC_PROCESSING, e.getMessage());
+    }
+
+    @ExceptionHandler(TemplateNotExistsException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiErrorResponse handleTemplateNotExistsException(TemplateNotExistsException e) {
+        return new ApiErrorResponse(ErrorCode.ERROR_NOT_FOUND, e.getMessage());
+    }
+
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleConstraintViolationException(ConstraintViolationException exception) {
@@ -54,7 +66,7 @@ public class ApiExceptionHandler {
     public ApiErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         final List<ViolationError> violations = e.getBindingResult().getFieldErrors().stream()
                 .map(error -> new ViolationError(error.getField(), error.getDefaultMessage(),
-                        error.getRejectedValue() != null ? (String) error.getRejectedValue() : "null"))
+                        error.getRejectedValue() != null ? (String) error.getRejectedValue().toString() : "null"))
                 .toList();
         return new ValidationErrorResponse(e.getMessage(), violations);
     }

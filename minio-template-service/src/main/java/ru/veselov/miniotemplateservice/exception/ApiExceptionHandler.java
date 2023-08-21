@@ -61,7 +61,7 @@ public class ApiExceptionHandler {
     public ApiErrorResponse handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         final List<ViolationError> violations = e.getBindingResult().getFieldErrors().stream()
                 .map(error -> new ViolationError(error.getField(), error.getDefaultMessage(),
-                        error.getRejectedValue() != null ? (String) error.getRejectedValue() : "null"))
+                        error.getRejectedValue() != null ? error.getRejectedValue().toString() : "null"))
                 .toList();
         return new ValidationErrorResponse(e.getMessage(), violations);
     }

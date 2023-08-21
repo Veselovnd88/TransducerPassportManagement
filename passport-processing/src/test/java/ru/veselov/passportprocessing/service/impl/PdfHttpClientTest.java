@@ -1,6 +1,5 @@
 package ru.veselov.passportprocessing.service.impl;
 
-import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import org.assertj.core.api.Assertions;
@@ -14,8 +13,6 @@ import ru.veselov.passportprocessing.exception.ServiceUnavailableException;
 
 @WireMockTest(httpPort = 30001)
 class PdfHttpClientTest {
-
-    public static WireMockServer wireMockServer;
 
     public static int PORT = 30001;
 
