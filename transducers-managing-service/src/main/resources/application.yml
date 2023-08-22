@@ -35,6 +35,9 @@ management:
     sampling:
       probability: 1.0
 
+serial:
+  serialsPerPage: 100
+
 logging:
   level:
     ru.veselov.passportprocessing: debug

@@ -7,4 +7,8 @@ public interface TransducerService {
 
     Transducer saveTransducer(TransducerDto transducerDto);
 
+    Transducer findTransducerById(String transducerId);
+
+    void deleteTransducer(String transducerId);
+
 }

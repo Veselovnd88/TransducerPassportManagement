@@ -1,5 +1,6 @@
 package ru.veselov.transducersmanagingservice.service;
 
+import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 
 import java.time.LocalDate;
@@ -11,9 +12,9 @@ public interface SerialNumberService {
 
     List<SerialNumber> findByNumber(String number);
 
-    List<SerialNumber> findByArt(String ptArt);
+    List<SerialNumber> findByArt(SortingParams sortingParams,String ptArt);
 
-    List<SerialNumber> findByDate(LocalDate before, LocalDate after);
+    List<SerialNumber> findByDate(SortingParams sortingParams, LocalDate before, LocalDate after);
 
     void deleteSerial(String serialId);
 

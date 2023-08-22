@@ -3,10 +3,19 @@ package ru.veselov.transducersmanagingservice.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.entity.SerialNumberEntity;
 import ru.veselov.transducersmanagingservice.entity.TransducerEntity;
+import ru.veselov.transducersmanagingservice.exception.PageExceedsMaximumValueException;
+import ru.veselov.transducersmanagingservice.mapper.SerialNumberMapper;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 import ru.veselov.transducersmanagingservice.repository.SerialNumberRepository;
 import ru.veselov.transducersmanagingservice.repository.TransducerRepository;
@@ -24,9 +33,14 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class SerialNumberServiceImpl implements SerialNumberService {
 
+    @Value("${serial.serialsPerPage}")
+    private int serialsPerPage;
+
     private final SerialNumberRepository serialNumberRepository;
 
     private final TransducerRepository transducerRepository;
+
+    private final SerialNumberMapper serialNumberMapper;
 
     @Override
     @Transactional
@@ -53,18 +67,27 @@ public class SerialNumberServiceImpl implements SerialNumberService {
 
     @Override
     public List<SerialNumber> findByNumber(String number) {
-        return null;
+        List<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByNumber(number);
+        log.info("Found [{} serials] with [number: {}]", foundSerials.size(), number);
+        return serialNumberMapper.toModelList(foundSerials);
     }
 
     @Override
-    public List<SerialNumber> findByArt(String ptArt) {
-        return null;
+    public List<SerialNumber> findByArt(SortingParams sortingParams, String ptArt) {
+        long totalWithPtArt = serialNumberRepository.countAllByPtArt(ptArt);
+        validatePageNumber(sortingParams.getPage(), totalWithPtArt);
+        Pageable pageable = createPageable(sortingParams.getPage(), sortingParams.getSort(), sortingParams.getOrder());
+        Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByPtArt(ptArt, pageable);
+        log.info("Found [{} serials] with [pt art: {}]", foundSerials.getContent().size(), ptArt);
+        return serialNumberMapper.toModelList(foundSerials.getContent());
     }
 
     @Override
-    public List<SerialNumber> findByDate(LocalDate before, LocalDate after) {
+    public List<SerialNumber> findByDate(SortingParams sortingParams, LocalDate before, LocalDate after) {
+
         return null;
     }
+
 
     @Override
     public void deleteSerial(String serialId) {
@@ -72,4 +95,24 @@ public class SerialNumberServiceImpl implements SerialNumberService {
         serialNumberRepository.deleteById(serialNumberUUID);
         log.info("Serial number with [id: {}] was deleted from DB", serialId);
     }
+
+    private Pageable createPageable(int page, String sort, String order) {
+        Sort sortOrder;
+        if (StringUtils.equals(order, "asc")) {
+            sortOrder = Sort.by(sort).ascending();
+        } else {
+            sortOrder = Sort.by(sort).descending();
+        }
+        return PageRequest.of(page, serialsPerPage).withSort(sortOrder);
+    }
+
+    private void validatePageNumber(int page, long count) {
+        long totalPages = count / serialsPerPage;
+        if (page > totalPages) {
+            log.error("Page number exceeds maximum value [max: {}, was: {}}]", totalPages, page);
+            throw new PageExceedsMaximumValueException("Page number exceeds maximum value [max: %s, was: %s]"
+                    .formatted(totalPages, page), page);
+        }
+    }
+
 }

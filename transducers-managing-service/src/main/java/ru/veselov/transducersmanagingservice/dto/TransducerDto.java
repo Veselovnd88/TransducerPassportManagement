@@ -10,8 +10,12 @@ public class TransducerDto {
     private String art;
 
     private String name;
+
     @NotNull
-    //@PressureType
+    private String code;
+
+    @NotNull
+    //@PressureType //TODO constraint
     private PressureType pressureType;
 
     @NotNull
