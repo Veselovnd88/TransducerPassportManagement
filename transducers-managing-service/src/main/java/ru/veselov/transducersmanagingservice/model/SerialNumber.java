@@ -1,5 +1,6 @@
 package ru.veselov.transducersmanagingservice.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -13,6 +14,7 @@ public class SerialNumber {
 
     private String ptArt;
 
+    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime createdAt;
 
 }

@@ -26,6 +26,9 @@ public class TransducerEntity extends BaseEntity {
     @Column(name = "tr_name", nullable = false)
     private String transducerName;
 
+    @Column(name = "code", nullable = false)
+    private String code;
+
     @Column(name = "pressure_type", nullable = false)
     @Enumerated(EnumType.STRING)
     private PressureType pressureType;

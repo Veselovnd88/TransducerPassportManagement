@@ -1,6 +1,5 @@
 package ru.veselov.transducersmanagingservice.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.Column;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
@@ -19,7 +18,6 @@ public abstract class BaseEntity {
     @Column(name = "id", columnDefinition = "uuid", nullable = false, updatable = false)
     private UUID id;
 
-    @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -27,4 +25,5 @@ public abstract class BaseEntity {
     public void prePersist() {
         this.createdAt = LocalDateTime.now();
     }
+
 }
