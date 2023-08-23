@@ -10,7 +10,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface SerialNumberMapper {
 
-    SerialNumber toModel(SerialNumberEntity serialNumberEntity);
+    SerialNumber toSerialNumberModel(SerialNumberEntity serialNumberEntity);
 
     List<SerialNumber> toModelList(List<SerialNumberEntity> entityList);
 

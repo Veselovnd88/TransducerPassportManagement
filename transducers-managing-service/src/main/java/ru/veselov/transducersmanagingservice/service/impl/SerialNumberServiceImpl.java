@@ -72,6 +72,13 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     }
 
     @Override
+    public Optional<SerialNumber> findById(String serialId) {
+        UUID uuid = UUID.fromString(serialId);
+        Optional<SerialNumberEntity> foundById = serialNumberRepository.findById(uuid);
+        return foundById.map(serialNumberMapper::toSerialNumberModel);
+    }
+
+    @Override
     public List<SerialNumber> findByArt(SortingParams sortingParams, String ptArt) {
         long totalWithPtArt = serialNumberRepository.countAllByPtArt(ptArt);
         validatePageNumber(sortingParams.getPage(), totalWithPtArt);
