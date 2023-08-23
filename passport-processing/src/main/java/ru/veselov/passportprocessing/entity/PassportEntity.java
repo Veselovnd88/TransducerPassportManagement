@@ -13,7 +13,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.UUID;
 
 @Entity
@@ -43,7 +43,7 @@ public class PassportEntity {
 
     @Column(name = "created_at", updatable = false)
     @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
+    private LocalDate createdAt;
 
     public PassportEntity(UUID templateId, String serial, String ptArt, LocalDate printDate) {
         this.templateId = templateId;

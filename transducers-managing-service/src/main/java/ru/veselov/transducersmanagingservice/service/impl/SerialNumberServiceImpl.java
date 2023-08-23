@@ -50,10 +50,11 @@ public class SerialNumberServiceImpl implements SerialNumberService {
             TransducerEntity transducerEntity = transducerEntityOptional.get();
             ArrayList<SerialNumberEntity> serialNumberEntities = new ArrayList<>();
             serials.forEach(serial -> {
-                SerialNumberEntity serialNumberEntity = SerialNumberEntity.builder().transducerEntity(transducerEntity)
-                        .ptArt(transducerEntity.getArt())
-                        .number(serial).build();
-                serialNumberEntities.add(serialNumberEntity);
+                SerialNumberEntity newEntity = new SerialNumberEntity();
+                newEntity.setTransducerEntity(transducerEntity);
+                newEntity.setPtArt(transducerEntity.getArt());
+                newEntity.setNumber(serial);
+                serialNumberEntities.add(newEntity);
             });
             serialNumberRepository.saveAll(serialNumberEntities);
             log.info("Serial number saved to DB, [total: {}]", serials.size());
@@ -61,8 +62,6 @@ public class SerialNumberServiceImpl implements SerialNumberService {
             log.error("Transducer with [art: {}] not found", ptArt);
             throw new EntityNotFoundException("Transducer with art %s not found".formatted(ptArt));
         }
-
-
     }
 
     @Override
@@ -76,18 +75,34 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     public List<SerialNumber> findByArt(SortingParams sortingParams, String ptArt) {
         long totalWithPtArt = serialNumberRepository.countAllByPtArt(ptArt);
         validatePageNumber(sortingParams.getPage(), totalWithPtArt);
-        Pageable pageable = createPageable(sortingParams.getPage(), sortingParams.getSort(), sortingParams.getOrder());
+        Pageable pageable = createPageable(sortingParams);
         Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByPtArt(ptArt, pageable);
         log.info("Found [{} serials] with [pt art: {}]", foundSerials.getContent().size(), ptArt);
         return serialNumberMapper.toModelList(foundSerials.getContent());
     }
 
     @Override
-    public List<SerialNumber> findByDate(SortingParams sortingParams, LocalDate before, LocalDate after) {
-
-        return null;
+    public List<SerialNumber> findBetweenDates(SortingParams sortingParams,
+                                               LocalDate before, LocalDate after) {
+        long totalCount = serialNumberRepository.countAllBetweenDates(before, after);
+        validatePageNumber(sortingParams.getPage(), totalCount);
+        Pageable pageable = createPageable(sortingParams);
+        Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllBetweenDates(before, after, pageable);
+        log.info("Found [{} serials] between dates [{} - {}]", foundSerials.getContent().size(), before, after);
+        return serialNumberMapper.toModelList(foundSerials.getContent());
     }
 
+    @Override
+    public List<SerialNumber> findByPtArtBetweenDates(SortingParams sortingParams, String ptArt,
+                                                      LocalDate before, LocalDate after) {
+        long totalCount = serialNumberRepository.countAllByPtArtBetweenDates(ptArt, before, after);
+        validatePageNumber(sortingParams.getPage(), totalCount);
+        Pageable pageable = createPageable(sortingParams);
+        Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByPtARtBetweenDates(ptArt, before, after, pageable);
+        log.info("Found [{} serials] with [ptArt: {}] between dates [{} - {}]", foundSerials.getContent().size(),
+                ptArt, before, after);
+        return serialNumberMapper.toModelList(foundSerials.getContent());
+    }
 
     @Override
     public void deleteSerial(String serialId) {
@@ -96,7 +111,10 @@ public class SerialNumberServiceImpl implements SerialNumberService {
         log.info("Serial number with [id: {}] was deleted from DB", serialId);
     }
 
-    private Pageable createPageable(int page, String sort, String order) {
+    private Pageable createPageable(SortingParams sortingParams) {
+        int page = sortingParams.getPage();
+        String sort = sortingParams.getSort();
+        String order = sortingParams.getOrder();
         Sort sortOrder;
         if (StringUtils.equals(order, "asc")) {
             sortOrder = Sort.by(sort).ascending();
