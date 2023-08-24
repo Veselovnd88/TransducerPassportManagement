@@ -9,3 +9,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/20-changelog-transducer.yaml
   - include:
       file: db/changelog/changelogs/21-changelog-serial.yaml
+  - include:
+      file: db/changelog/changelogs/22-changelog-serial-add-columns.yaml

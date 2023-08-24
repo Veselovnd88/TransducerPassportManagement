@@ -31,6 +31,12 @@ public class SerialNumberEntity extends BaseEntity {
     @Column(name = "pt_art", nullable = false)
     private String ptArt;
 
+    @Column(name = "ext_comment")
+    private String comment;
+
+    @Column(name = "customer")
+    private String customer;
+
     @Column(name = "saved_at")
     @Temporal(TemporalType.DATE)
     private LocalDate savedAt;

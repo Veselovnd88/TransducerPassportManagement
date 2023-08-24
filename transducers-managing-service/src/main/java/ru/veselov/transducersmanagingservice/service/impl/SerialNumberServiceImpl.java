@@ -54,11 +54,11 @@ public class SerialNumberServiceImpl implements SerialNumberService {
             TransducerEntity transducerEntity = transducerEntityOptional.get();
             ArrayList<SerialNumberEntity> serialNumberEntities = new ArrayList<>();
             serials.forEach(serial -> {
-                SerialNumberEntity newEntity = new SerialNumberEntity();
-                newEntity.setTransducerEntity(transducerEntity);
-                newEntity.setPtArt(transducerEntity.getArt());
-                newEntity.setNumber(serial);
-                serialNumberEntities.add(newEntity);
+                SerialNumberEntity serialNumberEntity = createAndSetUpEntity(serialsDto);
+                serialNumberEntity.setTransducerEntity(transducerEntity);
+                serialNumberEntity.setPtArt(transducerEntity.getArt());
+                serialNumberEntity.setNumber(serial);
+                serialNumberEntities.add(serialNumberEntity);
             });
             serialNumberRepository.saveAll(serialNumberEntities);
             log.info("Serial number saved to DB, [total: {}]", serials.size());
@@ -148,6 +148,14 @@ public class SerialNumberServiceImpl implements SerialNumberService {
             throw new PageExceedsMaximumValueException("Page number exceeds maximum value [max: %s, was: %s]"
                     .formatted(totalPages, page), page);
         }
+    }
+
+    private SerialNumberEntity createAndSetUpEntity(SerialsDto serialsDto) {
+        SerialNumberEntity serialNumberEntity = new SerialNumberEntity();
+        serialNumberEntity.setComment(serialsDto.getComment());
+        serialNumberEntity.setCustomer(serialsDto.getCustomer());
+        serialNumberEntity.setSavedAt(serialsDto.getSavedAt());
+        return serialNumberEntity;
     }
 
 }
