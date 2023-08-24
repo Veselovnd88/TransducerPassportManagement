@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.veselov.transducersmanagingservice.dto.DateParams;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.entity.SerialNumberEntity;
 import ru.veselov.transducersmanagingservice.entity.TransducerEntity;
@@ -92,8 +93,9 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     }
 
     @Override
-    public List<SerialNumber> findBetweenDates(SortingParams sortingParams,
-                                               LocalDate after, LocalDate before) {
+    public List<SerialNumber> findBetweenDates(SortingParams sortingParams, DateParams dateParams) {
+        LocalDate after = dateParams.getAfter();
+        LocalDate before = dateParams.getBefore();
         long totalCount = serialNumberRepository.countAllBetweenDates(after, before);
         validatePageNumber(sortingParams.getPage(), totalCount);
         Pageable pageable = createPageable(sortingParams);
@@ -104,7 +106,9 @@ public class SerialNumberServiceImpl implements SerialNumberService {
 
     @Override
     public List<SerialNumber> findByPtArtBetweenDates(SortingParams sortingParams, String ptArt,
-                                                      LocalDate after, LocalDate before) {
+                                                      DateParams dateParams) {
+        LocalDate after = dateParams.getAfter();
+        LocalDate before = dateParams.getBefore();
         long totalCount = serialNumberRepository.countAllByPtArtBetweenDates(ptArt, after, before);
         validatePageNumber(sortingParams.getPage(), totalCount);
         Pageable pageable = createPageable(sortingParams);

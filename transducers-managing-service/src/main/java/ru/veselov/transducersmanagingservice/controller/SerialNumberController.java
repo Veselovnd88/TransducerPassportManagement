@@ -2,7 +2,6 @@ package ru.veselov.transducersmanagingservice.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -10,14 +9,14 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.veselov.transducersmanagingservice.annotation.DateParam;
 import ru.veselov.transducersmanagingservice.annotation.SortingParam;
+import ru.veselov.transducersmanagingservice.dto.DateParams;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 import ru.veselov.transducersmanagingservice.service.SerialNumberService;
 
-import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -31,9 +30,8 @@ public class SerialNumberController {
     @GetMapping("/all/dates")
     public ResponseEntity<List<SerialNumber>> getAllSerialNumbersBetweenDates(
             @SortingParam SortingParams sortingParams,
-            @DateTimeFormat @RequestParam("after") LocalDate after,
-            @DateTimeFormat @RequestParam("before") LocalDate before) {
-        List<SerialNumber> serialNumbers = serialNumberService.findBetweenDates(sortingParams, after, before);
+            @DateParam DateParams dateParams) {
+        List<SerialNumber> serialNumbers = serialNumberService.findBetweenDates(sortingParams, dateParams);
         return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
     }
 
@@ -41,10 +39,9 @@ public class SerialNumberController {
     public ResponseEntity<List<SerialNumber>> getAllSerialNumbersByPtArtBetweenDates(
             @PathVariable("ptArt") String ptArt,
             @SortingParam SortingParams sortingParams,
-            @DateTimeFormat @RequestParam("after") LocalDate after,
-            @DateTimeFormat @RequestParam("before") LocalDate before) {
+            @DateParam DateParams dateParams) {
         List<SerialNumber> serialNumbers = serialNumberService
-                .findByPtArtBetweenDates(sortingParams, ptArt, after, before);
+                .findByPtArtBetweenDates(sortingParams, ptArt, dateParams);
         return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
     }
 
@@ -73,6 +70,5 @@ public class SerialNumberController {
         serialNumberService.deleteSerial(serialId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
-
 
 }
