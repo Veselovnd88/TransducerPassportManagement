@@ -24,24 +24,24 @@ public interface SerialNumberRepository extends JpaRepository<SerialNumberEntity
     long countAllByPtArt(@Param("ptArt") String ptArt);
 
     @Query(value = "SELECT s FROM SerialNumberEntity  s where s.ptArt= :ptArt " +
-            "AND s.savedAt BETWEEN :before AND :after",
+            "AND s.savedAt BETWEEN :after AND :before",
             countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt " +
-                    "AND s.savedAt BETWEEN :before AND :after")
+                    "AND s.savedAt BETWEEN :after AND :before")
     Page<SerialNumberEntity> findAllByPtARtBetweenDates(@Param("ptArt") String ptArt,
-                                                        @Param("before") LocalDate before,
-                                                        @Param("after") LocalDate after, Pageable pageable);
+                                                        @Param("after") LocalDate after,
+                                                        @Param("before") LocalDate before, Pageable pageable);
 
     @Query("SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt " +
-            "AND s.savedAt BETWEEN :before AND :after")
-    long countAllByPtArtBetweenDates(@Param("ptArt") String ptArt, @Param("before") LocalDate before,
-                                     @Param("after") LocalDate after);
+            "AND s.savedAt BETWEEN :after AND :before")
+    long countAllByPtArtBetweenDates(@Param("ptArt") String ptArt, @Param("after") LocalDate after,
+                                     @Param("before") LocalDate before);
 
-    @Query(value = "SELECT s FROM SerialNumberEntity  s where s.savedAt BETWEEN :before AND :after",
-            countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.savedAt BETWEEN :before AND :after")
-    Page<SerialNumberEntity> findAllBetweenDates(@Param("before") LocalDate before,
-                                                 @Param("after") LocalDate after, Pageable pageable);
+    @Query(value = "SELECT s FROM SerialNumberEntity  s where s.savedAt BETWEEN :after AND :before",
+            countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.savedAt BETWEEN :after AND :before")
+    Page<SerialNumberEntity> findAllBetweenDates(@Param("after") LocalDate after,
+                                                 @Param("before") LocalDate before, Pageable pageable);
 
-    @Query("SELECT COUNT(s) FROM SerialNumberEntity  s where s.savedAt BETWEEN :before AND :after")
-    long countAllBetweenDates(@Param("before") LocalDate before,
-                              @Param("after") LocalDate after);
+    @Query("SELECT COUNT(s) FROM SerialNumberEntity  s where s.savedAt BETWEEN :after AND :before")
+    long countAllBetweenDates(@Param("after") LocalDate after,
+                              @Param("before") LocalDate before);
 }

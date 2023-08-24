@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.veselov.transducersmanagingservice.annotation.SortingParam;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 import ru.veselov.transducersmanagingservice.service.SerialNumberService;
@@ -25,10 +26,11 @@ public class SerialNumberController {
     private final SerialNumberService serialNumberService;
 
     @GetMapping("/all/dates")
-    public ResponseEntity<List<SerialNumber>> getAllSerialNumber(SortingParams sortingParams,
-                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam("before") LocalDate before,
-                                                                 @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) @RequestParam("after") LocalDate after) {
-        List<SerialNumber> serialNumbers = serialNumberService.findBetweenDates(sortingParams, before, after);
+    public ResponseEntity<List<SerialNumber>> getAllSerialNumber(
+            @SortingParam SortingParams sortingParams,
+            @DateTimeFormat @RequestParam("after") LocalDate after,
+            @DateTimeFormat @RequestParam("before") LocalDate before) {
+        List<SerialNumber> serialNumbers = serialNumberService.findBetweenDates(sortingParams, after, before);
         return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
     }
 

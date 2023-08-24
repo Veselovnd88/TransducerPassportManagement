@@ -4,7 +4,6 @@ import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,10 +15,10 @@ public interface SerialNumberService {
 
     List<SerialNumber> findByArt(SortingParams sortingParams, String ptArt);
 
-    List<SerialNumber> findBetweenDates(SortingParams sortingParams, LocalDate before, LocalDate after);
+    List<SerialNumber> findBetweenDates(SortingParams sortingParams, LocalDate after, LocalDate before);
 
-    List<SerialNumber> findByPtArtBetweenDates(SortingParams sortingParams, String ptArt, LocalDate before,
-                                               LocalDate after);
+    List<SerialNumber> findByPtArtBetweenDates(SortingParams sortingParams, String ptArt, LocalDate after,
+                                               LocalDate before);
 
     Optional<SerialNumber> findById(String serialId);
 

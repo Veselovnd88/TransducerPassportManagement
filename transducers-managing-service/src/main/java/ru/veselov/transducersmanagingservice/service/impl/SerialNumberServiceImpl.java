@@ -90,24 +90,24 @@ public class SerialNumberServiceImpl implements SerialNumberService {
 
     @Override
     public List<SerialNumber> findBetweenDates(SortingParams sortingParams,
-                                               LocalDate before, LocalDate after) {
-        long totalCount = serialNumberRepository.countAllBetweenDates(before, after);
+                                               LocalDate after, LocalDate before) {
+        long totalCount = serialNumberRepository.countAllBetweenDates(after, before);
         validatePageNumber(sortingParams.getPage(), totalCount);
         Pageable pageable = createPageable(sortingParams);
-        Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllBetweenDates(before, after, pageable);
-        log.info("Found [{} serials] between dates [{} - {}]", foundSerials.getContent().size(), before, after);
+        Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllBetweenDates(after, before, pageable);
+        log.info("Found [{} serials] between dates [{} - {}]", foundSerials.getContent().size(), after, before);
         return serialNumberMapper.toModelList(foundSerials.getContent());
     }
 
     @Override
     public List<SerialNumber> findByPtArtBetweenDates(SortingParams sortingParams, String ptArt,
-                                                      LocalDate before, LocalDate after) {
-        long totalCount = serialNumberRepository.countAllByPtArtBetweenDates(ptArt, before, after);
+                                                      LocalDate after, LocalDate before) {
+        long totalCount = serialNumberRepository.countAllByPtArtBetweenDates(ptArt, after, before);
         validatePageNumber(sortingParams.getPage(), totalCount);
         Pageable pageable = createPageable(sortingParams);
-        Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByPtARtBetweenDates(ptArt, before, after, pageable);
+        Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByPtARtBetweenDates(ptArt, after, before, pageable);
         log.info("Found [{} serials] with [ptArt: {}] between dates [{} - {}]", foundSerials.getContent().size(),
-                ptArt, before, after);
+                ptArt, after, before);
         return serialNumberMapper.toModelList(foundSerials.getContent());
     }
 
