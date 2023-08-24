@@ -1,5 +1,6 @@
 package ru.veselov.transducersmanagingservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.HttpStatus;
@@ -8,11 +9,13 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import ru.veselov.transducersmanagingservice.annotation.DateParam;
 import ru.veselov.transducersmanagingservice.annotation.SortingParam;
 import ru.veselov.transducersmanagingservice.dto.DateParams;
+import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 import ru.veselov.transducersmanagingservice.service.SerialNumberService;
@@ -26,6 +29,12 @@ import java.util.List;
 public class SerialNumberController {
 
     private final SerialNumberService serialNumberService;
+
+    @PostMapping
+    public ResponseEntity<Void> saveSerials(@Valid SerialsDto serialsDto) {
+        serialNumberService.saveSerials(serialsDto);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
+    }
 
     @GetMapping("/all/dates")
     public ResponseEntity<List<SerialNumber>> getAllSerialNumbersBetweenDates(

@@ -12,6 +12,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.transducersmanagingservice.dto.DateParams;
+import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.entity.SerialNumberEntity;
 import ru.veselov.transducersmanagingservice.entity.TransducerEntity;
@@ -45,7 +46,9 @@ public class SerialNumberServiceImpl implements SerialNumberService {
 
     @Override
     @Transactional
-    public void saveSerials(List<String> serials, String ptArt) {
+    public void saveSerials(SerialsDto serialsDto) {
+        List<String> serials = serialsDto.getSerials();
+        String ptArt = serialsDto.getPtArt();
         Optional<TransducerEntity> transducerEntityOptional = transducerRepository.findByArt(ptArt);
         if (transducerEntityOptional.isPresent()) {
             TransducerEntity transducerEntity = transducerEntityOptional.get();

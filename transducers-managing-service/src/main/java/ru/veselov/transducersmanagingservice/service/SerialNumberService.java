@@ -1,6 +1,7 @@
 package ru.veselov.transducersmanagingservice.service;
 
 import ru.veselov.transducersmanagingservice.dto.DateParams;
+import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 
@@ -8,7 +9,7 @@ import java.util.List;
 
 public interface SerialNumberService {
 
-    void saveSerials(List<String> serials, String ptArt);
+    void saveSerials(SerialsDto serialsDto);
 
     List<SerialNumber> findByNumber(String number);
 
