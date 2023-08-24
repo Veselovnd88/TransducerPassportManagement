@@ -72,10 +72,13 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     }
 
     @Override
-    public Optional<SerialNumber> findById(String serialId) {
+    public SerialNumber findById(String serialId) {
         UUID uuid = UUID.fromString(serialId);
         Optional<SerialNumberEntity> foundById = serialNumberRepository.findById(uuid);
-        return foundById.map(serialNumberMapper::toSerialNumberModel);
+        return serialNumberMapper.toSerialNumberModel(foundById.orElseThrow(() -> {
+            log.error("Device with serial [number: {}] not found", serialId);
+            throw new EntityNotFoundException("Device with serial [number: %s] not found".formatted(serialId));
+        }));
     }
 
     @Override

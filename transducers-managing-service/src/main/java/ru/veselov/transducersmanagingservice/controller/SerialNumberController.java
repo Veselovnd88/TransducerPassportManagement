@@ -1,11 +1,14 @@
 package ru.veselov.transducersmanagingservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.UUID;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,12 +29,49 @@ public class SerialNumberController {
     private final SerialNumberService serialNumberService;
 
     @GetMapping("/all/dates")
-    public ResponseEntity<List<SerialNumber>> getAllSerialNumber(
+    public ResponseEntity<List<SerialNumber>> getAllSerialNumbersBetweenDates(
             @SortingParam SortingParams sortingParams,
             @DateTimeFormat @RequestParam("after") LocalDate after,
             @DateTimeFormat @RequestParam("before") LocalDate before) {
         List<SerialNumber> serialNumbers = serialNumberService.findBetweenDates(sortingParams, after, before);
         return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
+    }
+
+    @GetMapping("/all/dates/{ptArt}")
+    public ResponseEntity<List<SerialNumber>> getAllSerialNumbersByPtArtBetweenDates(
+            @PathVariable("ptArt") String ptArt,
+            @SortingParam SortingParams sortingParams,
+            @DateTimeFormat @RequestParam("after") LocalDate after,
+            @DateTimeFormat @RequestParam("before") LocalDate before) {
+        List<SerialNumber> serialNumbers = serialNumberService
+                .findByPtArtBetweenDates(sortingParams, ptArt, after, before);
+        return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
+    }
+
+    @GetMapping("/{number}")
+    public ResponseEntity<List<SerialNumber>> getSerialNumberByNumber(@PathVariable("number") String number) {
+        List<SerialNumber> serialNumbers = serialNumberService.findByNumber(number);
+        return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
+    }
+
+    @GetMapping("/all/{ptArt}")
+    public ResponseEntity<List<SerialNumber>> getAllSerialNumbersByPtArt(
+            @PathVariable("ptArt") String ptArt,
+            @SortingParam SortingParams sortingParams) {
+        List<SerialNumber> serialNumbers = serialNumberService.findByArt(sortingParams, ptArt);
+        return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
+    }
+
+    @GetMapping("/{serialId}")
+    public ResponseEntity<SerialNumber> getSerialNumberById(@UUID @PathVariable("serialId") String serialId) {
+        SerialNumber serialNumber = serialNumberService.findById(serialId);
+        return new ResponseEntity<>(serialNumber, HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{serialId}")
+    public ResponseEntity<Void> deleteSerialNumberById(@UUID @PathVariable("serialId") String serialId) {
+        serialNumberService.deleteSerial(serialId);
+        return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
 
