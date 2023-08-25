@@ -35,7 +35,7 @@ public class SerialNumberController {
     private final SerialNumberService serialNumberService;
 
     @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Void> saveSerials(@Valid @RequestPart SerialsDto serialsDto,
+    public ResponseEntity<Void> saveSerials(@Valid @RequestPart("serials") SerialsDto serialsDto,
                                             @RequestPart("file") @Xlsx MultipartFile multipartFile) {
         serialNumberService.saveSerials(serialsDto, multipartFile);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
@@ -59,7 +59,7 @@ public class SerialNumberController {
         return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
     }
 
-    @GetMapping("/{number}")
+    @GetMapping("/number/{number}")
     public ResponseEntity<List<SerialNumber>> getSerialNumberByNumber(@PathVariable("number") String number) {
         List<SerialNumber> serialNumbers = serialNumberService.findByNumber(number);
         return new ResponseEntity<>(serialNumbers, HttpStatus.OK);

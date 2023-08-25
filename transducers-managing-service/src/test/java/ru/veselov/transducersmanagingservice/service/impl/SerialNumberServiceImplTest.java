@@ -119,7 +119,7 @@ class SerialNumberServiceImplTest {
 
     @Test
     void shouldFindSerialsBetweenDates() {
-        Mockito.when(serialNumberRepository.countAllBetweenDates(TestConstants.AFTER, TestConstants.BEFORE))
+        Mockito.when(serialNumberRepository.countAllBetweenDates(TestConstants.DATE_AFTER, TestConstants.DATE_BEFORE))
                 .thenReturn(1L);
         Page page = Mockito.mock(Page.class);
         Mockito.when(page.getContent()).thenReturn(List.of(getBaseSerialNumberEntity()));
@@ -134,7 +134,7 @@ class SerialNumberServiceImplTest {
 
         Assertions.assertThat(foundSerials).hasSize(1);
         Mockito.verify(serialNumberRepository, Mockito.times(1))
-                .countAllBetweenDates(TestConstants.AFTER, TestConstants.BEFORE);
+                .countAllBetweenDates(TestConstants.DATE_AFTER, TestConstants.DATE_BEFORE);
         Mockito.verify(serialNumberRepository, Mockito.times(1))
                 .findAllBetweenDates(
                         ArgumentMatchers.any(LocalDate.class),
@@ -146,8 +146,8 @@ class SerialNumberServiceImplTest {
     void findSerialsByPtArtBetweenDates() {
         Mockito.when(serialNumberRepository.countAllByPtArtBetweenDates(
                         TestConstants.PT_ART,
-                        TestConstants.AFTER,
-                        TestConstants.BEFORE))
+                        TestConstants.DATE_AFTER,
+                        TestConstants.DATE_BEFORE))
                 .thenReturn(1L);
         Page page = Mockito.mock(Page.class);
         Mockito.when(page.getContent()).thenReturn(List.of(getBaseSerialNumberEntity()));
@@ -163,7 +163,7 @@ class SerialNumberServiceImplTest {
 
         Assertions.assertThat(foundSerials).hasSize(1);
         Mockito.verify(serialNumberRepository, Mockito.times(1))
-                .countAllByPtArtBetweenDates(TestConstants.PT_ART, TestConstants.AFTER, TestConstants.BEFORE);
+                .countAllByPtArtBetweenDates(TestConstants.PT_ART, TestConstants.DATE_AFTER, TestConstants.DATE_BEFORE);
         Mockito.verify(serialNumberRepository, Mockito.times(1))
                 .findAllByPtArtBetweenDates(
                         ArgumentMatchers.anyString(),
@@ -177,8 +177,8 @@ class SerialNumberServiceImplTest {
         Mockito.when(serialNumberRepository.countAllByPtArtAnCustomerBetweenDates(
                         TestConstants.PT_ART,
                         TestConstants.CUSTOMER_ID,
-                        TestConstants.AFTER,
-                        TestConstants.BEFORE))
+                        TestConstants.DATE_AFTER,
+                        TestConstants.DATE_BEFORE))
                 .thenReturn(1L);
         Page page = Mockito.mock(Page.class);
         Mockito.when(page.getContent()).thenReturn(List.of(getBaseSerialNumberEntity()));
@@ -199,8 +199,8 @@ class SerialNumberServiceImplTest {
                 .countAllByPtArtAnCustomerBetweenDates(
                         TestConstants.PT_ART,
                         TestConstants.CUSTOMER_ID,
-                        TestConstants.AFTER,
-                        TestConstants.BEFORE);
+                        TestConstants.DATE_AFTER,
+                        TestConstants.DATE_BEFORE);
         Mockito.verify(serialNumberRepository, Mockito.times(1))
                 .findAllByPtArtAndCustomerBetweenDates(
                         ArgumentMatchers.anyString(),
