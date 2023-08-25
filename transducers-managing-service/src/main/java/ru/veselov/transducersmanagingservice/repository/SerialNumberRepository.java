@@ -46,7 +46,7 @@ public interface SerialNumberRepository extends JpaRepository<SerialNumberEntity
     long countAllBetweenDates(@Param("after") LocalDate after,
                               @Param("before") LocalDate before);
 
-    @Query(value = "SELECT s FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer.id= :customerId " +
+    @Query(value = "SELECT s FROM SerialNumberEntity s left join fetch  s.customer where s.ptArt= :ptArt AND s.customer.id= :customerId " +
             "AND s.savedAt BETWEEN :after AND :before",
             countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer.id= :customerId " +
                     "AND s.savedAt BETWEEN :after AND :before")

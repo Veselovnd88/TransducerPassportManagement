@@ -11,6 +11,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.transducersmanagingservice.dto.DateParams;
 import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
@@ -24,6 +25,7 @@ import ru.veselov.transducersmanagingservice.repository.CustomerRepository;
 import ru.veselov.transducersmanagingservice.repository.SerialNumberRepository;
 import ru.veselov.transducersmanagingservice.repository.TransducerRepository;
 import ru.veselov.transducersmanagingservice.service.SerialNumberService;
+import ru.veselov.transducersmanagingservice.service.XlsxParseService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -46,12 +48,14 @@ public class SerialNumberServiceImpl implements SerialNumberService {
 
     private final CustomerRepository customerRepository;
 
+    private final XlsxParseService xlsxParseService;
+
     private final SerialNumberMapper serialNumberMapper;
 
     @Override
     @Transactional
-    public void saveSerials(SerialsDto serialsDto) {
-        List<String> serials = serialsDto.getSerials();
+    public void saveSerials(SerialsDto serialsDto, MultipartFile multipartFile) {
+        List<String> serials = xlsxParseService.parseSerials(multipartFile);
         String ptArt = serialsDto.getPtArt();
         UUID customerId = UUID.fromString(serialsDto.getCustomerId());
         Optional<TransducerEntity> transducerEntityOptional = transducerRepository.findByArt(ptArt);

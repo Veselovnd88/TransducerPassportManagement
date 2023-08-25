@@ -1,5 +1,6 @@
 package ru.veselov.transducersmanagingservice.service;
 
+import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.transducersmanagingservice.dto.DateParams;
 import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public interface SerialNumberService {
 
-    void saveSerials(SerialsDto serialsDto);
+    void saveSerials(SerialsDto serialsDto, MultipartFile multipartFile);
 
     List<SerialNumber> findByNumber(String number);
 

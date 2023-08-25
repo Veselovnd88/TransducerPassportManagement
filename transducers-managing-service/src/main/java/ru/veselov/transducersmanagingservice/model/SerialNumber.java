@@ -21,6 +21,10 @@ public class SerialNumber {
 
     private String ptArt;
 
+    private String comment;
+
+    private String customer;
+
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate savedAt;
 

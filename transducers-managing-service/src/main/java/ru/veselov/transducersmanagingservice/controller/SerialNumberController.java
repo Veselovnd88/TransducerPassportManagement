@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -11,9 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.transducersmanagingservice.annotation.DateParam;
 import ru.veselov.transducersmanagingservice.annotation.SortingParam;
+import ru.veselov.transducersmanagingservice.annotation.Xlsx;
 import ru.veselov.transducersmanagingservice.dto.DateParams;
 import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
@@ -30,9 +34,10 @@ public class SerialNumberController {
 
     private final SerialNumberService serialNumberService;
 
-    @PostMapping
-    public ResponseEntity<Void> saveSerials(@Valid SerialsDto serialsDto) {
-        serialNumberService.saveSerials(serialsDto);
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<Void> saveSerials(@Valid @RequestPart SerialsDto serialsDto,
+                                            @RequestPart("file") @Xlsx MultipartFile multipartFile) {
+        serialNumberService.saveSerials(serialsDto, multipartFile);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
