@@ -19,6 +19,12 @@ public interface SerialNumberService {
 
     List<SerialNumber> findByPtArtBetweenDates(SortingParams sortingParams, String ptArt, DateParams dateParams);
 
+    List<SerialNumber> findByArtAndCustomerBetweenDates(
+            SortingParams sortingParams,
+            String ptArt,
+            String customerId,
+            DateParams dateParams);
+
     SerialNumber findById(String serialId);
 
     void deleteSerial(String serialId);

@@ -34,8 +34,9 @@ public class SerialNumberEntity extends BaseEntity {
     @Column(name = "ext_comment")
     private String comment;
 
-    @Column(name = "customer")
-    private String customer;
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "customer_id", referencedColumnName = "id")
+    private CustomerEntity customer;
 
     @Column(name = "saved_at")
     @Temporal(TemporalType.DATE)

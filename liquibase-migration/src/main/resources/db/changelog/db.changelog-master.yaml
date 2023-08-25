@@ -11,3 +11,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/21-changelog-serial.yaml
   - include:
       file: db/changelog/changelogs/22-changelog-serial-add-columns.yaml
+  - include:
+      file: db/changelog/changelogs/23-changelog-customer.yaml

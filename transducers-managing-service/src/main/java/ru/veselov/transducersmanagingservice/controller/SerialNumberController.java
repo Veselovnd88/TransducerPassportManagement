@@ -74,6 +74,19 @@ public class SerialNumberController {
         return new ResponseEntity<>(serialNumber, HttpStatus.OK);
     }
 
+    @GetMapping("/all/dates/{ptArt}/{customerId}")
+    public ResponseEntity<List<SerialNumber>> getAlLSerialNumberByPtArtAndCustomer(
+            @PathVariable("ptArt") String ptArt,
+            @UUID @PathVariable("customerId") String customerId,
+            @SortingParam SortingParams sortingParams,
+            @DateParam DateParams dateParams
+    ) {
+        List<SerialNumber> foundSerials = serialNumberService
+                .findByArtAndCustomerBetweenDates(sortingParams, ptArt, customerId, dateParams);
+        return new ResponseEntity<>(foundSerials, HttpStatus.OK);
+    }
+
+
     @DeleteMapping("/{serialId}")
     public ResponseEntity<Void> deleteSerialNumberById(@UUID @PathVariable("serialId") String serialId) {
         serialNumberService.deleteSerial(serialId);

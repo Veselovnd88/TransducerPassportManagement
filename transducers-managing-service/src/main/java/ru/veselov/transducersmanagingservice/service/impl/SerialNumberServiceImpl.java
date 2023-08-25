@@ -14,11 +14,13 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.transducersmanagingservice.dto.DateParams;
 import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
+import ru.veselov.transducersmanagingservice.entity.CustomerEntity;
 import ru.veselov.transducersmanagingservice.entity.SerialNumberEntity;
 import ru.veselov.transducersmanagingservice.entity.TransducerEntity;
 import ru.veselov.transducersmanagingservice.exception.PageExceedsMaximumValueException;
 import ru.veselov.transducersmanagingservice.mapper.SerialNumberMapper;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
+import ru.veselov.transducersmanagingservice.repository.CustomerRepository;
 import ru.veselov.transducersmanagingservice.repository.SerialNumberRepository;
 import ru.veselov.transducersmanagingservice.repository.TransducerRepository;
 import ru.veselov.transducersmanagingservice.service.SerialNumberService;
@@ -42,6 +44,8 @@ public class SerialNumberServiceImpl implements SerialNumberService {
 
     private final TransducerRepository transducerRepository;
 
+    private final CustomerRepository customerRepository;
+
     private final SerialNumberMapper serialNumberMapper;
 
     @Override
@@ -49,23 +53,28 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     public void saveSerials(SerialsDto serialsDto) {
         List<String> serials = serialsDto.getSerials();
         String ptArt = serialsDto.getPtArt();
+        UUID customerId = UUID.fromString(serialsDto.getCustomerId());
         Optional<TransducerEntity> transducerEntityOptional = transducerRepository.findByArt(ptArt);
-        if (transducerEntityOptional.isPresent()) {
-            TransducerEntity transducerEntity = transducerEntityOptional.get();
-            ArrayList<SerialNumberEntity> serialNumberEntities = new ArrayList<>();
-            serials.forEach(serial -> {
-                SerialNumberEntity serialNumberEntity = createAndSetUpEntity(serialsDto);
-                serialNumberEntity.setTransducerEntity(transducerEntity);
-                serialNumberEntity.setPtArt(transducerEntity.getArt());
-                serialNumberEntity.setNumber(serial);
-                serialNumberEntities.add(serialNumberEntity);
-            });
-            serialNumberRepository.saveAll(serialNumberEntities);
-            log.info("Serial number saved to DB, [total: {}]", serials.size());
-        } else {
+        TransducerEntity transducerEntity = transducerEntityOptional.orElseThrow(() -> {
             log.error("Transducer with [art: {}] not found", ptArt);
             throw new EntityNotFoundException("Transducer with art %s not found".formatted(ptArt));
-        }
+        });
+        Optional<CustomerEntity> customerEntityOptional = customerRepository.findById(customerId);
+        CustomerEntity customerEntity = customerEntityOptional.orElseThrow(() -> {
+            log.error("Customer with [id: {}] not found", customerId);
+            throw new EntityNotFoundException("Customer with id %s not found".formatted(customerId));
+        });
+        ArrayList<SerialNumberEntity> serialNumberEntities = new ArrayList<>();
+        serials.forEach(serial -> {
+            SerialNumberEntity serialNumberEntity = createAndSetUpEntity(serialsDto);
+            serialNumberEntity.setTransducerEntity(transducerEntity);
+            serialNumberEntity.setCustomer(customerEntity);
+            serialNumberEntity.setPtArt(transducerEntity.getArt());
+            serialNumberEntity.setNumber(serial);
+            serialNumberEntities.add(serialNumberEntity);
+        });
+        serialNumberRepository.saveAll(serialNumberEntities);
+        log.info("Serial number saved to DB, [total: {}]", serials.size());
     }
 
     @Override
@@ -122,6 +131,25 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     }
 
     @Override
+    public List<SerialNumber> findByArtAndCustomerBetweenDates(SortingParams sortingParams,
+                                                               String ptArt,
+                                                               String customerId,
+                                                               DateParams dateParams) {
+        LocalDate after = dateParams.getAfter();
+        LocalDate before = dateParams.getBefore();
+        UUID customerUUID = UUID.fromString(customerId);
+        long totalCount = serialNumberRepository
+                .countAllByPtArtAnCustomerBetweenDates(ptArt, customerUUID, after, before);
+        validatePageNumber(sortingParams.getPage(), totalCount);
+        Pageable pageable = createPageable(sortingParams);
+        Page<SerialNumberEntity> foundSerials = serialNumberRepository
+                .findAllByPtArtAndCustomerBetweenDates(ptArt, customerUUID, after, before, pageable);
+        log.info("Found [{} serials] with [ptArt: {} for customer: {}] between dates [{} - {}]",
+                foundSerials.getContent().size(), customerId, ptArt, after, before);
+        return serialNumberMapper.toModelList(foundSerials.getContent());
+    }
+
+    @Override
     public void deleteSerial(String serialId) {
         UUID serialNumberUUID = UUID.fromString(serialId);
         serialNumberRepository.deleteById(serialNumberUUID);
@@ -153,7 +181,6 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     private SerialNumberEntity createAndSetUpEntity(SerialsDto serialsDto) {
         SerialNumberEntity serialNumberEntity = new SerialNumberEntity();
         serialNumberEntity.setComment(serialsDto.getComment());
-        serialNumberEntity.setCustomer(serialsDto.getCustomer());
         serialNumberEntity.setSavedAt(serialsDto.getSavedAt());
         return serialNumberEntity;
     }

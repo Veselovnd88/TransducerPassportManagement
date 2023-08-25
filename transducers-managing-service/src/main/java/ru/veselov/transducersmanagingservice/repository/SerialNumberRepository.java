@@ -5,12 +5,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ru.veselov.transducersmanagingservice.entity.SerialNumberEntity;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-
+@Repository
 public interface SerialNumberRepository extends JpaRepository<SerialNumberEntity, UUID> {
 
     @Query("SELECT s FROM SerialNumberEntity s where s.number= :number")
@@ -45,22 +46,21 @@ public interface SerialNumberRepository extends JpaRepository<SerialNumberEntity
     long countAllBetweenDates(@Param("after") LocalDate after,
                               @Param("before") LocalDate before);
 
-    @Query(value = "SELECT s FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer= :customer " +
+    @Query(value = "SELECT s FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer.id= :customerId " +
             "AND s.savedAt BETWEEN :after AND :before",
-            countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer= :customer " +
+            countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer.id= :customerId " +
                     "AND s.savedAt BETWEEN :after AND :before")
     Page<SerialNumberEntity> findAllByPtArtAndCustomerBetweenDates(@Param("ptArt") String ptArt,
-                                                                   @Param("customer") String customer,
+                                                                   @Param("customerId") UUID customerId,
                                                                    @Param("after") LocalDate after,
                                                                    @Param("before") LocalDate before,
                                                                    Pageable pageable);
 
-    @Query("SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer= :customer " +
+    @Query("SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer.id= :customerId " +
             "AND s.savedAt BETWEEN :after AND :before")
     long countAllByPtArtAnCustomerBetweenDates(@Param("ptArt") String ptArt,
-                                               @Param("customer") String customer,
+                                               @Param("customerId") UUID customerId,
                                                @Param("after") LocalDate after,
                                                @Param("before") LocalDate before);
-
 
 }
