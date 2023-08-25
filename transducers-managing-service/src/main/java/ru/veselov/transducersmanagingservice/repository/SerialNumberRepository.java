@@ -27,7 +27,7 @@ public interface SerialNumberRepository extends JpaRepository<SerialNumberEntity
             "AND s.savedAt BETWEEN :after AND :before",
             countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt " +
                     "AND s.savedAt BETWEEN :after AND :before")
-    Page<SerialNumberEntity> findAllByPtARtBetweenDates(@Param("ptArt") String ptArt,
+    Page<SerialNumberEntity> findAllByPtArtBetweenDates(@Param("ptArt") String ptArt,
                                                         @Param("after") LocalDate after,
                                                         @Param("before") LocalDate before, Pageable pageable);
 
@@ -44,4 +44,23 @@ public interface SerialNumberRepository extends JpaRepository<SerialNumberEntity
     @Query("SELECT COUNT(s) FROM SerialNumberEntity  s where s.savedAt BETWEEN :after AND :before")
     long countAllBetweenDates(@Param("after") LocalDate after,
                               @Param("before") LocalDate before);
+
+    @Query(value = "SELECT s FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer= :customer " +
+            "AND s.savedAt BETWEEN :after AND :before",
+            countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer= :customer " +
+                    "AND s.savedAt BETWEEN :after AND :before")
+    Page<SerialNumberEntity> findAllByPtArtAndCustomerBetweenDates(@Param("ptArt") String ptArt,
+                                                                   @Param("customer") String customer,
+                                                                   @Param("after") LocalDate after,
+                                                                   @Param("before") LocalDate before,
+                                                                   Pageable pageable);
+
+    @Query("SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer= :customer " +
+            "AND s.savedAt BETWEEN :after AND :before")
+    long countAllByPtArtAnCustomerBetweenDates(@Param("ptArt") String ptArt,
+                                               @Param("customer") String customer,
+                                               @Param("after") LocalDate after,
+                                               @Param("before") LocalDate before);
+
+
 }

@@ -115,7 +115,7 @@ public class SerialNumberServiceImpl implements SerialNumberService {
         long totalCount = serialNumberRepository.countAllByPtArtBetweenDates(ptArt, after, before);
         validatePageNumber(sortingParams.getPage(), totalCount);
         Pageable pageable = createPageable(sortingParams);
-        Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByPtARtBetweenDates(ptArt, after, before, pageable);
+        Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByPtArtBetweenDates(ptArt, after, before, pageable);
         log.info("Found [{} serials] with [ptArt: {}] between dates [{} - {}]", foundSerials.getContent().size(),
                 ptArt, after, before);
         return serialNumberMapper.toModelList(foundSerials.getContent());
