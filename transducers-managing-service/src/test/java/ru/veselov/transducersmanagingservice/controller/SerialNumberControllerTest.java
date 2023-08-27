@@ -30,7 +30,7 @@ import java.util.List;
 @ExtendWith(MockitoExtension.class)
 class SerialNumberControllerTest {
 
-    private final static String URL = "/api/v1/serials";
+    private final static String URL_PREFIX = "/api/v1/serials";
 
     private final static byte[] BYTES = new byte[]{1, 2, 3};
 
@@ -63,7 +63,7 @@ class SerialNumberControllerTest {
         multipartBodyBuilder.part("file", BYTES).filename("serials.xlsx");
 
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL).path("/upload").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isAccepted();
 
@@ -80,8 +80,8 @@ class SerialNumberControllerTest {
     void shouldGetAllSerialsBetweenDates() {
         Mockito.when(serialNumberService.findBetweenDates(TestConstants.SORTING_PARAMS, TestConstants.DATE_PARAMS))
                 .thenReturn(List.of(Instancio.create(SerialNumber.class)));
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all/dates")
-                        .queryParams(getQueryParams())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all/dates")
+                        .queryParams(getQueryParamsWithDateParams())
                         .build())
                 .exchange().expectStatus().isOk().expectBody(List.class);
 
@@ -96,9 +96,9 @@ class SerialNumberControllerTest {
                         TestConstants.PT_ART,
                         TestConstants.DATE_PARAMS))
                 .thenReturn(List.of(Instancio.create(SerialNumber.class)));
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all/dates")
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all/dates")
                         .path("/" + TestConstants.PT_ART)
-                        .queryParams(getQueryParams()).build())
+                        .queryParams(getQueryParamsWithDateParams()).build())
                 .exchange().expectStatus().isOk()
                 .expectBody(List.class);
 
@@ -112,19 +112,78 @@ class SerialNumberControllerTest {
     void shouldGetSerialsByNumber() {
         Mockito.when(serialNumberService.findByNumber(TestConstants.NUMBER))
                 .thenReturn(List.of(Instancio.create(SerialNumber.class)));
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/number/" + TestConstants.NUMBER).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/number/" + TestConstants.NUMBER).build())
                 .exchange().expectStatus().isOk().expectBody(List.class);
 
         Mockito.verify(serialNumberService, Mockito.times(1)).findByNumber(TestConstants.NUMBER);
     }
 
-    private MultiValueMap<String, String> getQueryParams() {
+    @Test
+    void shouldFindAllSerialsByArt() {
+        Mockito.when(serialNumberService.findByArt(TestConstants.SORTING_PARAMS, TestConstants.PT_ART))
+                .thenReturn(List.of(Instancio.create(SerialNumber.class)));
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").path("/" + TestConstants.PT_ART)
+                        .queryParams(getQuerySortingParamsOnly()).build())
+                .exchange().expectStatus().isOk()
+                .expectBody(List.class);
+
+        Mockito.verify(serialNumberService, Mockito.times(1))
+                .findByArt(TestConstants.SORTING_PARAMS, TestConstants.PT_ART);
+    }
+
+    @Test
+    void shouldFindSerialById() {
+        Mockito.when(serialNumberService.findById(TestConstants.SERIAL_ID.toString()))
+                .thenReturn(Instancio.create(SerialNumber.class));
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/" + TestConstants.SERIAL_ID)
+                        .build())
+                .exchange().expectStatus().isOk().expectBody(SerialNumber.class);
+
+        Mockito.verify(serialNumberService, Mockito.times(1)).findById(TestConstants.SERIAL_ID.toString());
+    }
+
+    @Test
+    void shouldFindSerialsByArtAndCustomerBetweenDates() {
+        Mockito.when(serialNumberService.findByArtAndCustomerBetweenDates(
+                        TestConstants.SORTING_PARAMS,
+                        TestConstants.PT_ART,
+                        TestConstants.CUSTOMER_ID.toString(),
+                        TestConstants.DATE_PARAMS))
+                .thenReturn(List.of(Instancio.create(SerialNumber.class)));
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all/dates")
+                        .path("/" + TestConstants.PT_ART)
+                        .path("/" + TestConstants.CUSTOMER_ID)
+                        .queryParams(getQueryParamsWithDateParams()).build())
+                .exchange().expectStatus().isOk()
+                .expectBody(List.class);
+
+        Mockito.verify(serialNumberService, Mockito.times(1))
+                .findByArtAndCustomerBetweenDates(TestConstants.SORTING_PARAMS,
+                        TestConstants.PT_ART,
+                        TestConstants.CUSTOMER_ID.toString(),
+                        TestConstants.DATE_PARAMS);
+    }
+
+    @Test
+    void shouldDeleteSerialById() {
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/" + TestConstants.SERIAL_ID).build())
+                .exchange().expectStatus().isAccepted();
+
+        Mockito.verify(serialNumberService, Mockito.times(1)).deleteSerial(TestConstants.SERIAL_ID.toString());
+    }
+
+    private MultiValueMap<String, String> getQueryParamsWithDateParams() {
+        MultiValueMap<String, String> linkedMultiValueMap = getQuerySortingParamsOnly();
+        linkedMultiValueMap.add(TestConstants.AFTER, TestConstants.DATE_AFTER.toString());
+        linkedMultiValueMap.add(TestConstants.BEFORE, TestConstants.DATE_BEFORE.toString());
+        return linkedMultiValueMap;
+    }
+
+    private MultiValueMap<String, String> getQuerySortingParamsOnly() {
         LinkedMultiValueMap<String, String> linkedMultiValueMap = new LinkedMultiValueMap<>();
         linkedMultiValueMap.add(TestConstants.PAGE, TestConstants.SORTING_PARAMS.getPage().toString());
         linkedMultiValueMap.add(TestConstants.SORT, TestConstants.SORTING_PARAMS.getSort());
         linkedMultiValueMap.add(TestConstants.ORDER, TestConstants.SORTING_PARAMS.getOrder());
-        linkedMultiValueMap.add(TestConstants.AFTER, TestConstants.DATE_AFTER.toString());
-        linkedMultiValueMap.add(TestConstants.BEFORE, TestConstants.DATE_BEFORE.toString());
         return linkedMultiValueMap;
     }
 
