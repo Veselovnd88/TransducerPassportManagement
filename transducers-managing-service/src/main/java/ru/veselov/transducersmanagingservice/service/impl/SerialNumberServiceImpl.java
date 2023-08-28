@@ -3,12 +3,9 @@ package ru.veselov.transducersmanagingservice.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +15,6 @@ import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.entity.CustomerEntity;
 import ru.veselov.transducersmanagingservice.entity.SerialNumberEntity;
 import ru.veselov.transducersmanagingservice.entity.TransducerEntity;
-import ru.veselov.transducersmanagingservice.exception.PageExceedsMaximumValueException;
 import ru.veselov.transducersmanagingservice.mapper.SerialNumberMapper;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 import ru.veselov.transducersmanagingservice.repository.CustomerRepository;
@@ -26,6 +22,7 @@ import ru.veselov.transducersmanagingservice.repository.SerialNumberRepository;
 import ru.veselov.transducersmanagingservice.repository.TransducerRepository;
 import ru.veselov.transducersmanagingservice.service.SerialNumberService;
 import ru.veselov.transducersmanagingservice.service.XlsxParseService;
+import ru.veselov.transducersmanagingservice.util.SortingParamsUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -91,8 +88,8 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     @Override
     public SerialNumber findById(String serialId) {
         UUID uuid = UUID.fromString(serialId);
-        Optional<SerialNumberEntity> foundById = serialNumberRepository.findById(uuid);
-        return serialNumberMapper.toSerialNumberModel(foundById.orElseThrow(() -> {
+        Optional<SerialNumberEntity> foundSerial = serialNumberRepository.findById(uuid);
+        return serialNumberMapper.toSerialNumberModel(foundSerial.orElseThrow(() -> {
             log.error("Device with serial [number: {}] not found", serialId);
             throw new EntityNotFoundException("Device with serial [number: %s] not found".formatted(serialId));
         }));
@@ -100,9 +97,9 @@ public class SerialNumberServiceImpl implements SerialNumberService {
 
     @Override
     public List<SerialNumber> findByArt(SortingParams sortingParams, String ptArt) {
-        long totalWithPtArt = serialNumberRepository.countAllByPtArt(ptArt);
-        validatePageNumber(sortingParams.getPage(), totalWithPtArt);
-        Pageable pageable = createPageable(sortingParams);
+        long totalCount = serialNumberRepository.countAllByPtArt(ptArt);
+        SortingParamsUtils.validatePageNumber(sortingParams.getPage(), totalCount, serialsPerPage);
+        Pageable pageable = SortingParamsUtils.createPageable(sortingParams, serialsPerPage);
         Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByPtArt(ptArt, pageable);
         log.info("Found [{} serials] with [pt art: {}]", foundSerials.getContent().size(), ptArt);
         return serialNumberMapper.toModelList(foundSerials.getContent());
@@ -113,8 +110,8 @@ public class SerialNumberServiceImpl implements SerialNumberService {
         LocalDate after = dateParams.getAfter();
         LocalDate before = dateParams.getBefore();
         long totalCount = serialNumberRepository.countAllBetweenDates(after, before);
-        validatePageNumber(sortingParams.getPage(), totalCount);
-        Pageable pageable = createPageable(sortingParams);
+        SortingParamsUtils.validatePageNumber(sortingParams.getPage(), totalCount, serialsPerPage);
+        Pageable pageable = SortingParamsUtils.createPageable(sortingParams, serialsPerPage);
         Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllBetweenDates(after, before, pageable);
         log.info("Found [{} serials] between dates [{} - {}]", foundSerials.getContent().size(), after, before);
         return serialNumberMapper.toModelList(foundSerials.getContent());
@@ -126,8 +123,8 @@ public class SerialNumberServiceImpl implements SerialNumberService {
         LocalDate after = dateParams.getAfter();
         LocalDate before = dateParams.getBefore();
         long totalCount = serialNumberRepository.countAllByPtArtBetweenDates(ptArt, after, before);
-        validatePageNumber(sortingParams.getPage(), totalCount);
-        Pageable pageable = createPageable(sortingParams);
+        SortingParamsUtils.validatePageNumber(sortingParams.getPage(), totalCount, serialsPerPage);
+        Pageable pageable = SortingParamsUtils.createPageable(sortingParams, serialsPerPage);
         Page<SerialNumberEntity> foundSerials = serialNumberRepository.findAllByPtArtBetweenDates(ptArt, after, before, pageable);
         log.info("Found [{} serials] with [ptArt: {}] between dates [{} - {}]", foundSerials.getContent().size(),
                 ptArt, after, before);
@@ -144,8 +141,8 @@ public class SerialNumberServiceImpl implements SerialNumberService {
         UUID customerUUID = UUID.fromString(customerId);
         long totalCount = serialNumberRepository
                 .countAllByPtArtAnCustomerBetweenDates(ptArt, customerUUID, after, before);
-        validatePageNumber(sortingParams.getPage(), totalCount);
-        Pageable pageable = createPageable(sortingParams);
+        SortingParamsUtils.validatePageNumber(sortingParams.getPage(), totalCount, serialsPerPage);
+        Pageable pageable = SortingParamsUtils.createPageable(sortingParams, serialsPerPage);
         Page<SerialNumberEntity> foundSerials = serialNumberRepository
                 .findAllByPtArtAndCustomerBetweenDates(ptArt, customerUUID, after, before, pageable);
         log.info("Found [{} serials] with [ptArt: {} for customer: {}] between dates [{} - {}]",
@@ -158,28 +155,6 @@ public class SerialNumberServiceImpl implements SerialNumberService {
         UUID serialNumberUUID = UUID.fromString(serialId);
         serialNumberRepository.deleteById(serialNumberUUID);
         log.info("Serial number with [id: {}] was deleted from DB", serialId);
-    }
-
-    private Pageable createPageable(SortingParams sortingParams) {
-        int page = sortingParams.getPage();
-        String sort = sortingParams.getSort();
-        String order = sortingParams.getOrder();
-        Sort sortOrder;
-        if (StringUtils.equals(order, "asc")) {
-            sortOrder = Sort.by(sort).ascending();
-        } else {
-            sortOrder = Sort.by(sort).descending();
-        }
-        return PageRequest.of(page, serialsPerPage).withSort(sortOrder);
-    }
-
-    private void validatePageNumber(int page, long count) {
-        long totalPages = count / serialsPerPage;
-        if (page > totalPages) {
-            log.error("Page number exceeds maximum value [max: {}, was: {}}]", totalPages, page);
-            throw new PageExceedsMaximumValueException("Page number exceeds maximum value [max: %s, was: %s]"
-                    .formatted(totalPages, page), page);
-        }
     }
 
     private SerialNumberEntity createAndSetUpEntity(SerialsDto serialsDto) {
