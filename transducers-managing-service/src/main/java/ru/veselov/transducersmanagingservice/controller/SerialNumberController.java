@@ -1,6 +1,7 @@
 package ru.veselov.transducersmanagingservice.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.http.HttpStatus;
@@ -23,12 +24,13 @@ import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 import ru.veselov.transducersmanagingservice.service.SerialNumberService;
+import ru.veselov.transducersmanagingservice.validator.groups.SerialNumberField;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/serials")
-@Validated
+@Validated({SerialNumberField.class, Default.class})
 @RequiredArgsConstructor
 public class SerialNumberController {
 
@@ -43,7 +45,7 @@ public class SerialNumberController {
 
     @GetMapping("/all/dates")
     public ResponseEntity<List<SerialNumber>> getAllSerialNumbersBetweenDates(
-            @SortingParam SortingParams sortingParams,
+            @Valid @SortingParam SortingParams sortingParams,
             @DateParam DateParams dateParams) {
         List<SerialNumber> serialNumbers = serialNumberService.findBetweenDates(sortingParams, dateParams);
         return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
@@ -52,7 +54,7 @@ public class SerialNumberController {
     @GetMapping("/all/dates/{ptArt}")
     public ResponseEntity<List<SerialNumber>> getAllSerialNumbersByPtArtBetweenDates(
             @PathVariable("ptArt") String ptArt,
-            @SortingParam SortingParams sortingParams,
+            @Valid @SortingParam SortingParams sortingParams,
             @DateParam DateParams dateParams) {
         List<SerialNumber> serialNumbers = serialNumberService
                 .findByPtArtBetweenDates(sortingParams, ptArt, dateParams);
@@ -68,7 +70,7 @@ public class SerialNumberController {
     @GetMapping("/all/{ptArt}")
     public ResponseEntity<List<SerialNumber>> getAllSerialNumbersByPtArt(
             @PathVariable("ptArt") String ptArt,
-            @SortingParam SortingParams sortingParams) {
+            @Valid @SortingParam SortingParams sortingParams) {
         List<SerialNumber> serialNumbers = serialNumberService.findByArt(sortingParams, ptArt);
         return new ResponseEntity<>(serialNumbers, HttpStatus.OK);
     }
@@ -83,7 +85,7 @@ public class SerialNumberController {
     public ResponseEntity<List<SerialNumber>> getAlLSerialNumberByPtArtAndCustomer(
             @PathVariable("ptArt") String ptArt,
             @UUID @PathVariable("customerId") String customerId,
-            @SortingParam SortingParams sortingParams,
+            @Valid @SortingParam SortingParams sortingParams,
             @DateParam DateParams dateParams
     ) {
         List<SerialNumber> foundSerials = serialNumberService

@@ -7,6 +7,10 @@ import org.springframework.web.method.annotation.RequestParamMethodArgumentResol
 import ru.veselov.transducersmanagingservice.annotation.SortingParam;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
 
+/**
+ * Base resolver for further extending exact classes for assigning annotations
+ */
+
 public class SortParameterRequestParamsResolver extends RequestParamMethodArgumentResolver {
 
     private static final String SORT = "sort";

@@ -2,16 +2,16 @@ package ru.veselov.transducersmanagingservice.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
-import ru.veselov.transducersmanagingservice.annotation.SortBy;
+import ru.veselov.transducersmanagingservice.annotation.SortBySerialField;
 
 import java.util.List;
 
-public class SortByFieldValidator implements ConstraintValidator<SortBy, Object> {
+public class SortBySerialFieldValidator implements ConstraintValidator<SortBySerialField, Object> {
 
     private List<String> availableSortFields;
 
     @Override
-    public void initialize(SortBy constraintAnnotation) {
+    public void initialize(SortBySerialField constraintAnnotation) {
         availableSortFields = List.of("createdAt", "number", "ptArt");
     }
 
