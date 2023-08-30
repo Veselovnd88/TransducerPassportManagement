@@ -1,19 +1,19 @@
 package ru.veselov.transducersmanagingservice.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.hibernate.validator.constraints.ru.INN;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 public class CustomerDto {
 
     @NotBlank
     private String name;
 
     @NotBlank
-    @INN
     private String inn;
-
-    private String otherId;
 
 }

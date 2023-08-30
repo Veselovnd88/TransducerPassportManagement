@@ -10,6 +10,8 @@ public class TestConstants {
 
     public static final UUID SERIAL_ID = UUID.randomUUID();
 
+    public static final String INN = "5167991252";
+
     public static final UUID CUSTOMER_ID = UUID.randomUUID();
 
     public static final String PT_ART = "801877";

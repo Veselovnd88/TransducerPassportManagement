@@ -38,6 +38,9 @@ management:
 serial:
   serialsPerPage: 100
 
+customer:
+  customersPerPage: 10
+
 logging:
   level:
     ru.veselov.passportprocessing: debug

@@ -26,7 +26,7 @@ import java.util.UUID;
 @Slf4j
 public class CustomerServiceImpl implements CustomerService {
 
-    @Value("customer.customersPerPage")
+    @Value("${customer.customersPerPage}")
     private int customersPerPage;
 
     private final CustomerRepository customerRepository;
@@ -83,7 +83,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void updateCustomer(String customerId, CustomerDto customerDto) {
+    public Customer updateCustomer(String customerId, CustomerDto customerDto) {
         UUID customerUUID = UUID.fromString(customerId);
         Optional<CustomerEntity> foundEntity = customerRepository.findById(customerUUID);
         if (foundEntity.isEmpty()) {
@@ -93,10 +93,12 @@ public class CustomerServiceImpl implements CustomerService {
         CustomerEntity customerEntity = foundEntity.get();
         if (!customerDto.getInn().equals(customerEntity.getInn())) {
             customerValidator.validateInn(customerDto.getInn());
+            customerEntity.setInn(customerDto.getInn());
         }
-        customerEntity.setInn(customerDto.getInn());
         customerEntity.setName(customerDto.getName());
-        customerRepository.save(customerEntity);
+        CustomerEntity saved = customerRepository.save(customerEntity);
         log.info("Customer info updated with {}", customerDto);
+        return customerMapper.toModel(saved);
     }
+
 }

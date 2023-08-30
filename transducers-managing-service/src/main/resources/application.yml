@@ -39,7 +39,7 @@ serial:
   serialsPerPage: 100
 
 customer:
-  customersPerPage:10
+  customersPerPage: 10
 
 logging:
   level:
