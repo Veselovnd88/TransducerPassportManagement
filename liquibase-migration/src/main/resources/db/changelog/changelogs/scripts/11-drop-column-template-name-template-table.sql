@@ -1,4 +1,4 @@
-alter table pass_template
-    drop COLUMN template_name varchar;
+alter table public.pass_template
+    drop COLUMN IF EXISTS template_name;
 
 GO

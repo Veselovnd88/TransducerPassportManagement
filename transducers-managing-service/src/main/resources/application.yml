@@ -1,0 +1,47 @@
+server:
+  port: 7177
+
+spring:
+  application:
+    name: transducers
+
+  datasource:
+    url: jdbc:postgresql://localhost:5433/PtManagementDB
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        show_sql: true
+        format_sql: false
+        hbm2ddl:
+          auto: validate
+  liquibase:
+    enabled: true
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: false
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
+
+serial:
+  serialsPerPage: 100
+
+customer:
+  customersPerPage: 10
+
+logging:
+  level:
+    ru.veselov.passportprocessing: debug
+

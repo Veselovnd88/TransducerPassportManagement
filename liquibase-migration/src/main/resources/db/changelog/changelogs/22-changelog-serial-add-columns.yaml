@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: alterTableAddCommentAndCustomerColumn
+      author: Veselov Nikolay
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/22-alter-serial-table-add-customer-comment-column.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/22-alter-table-drop-columns.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
