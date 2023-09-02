@@ -8,6 +8,8 @@ public enum ErrorCode {
 
     ERROR_VALIDATION,
 
-    ERROR_WRONG_DATE
+    ERROR_WRONG_DATE,
+
+    ERROR_CONFICT
 
 }

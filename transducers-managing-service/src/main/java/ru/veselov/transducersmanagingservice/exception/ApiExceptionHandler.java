@@ -43,7 +43,7 @@ public class ApiExceptionHandler {
     @ExceptionHandler(EntityExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiErrorResponse handleEntityExistsException(EntityExistsException exception) {
-        return new ApiErrorResponse(ErrorCode.ERROR_NOT_FOUND, exception.getMessage());//FIXME
+        return new ApiErrorResponse(ErrorCode.ERROR_CONFICT, exception.getMessage());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
