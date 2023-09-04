@@ -41,6 +41,9 @@ serial:
 customer:
   customersPerPage: 10
 
+transducer:
+  transducersPerPage: 10
+
 logging:
   level:
     ru.veselov.passportprocessing: debug

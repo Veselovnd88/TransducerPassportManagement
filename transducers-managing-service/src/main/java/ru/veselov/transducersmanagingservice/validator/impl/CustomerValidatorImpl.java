@@ -24,5 +24,6 @@ public class CustomerValidatorImpl implements CustomerValidator {
             log.error("Customer with such [inn {}] already exists", inn);
             throw new EntityExistsException("Customer with such inn %s already exists".formatted(inn));
         }
+        log.debug("Customer with [inn {}] successfully validated", inn);
     }
 }

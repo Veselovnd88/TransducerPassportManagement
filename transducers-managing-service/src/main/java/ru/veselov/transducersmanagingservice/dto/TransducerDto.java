@@ -1,47 +1,54 @@
 package ru.veselov.transducersmanagingservice.dto;
 
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import ru.veselov.transducersmanagingservice.entity.PressureType;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TransducerDto {
-    @NotNull
+    @NotBlank
     private String art;
 
-    private String name;
+    private String transducerName;
 
-    @NotNull
+    @NotBlank
     private String code;
 
     @NotNull
-    //@PressureType //TODO constraint
     private PressureType pressureType;
 
-    @NotNull
+    @NotBlank
     private String model;
 
-    @NotNull
+    @NotBlank
     private String outputCode;
 
-    @NotNull
+    @NotBlank
     private String pressureRange;
 
-    @NotNull
+    @NotBlank
     private String accuracy;
 
-    @NotNull
+    @NotBlank
     private String electricalOutput;
 
-    @NotNull
+    @NotBlank
     private String thread;
 
-    @NotNull
+    @NotBlank
     private String connector;
 
-    @NotNull
+    @NotBlank
     private String pinOut;
-
+    @Max(value = 100)
     private String options;
 
 }
