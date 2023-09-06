@@ -14,6 +14,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.transducersmanagingservice.TestConstants;
 import ru.veselov.transducersmanagingservice.dto.TransducerDto;
@@ -24,9 +26,11 @@ import ru.veselov.transducersmanagingservice.model.Transducer;
 import ru.veselov.transducersmanagingservice.repository.TransducerRepository;
 import ru.veselov.transducersmanagingservice.validator.TransducerValidator;
 
+import java.util.List;
 import java.util.Optional;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("unchecked")
 class TransducerServiceImplTest {
 
     @Mock
@@ -112,7 +116,66 @@ class TransducerServiceImplTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
+    @Test
+    void shouldDelete() {
+        transducerService.deleteTransducer(TestConstants.TRANSDUCER_ID.toString());
 
+        Mockito.verify(transducerRepository, Mockito.times(1)).deleteById(TestConstants.TRANSDUCER_ID);
+    }
 
+    @Test
+    void shouldUpdateTransducerDifferentArt() {
+        TransducerDto transducerDto = Instancio.of(TransducerDto.class).set(Select.field("art"), "15").create();
+        TransducerEntity transducerEntity = Instancio.of(TransducerEntity.class)
+                .set(Select.field("art"), TestConstants.PT_ART).create();
+        transducerEntity.setId(TestConstants.TRANSDUCER_ID);
+        Mockito.when(transducerRepository.findById(TestConstants.TRANSDUCER_ID))
+                .thenReturn(Optional.of(transducerEntity));
+
+        transducerService.updateTransducer(TestConstants.TRANSDUCER_ID.toString(), transducerDto);
+        Mockito.verify(transducerRepository, Mockito.times(1)).save(transducerEntityArgumentCaptor.capture());
+        TransducerEntity captured = transducerEntityArgumentCaptor.getValue();
+        Assertions.assertThat(captured.getArt()).isEqualTo(transducerDto.getArt());
+        Mockito.verify(transducerValidator, Mockito.times(1)).validatePtArt(transducerDto.getArt());
+    }
+
+    @Test
+    void shouldUpdateTransducerSameArt() {
+        TransducerDto transducerDto = Instancio
+                .of(TransducerDto.class).set(Select.field("art"), TestConstants.PT_ART).create();
+        TransducerEntity transducerEntity = Instancio.of(TransducerEntity.class)
+                .set(Select.field("art"), TestConstants.PT_ART).create();
+        transducerEntity.setId(TestConstants.TRANSDUCER_ID);
+        Mockito.when(transducerRepository.findById(TestConstants.TRANSDUCER_ID))
+                .thenReturn(Optional.of(transducerEntity));
+
+        transducerService.updateTransducer(TestConstants.TRANSDUCER_ID.toString(), transducerDto);
+        Mockito.verify(transducerRepository, Mockito.times(1)).save(transducerEntityArgumentCaptor.capture());
+        TransducerEntity captured = transducerEntityArgumentCaptor.getValue();
+        Assertions.assertThat(captured.getArt()).isEqualTo(transducerDto.getArt());
+        Mockito.verify(transducerValidator, Mockito.never()).validatePtArt(TestConstants.PT_ART);
+    }
+
+    @Test
+    void shouldThrowEntityNotFoundExceptionIfUpdatingTransducerNotFound() {
+        TransducerDto transducerDto = Instancio.create(TransducerDto.class);
+        Mockito.when(transducerRepository.findById(TestConstants.TRANSDUCER_ID)).thenReturn(Optional.empty());
+        String transducerId = TestConstants.TRANSDUCER_ID.toString();
+        Assertions.assertThatThrownBy(() -> transducerService.updateTransducer(transducerId, transducerDto))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void shouldGetAllTransducers() {
+        TransducerEntity transducerEntity = Instancio.create(TransducerEntity.class);
+        Mockito.when(transducerRepository.countAll()).thenReturn(1L);
+        Page<TransducerEntity> page = Mockito.mock(Page.class);
+        Mockito.when(page.getContent()).thenReturn(List.of(transducerEntity));
+        Mockito.when(transducerRepository.getAll(ArgumentMatchers.any(Pageable.class))).thenReturn(page);
+
+        List<Transducer> all = transducerService.getAll(TestConstants.SORTING_PARAMS);
+
+        Assertions.assertThat(all).hasSize(1);
+    }
 
 }

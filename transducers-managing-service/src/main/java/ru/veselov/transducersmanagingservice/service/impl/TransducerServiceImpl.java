@@ -84,7 +84,7 @@ public class TransducerServiceImpl implements TransducerService {
         UUID uuid = UUID.fromString(transducerId);
         Optional<TransducerEntity> foundTransducer = transducerRepository.findById(uuid);
         TransducerEntity transducerEntity = foundTransducer.orElseThrow(() -> {
-            log.error("Transducer with [id {}] not found", transducerDto);
+            log.error("Transducer with [id: {}] not found", transducerId);
             throw new EntityNotFoundException("Transducer with id %s not found".formatted(transducerId));
         });
         if (!transducerEntity.getArt().equals(transducerDto.getArt())) {
