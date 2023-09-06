@@ -1,8 +1,8 @@
 package ru.veselov.transducersmanagingservice.dto;
 
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -49,7 +49,7 @@ public class TransducerDto {
 
     @NotBlank
     private String pinOut;
-    @Max(value = 100)
+    @Size(max = 100)
     private String options;
 
 }
