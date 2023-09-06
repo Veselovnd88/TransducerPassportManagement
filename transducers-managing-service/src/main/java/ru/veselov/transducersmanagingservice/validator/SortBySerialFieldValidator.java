@@ -2,10 +2,11 @@ package ru.veselov.transducersmanagingservice.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.extern.slf4j.Slf4j;
 import ru.veselov.transducersmanagingservice.annotation.SortBySerialField;
 
 import java.util.List;
-
+@Slf4j
 public class SortBySerialFieldValidator implements ConstraintValidator<SortBySerialField, Object> {
 
     private List<String> availableSortFields;
@@ -21,6 +22,7 @@ public class SortBySerialFieldValidator implements ConstraintValidator<SortBySer
             return true;
         }
         String field = (String) value;
+        log.debug("Validation of soring field for serialNumber");
         return availableSortFields.contains(field);
     }
 

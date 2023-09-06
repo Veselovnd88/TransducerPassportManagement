@@ -24,7 +24,7 @@ public class TransducerValidatorImpl implements TransducerValidator {
             log.error("Transducer with [art: {}] already exists", ptArt);
             throw new EntityExistsException("Transducer with art %s already exists".formatted(ptArt));
         }
-        log.debug("[PtArt: {}] successfully validated", ptArt);
+        log.debug("[Transducer with ptArt: {}] successfully validated", ptArt);
     }
 
 }

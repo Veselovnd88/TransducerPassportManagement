@@ -14,6 +14,8 @@ public class TestConstants {
 
     public static final UUID CUSTOMER_ID = UUID.randomUUID();
 
+    public static final UUID TRANSDUCER_ID = UUID.randomUUID();
+
     public static final String PT_ART = "801877";
 
     public static final String NUMBER = "1905201209001";

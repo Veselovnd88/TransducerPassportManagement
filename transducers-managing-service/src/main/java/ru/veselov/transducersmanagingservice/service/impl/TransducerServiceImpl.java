@@ -29,7 +29,7 @@ import java.util.UUID;
 public class TransducerServiceImpl implements TransducerService {
 
     @Value("${transducer.transducersPerPage}")
-    private int transducersPerPAge;
+    private int transducersPerPage;
 
     private final TransducerRepository transducerRepository;
 
@@ -92,15 +92,15 @@ public class TransducerServiceImpl implements TransducerService {
         }
         updateTransducerEntity(transducerEntity, transducerDto);
         TransducerEntity updated = transducerRepository.save(transducerEntity);
-        log.info("Transudcer with [id: {}] successfully updated", transducerId);
+        log.info("Transducer with [id: {}] successfully updated", transducerId);
         return transducerMapper.toModel(updated);
     }
 
     @Override
     public List<Transducer> getAll(SortingParams sortingParams) {
         long countAll = transducerRepository.countAll();
-        SortingParamsUtils.validatePageNumber(sortingParams.getPage(), countAll, transducersPerPAge);
-        Pageable pageable = SortingParamsUtils.createPageable(sortingParams, transducersPerPAge);
+        SortingParamsUtils.validatePageNumber(sortingParams.getPage(), countAll, transducersPerPage);
+        Pageable pageable = SortingParamsUtils.createPageable(sortingParams, transducersPerPage);
         Page<TransducerEntity> allTransducers = transducerRepository.getAll(pageable);
         log.info("Found [{}] transducers", allTransducers.getTotalElements());
         return transducerMapper.toModels(allTransducers.getContent());

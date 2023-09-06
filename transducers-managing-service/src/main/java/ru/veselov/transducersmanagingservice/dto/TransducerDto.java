@@ -14,6 +14,7 @@ import ru.veselov.transducersmanagingservice.entity.PressureType;
 @AllArgsConstructor
 @Builder
 public class TransducerDto {
+
     @NotBlank
     private String art;
 
