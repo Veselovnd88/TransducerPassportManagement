@@ -5,12 +5,6 @@ spring:
   application:
     name: transducers
 
-  datasource:
-    url: jdbc:postgresql://localhost:5433/PtManagementDB
-    username: admin
-    password: admin
-    driver-class-name: org.postgresql.Driver
-
   jpa:
     properties:
       hibernate:

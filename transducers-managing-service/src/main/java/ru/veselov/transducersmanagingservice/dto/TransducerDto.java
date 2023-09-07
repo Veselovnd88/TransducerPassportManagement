@@ -49,6 +49,7 @@ public class TransducerDto {
 
     @NotBlank
     private String pinOut;
+
     @Size(max = 100)
     private String options;
 

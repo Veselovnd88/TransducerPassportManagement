@@ -1,37 +1,26 @@
 package ru.veselov.transducersmanagingservice.app;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.transducersmanagingservice.TestConstants;
+import ru.veselov.transducersmanagingservice.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.transducersmanagingservice.dto.CustomerDto;
 import ru.veselov.transducersmanagingservice.exception.error.ErrorCode;
-import ru.veselov.transducersmanagingservice.repository.CustomerRepository;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
-@DirtiesContext
 @ActiveProfiles("test")
-class CustomerControllerValidationIntegrationTest {
+class CustomerControllerValidationIntegrationTest extends PostgresContainersConfig {
 
     private final static String URL_PREFIX = "/api/v1/customer";
 
     @Autowired
     WebTestClient webTestClient;
-
-    @Autowired
-    CustomerRepository customerRepository;
-
-    @AfterEach
-    void clear() {
-        customerRepository.deleteAll();
-    }
 
     @Test
     void shouldReturnValidationErrorWithName() {

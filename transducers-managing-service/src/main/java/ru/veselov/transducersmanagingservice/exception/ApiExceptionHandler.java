@@ -28,6 +28,12 @@ public class ApiExceptionHandler {
         return new ApiErrorResponse(ErrorCode.ERROR_WRONG_DATE, e.getMessage());
     }
 
+    @ExceptionHandler(IllegalArgumentException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleIllegalArgumentException(IllegalArgumentException e) {
+        return new ApiErrorResponse(ErrorCode.ERROR_ILLEGAL_ARG, e.getMessage());
+    }
+
     @ExceptionHandler(PageExceedsMaximumValueException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleMaxPageException(PageExceedsMaximumValueException exception) {

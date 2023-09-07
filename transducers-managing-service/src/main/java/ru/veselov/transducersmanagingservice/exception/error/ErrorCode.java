@@ -10,6 +10,6 @@ public enum ErrorCode {
 
     ERROR_WRONG_DATE,
 
-    ERROR_CONFICT
+    ERROR_ILLEGAL_ARG, ERROR_CONFICT
 
 }
