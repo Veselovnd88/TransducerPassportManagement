@@ -62,7 +62,7 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/create").build())
                 .bodyValue(transducerDto)
                 .exchange().expectStatus().isEqualTo(HttpStatus.CONFLICT)
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFICT.toString());
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFLICT.toString());
     }
 
     @Test
@@ -152,7 +152,7 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
                         .path("/update/" + transducerEntityForUpdate.getId()).build())
                 .bodyValue(transducerDto).exchange().expectStatus().isEqualTo(HttpStatus.CONFLICT)
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFICT.toString());
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFLICT.toString());
     }
 
     @Test

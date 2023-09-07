@@ -3,6 +3,8 @@ package ru.veselov.transducersmanagingservice.app;
 import org.instancio.Instancio;
 import org.instancio.Select;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,40 +24,32 @@ class TransducerControllerValidationTest extends PostgresContainersConfig {
     @Autowired
     WebTestClient webTestClient;
 
-    @Test
-    void shouldReturnValidationErrorWithBlankCodeField() {
+    @ParameterizedTest
+    @ValueSource(strings = {"art", "pressureRange", "outputCode", "model", "code", "pressureType", "accuracy",
+            "electricalOutput", "thread", "connector", "pinOut"})
+    void shouldReturnValidationErrorWithNullField(String field) {
         TransducerDto transducerDto = Instancio.of(TransducerDto.class)
-                .set(Select.field("code"), null).create();
+                .set(Select.field(field), null).create();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/create").build())
                 .bodyValue(transducerDto)
                 .exchange().expectStatus().isBadRequest().expectBody()
                 .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("code");
+                .jsonPath("$.violations[0].fieldName").isEqualTo(field);
     }
 
-    @Test
-    void shouldReturnValidationErrorWithBlankPressureTypeField() {
+    @ParameterizedTest
+    @ValueSource(strings = {"art", "pressureRange", "outputCode", "model", "code", "accuracy",
+            "electricalOutput", "thread", "connector", "pinOut"})
+    void shouldReturnValidationErrorWithBlankField(String field) {
         TransducerDto transducerDto = Instancio.of(TransducerDto.class)
-                .set(Select.field("pressureType"), null).create();
+                .set(Select.field(field), "").create();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/create").build())
                 .bodyValue(transducerDto)
                 .exchange().expectStatus().isBadRequest().expectBody()
                 .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("pressureType");
-    }
-
-    @Test
-    void shouldReturnValidationErrorWithBlankArtField() {
-        TransducerDto transducerDto = Instancio.of(TransducerDto.class)
-                .set(Select.field("art"), null).create();
-
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/create").build())
-                .bodyValue(transducerDto)
-                .exchange().expectStatus().isBadRequest().expectBody()
-                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("art");
+                .jsonPath("$.violations[0].fieldName").isEqualTo(field);
     }
 
     @Test
@@ -69,6 +63,48 @@ class TransducerControllerValidationTest extends PostgresContainersConfig {
                 .exchange().expectStatus().isBadRequest().expectBody()
                 .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
                 .jsonPath("$.violations[0].fieldName").isEqualTo("options");
+    }
+
+    @Test
+    void shouldReturnValidationErrorIfNotUUIDForGetById() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/id/notUuid").build())
+                .exchange().expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("transducerId");
+    }
+
+    @Test
+    void shouldReturnValidationErrorIfNotUUIDForDelete() {
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/delete/notUuid").build())
+                .exchange().expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("transducerId");
+    }
+
+    @Test
+    void shouldReturnValidationErrorIfNotUUIDForUpdate() {
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/update/notUuid").build())
+                .bodyValue(Instancio.create(TransducerDto.class))
+                .exchange().expectStatus().isBadRequest()
+                .expectBody()
+                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("transducerId");
+    }
+
+    @Test
+    void shouldReturnValidationErrorForSortingParamsNotTransducerField() {
+        //passed sort parameter for serial number entity to check validation groups
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
+                        .queryParam("sort", "number")
+                        .build())
+                .exchange().expectStatus().isBadRequest().expectBody()
+                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("sort");
     }
 
 }
