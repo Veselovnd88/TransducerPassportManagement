@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.transducersmanagingservice.dto.CustomerDto;
 import ru.veselov.transducersmanagingservice.dto.SortingParams;
 import ru.veselov.transducersmanagingservice.entity.CustomerEntity;
@@ -24,6 +25,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional(readOnly = true)
 public class CustomerServiceImpl implements CustomerService {
 
     @Value("${customer.customersPerPage}")
@@ -36,6 +38,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerMapper customerMapper;
 
     @Override
+    @Transactional
     public void save(CustomerDto customerDto) {
         customerValidator.validateInn(customerDto.getInn());
         CustomerEntity customerEntity = customerMapper.toEntity(customerDto);
@@ -76,6 +79,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public void deleteCustomer(String customerId) {
         UUID customerUUID = UUID.fromString(customerId);
         customerRepository.deleteById(customerUUID);
@@ -83,6 +87,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public Customer updateCustomer(String customerId, CustomerDto customerDto) {
         UUID customerUUID = UUID.fromString(customerId);
         Optional<CustomerEntity> foundEntity = customerRepository.findById(customerUUID);

@@ -13,7 +13,7 @@ import ru.veselov.transducersmanagingservice.exception.PageExceedsMaximumValueEx
 @Slf4j
 public class SortingParamsUtils {
 
-    public static Pageable createPageable(SortingParams sortingParams, int serialsPerPage) {
+    public static Pageable createPageable(SortingParams sortingParams, int itemsPerPage) {
         int page = sortingParams.getPage();
         String sort = sortingParams.getSort();
         String order = sortingParams.getOrder();
@@ -23,7 +23,7 @@ public class SortingParamsUtils {
         } else {
             sortOrder = Sort.by(sort).descending();
         }
-        return PageRequest.of(page, serialsPerPage).withSort(sortOrder);
+        return PageRequest.of(page, itemsPerPage).withSort(sortOrder);
     }
 
     public static void validatePageNumber(int page, long count, int serialsPerPage) {

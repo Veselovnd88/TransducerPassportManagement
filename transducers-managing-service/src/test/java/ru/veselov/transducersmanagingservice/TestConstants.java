@@ -14,6 +14,8 @@ public class TestConstants {
 
     public static final UUID CUSTOMER_ID = UUID.randomUUID();
 
+    public static final UUID TRANSDUCER_ID = UUID.randomUUID();
+
     public static final String PT_ART = "801877";
 
     public static final String NUMBER = "1905201209001";
@@ -22,7 +24,7 @@ public class TestConstants {
 
     public static final LocalDate DATE_BEFORE = LocalDate.parse("2023-08-25");
 
-    public static final SortingParams SORTING_PARAMS = new SortingParams(0, "ptArt", "asc");
+    public static final SortingParams SORTING_PARAMS = new SortingParams(0, "createdAt", "asc");
 
     public static final DateParams DATE_PARAMS = new DateParams(DATE_AFTER, DATE_BEFORE);
 

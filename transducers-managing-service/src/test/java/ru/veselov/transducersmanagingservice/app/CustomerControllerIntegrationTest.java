@@ -69,7 +69,7 @@ class CustomerControllerIntegrationTest extends PostgresContainersConfig {
                 .contentType(MediaType.APPLICATION_JSON)
                 .bodyValue(customerDto)
                 .exchange().expectStatus().isEqualTo(HttpStatus.CONFLICT)
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFICT.toString());
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFLICT.toString());
     }
 
     @Test
@@ -175,7 +175,7 @@ class CustomerControllerIntegrationTest extends PostgresContainersConfig {
                         .build())
                 .bodyValue(customerDto)
                 .exchange().expectStatus().isEqualTo(HttpStatus.CONFLICT).expectBody()
-                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFICT.toString());
+                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFLICT.toString());
     }
 
     CustomerEntity saveCustomer() {
