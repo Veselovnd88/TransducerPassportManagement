@@ -68,7 +68,7 @@ public class SerialNumberServiceImpl implements SerialNumberService {
         ArrayList<SerialNumberEntity> serialNumberEntities = new ArrayList<>();
         serials.forEach(serial -> {
             SerialNumberEntity serialNumberEntity = createAndSetUpEntity(serialsDto);
-            serialNumberEntity.setTransducerEntity(transducerEntity);
+            serialNumberEntity.setTransducer(transducerEntity);
             serialNumberEntity.setCustomer(customerEntity);
             serialNumberEntity.setPtArt(transducerEntity.getArt());
             serialNumberEntity.setNumber(serial);

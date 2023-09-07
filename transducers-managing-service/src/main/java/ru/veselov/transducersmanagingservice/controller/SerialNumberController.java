@@ -50,7 +50,7 @@ public class SerialNumberController {
         return serialNumberService.findBetweenDates(sortingParams, dateParams);
     }
 
-    @GetMapping("/all/dates/{ptArt}")
+    @GetMapping("/all/dates/art/{ptArt}")
     public List<SerialNumber> getAllSerialNumbersByPtArtBetweenDates(@PathVariable("ptArt") String ptArt,
                                                                      @Valid @SortingParam SortingParams sortingParams,
                                                                      @DateParam DateParams dateParams) {
@@ -62,18 +62,18 @@ public class SerialNumberController {
         return serialNumberService.findByNumber(number);
     }
 
-    @GetMapping("/all/{ptArt}")
+    @GetMapping("/all/art/{ptArt}")
     public List<SerialNumber> getAllSerialNumbersByPtArt(@PathVariable("ptArt") String ptArt,
                                                          @Valid @SortingParam SortingParams sortingParams) {
         return serialNumberService.findByArt(sortingParams, ptArt);
     }
 
-    @GetMapping("/{serialId}")
+    @GetMapping("/id/{serialId}")
     public SerialNumber getSerialNumberById(@UUID @PathVariable("serialId") String serialId) {
         return serialNumberService.findById(serialId);
     }
 
-    @GetMapping("/all/dates/{ptArt}/{customerId}")
+    @GetMapping("/all/dates/art/{ptArt}/customer/{customerId}")
     public List<SerialNumber> getAlLSerialNumberByPtArtAndCustomer(@PathVariable("ptArt") String ptArt,
                                                                    @UUID @PathVariable("customerId") String customerId,
                                                                    @Valid @SortingParam SortingParams sortingParams,

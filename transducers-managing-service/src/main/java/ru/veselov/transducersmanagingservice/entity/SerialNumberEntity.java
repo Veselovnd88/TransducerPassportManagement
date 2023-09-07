@@ -21,8 +21,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode(exclude = {"transducerEntity"}, callSuper = false)
-@ToString(exclude = {"transducerEntity"})
+@EqualsAndHashCode(exclude = {"transducer"}, callSuper = false)
+@ToString(exclude = {"transducer"})
 public class SerialNumberEntity extends BaseEntity {
 
     @Column(name = "number", nullable = false)
@@ -44,6 +44,6 @@ public class SerialNumberEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "pt_id", referencedColumnName = "id")
-    TransducerEntity transducerEntity;
+    TransducerEntity transducer;
 
 }

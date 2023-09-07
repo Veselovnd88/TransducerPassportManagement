@@ -243,7 +243,7 @@ class SerialNumberServiceImplTest {
         Assertions.assertThat(captured.get(0)).isNotNull();
         SerialNumberEntity serialNumberEntity = captured.get(0);
         Assertions.assertThat(serialNumberEntity.getCustomer()).isEqualTo(customerEntity);
-        Assertions.assertThat(serialNumberEntity.getTransducerEntity()).isEqualTo(transducerEntity);
+        Assertions.assertThat(serialNumberEntity.getTransducer()).isEqualTo(transducerEntity);
         Assertions.assertThat(serialNumberEntity.getPtArt()).isEqualTo(transducerEntity.getArt());
     }
 
