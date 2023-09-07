@@ -54,7 +54,7 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
     }
 
     @Test
-    void shouldReturnErrorIfTransducerWithArtExists() {
+    void shouldReturnConflictErrorIfTransducerWithArtExists() {
         saveTransducerToRepo();
         TransducerDto transducerDto = Instancio.of(TransducerDto.class)
                 .set(Select.field("art"), TestConstants.PT_ART).create();
@@ -78,6 +78,14 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
     }
 
     @Test
+    void shouldReturnNotFoundErrorIfTransducerWithIdNotExists() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/id/" + TestConstants.TRANSDUCER_ID).build())
+                .exchange().expectStatus().isNotFound().expectBody()
+                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+    }
+
+    @Test
     void shouldReturnTransducerByArt() {
         TransducerEntity transducerEntity = saveTransducerToRepo();
 
@@ -86,6 +94,14 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
                 .exchange().expectStatus().isOk().expectBody()
                 .jsonPath("$.art").isEqualTo(transducerEntity.getArt())
                 .jsonPath("$.options").isEqualTo(transducerEntity.getOptions());
+    }
+
+    @Test
+    void shouldReturnNotFoundErrorIfTransducerWithArtNotExists() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/art/" + TestConstants.PT_ART).build())
+                .exchange().expectStatus().isNotFound().expectBody()
+                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }
 
     @Test
@@ -124,6 +140,30 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
         Assertions.assertThat(updatedEntity.getArt()).isEqualTo(transducerDto.getArt());
     }
 
+    @Test
+    void shouldReturnConflictErrorIfWantToUpdateArtToExistingArt() {
+        TransducerEntity transducerEntityForUpdate = saveTransducerToRepo();
+        TransducerEntity transducerEntityForConflict = Instancio.of(TransducerEntity.class)
+                .set(Select.field("art"), "conflict").create();
+        transducerRepository.save(transducerEntityForConflict);
+        TransducerDto transducerDto = Instancio.of(TransducerDto.class)
+                .set(Select.field("art"), transducerEntityForConflict.getArt()).create();
+
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/update/" + transducerEntityForUpdate.getId()).build())
+                .bodyValue(transducerDto).exchange().expectStatus().isEqualTo(HttpStatus.CONFLICT)
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFICT.toString());
+    }
+
+    @Test
+    void shouldReturnNotFoundErrorIfEntityForUpdateNotExists() {
+        TransducerDto transducerDto = Instancio.create(TransducerDto.class);
+
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/update/" + TestConstants.TRANSDUCER_ID).build())
+                .bodyValue(transducerDto).exchange().expectStatus().isNotFound()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+    }
 
     private TransducerEntity saveTransducerToRepo() {
         TransducerEntity transducerEntity = Instancio.of(TransducerEntity.class)
