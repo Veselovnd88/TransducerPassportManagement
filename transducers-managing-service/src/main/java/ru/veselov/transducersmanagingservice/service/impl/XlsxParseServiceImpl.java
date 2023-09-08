@@ -2,6 +2,8 @@ package ru.veselov.transducersmanagingservice.service.impl;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
+import org.apache.poi.ooxml.POIXMLException;
+import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.DataFormatter;
@@ -49,9 +51,9 @@ public class XlsxParseServiceImpl implements XlsxParseService {
             }
             log.info("Serial numbers successfully parsed: [total: {}]", serials.size());
             return serials;
-        } catch (IOException e) {
+        } catch (IOException | POIXMLException | NotOfficeXmlFileException e) {
             log.error("Error during parsing xlsx file: {}", e.getMessage());
-            throw new ParseXlsxFileException(e.getMessage());
+            throw new ParseXlsxFileException(e.getMessage(), e);
         }
 
     }
