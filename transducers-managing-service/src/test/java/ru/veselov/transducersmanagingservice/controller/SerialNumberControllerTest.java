@@ -97,7 +97,7 @@ class SerialNumberControllerTest {
                         TestConstants.DATE_PARAMS))
                 .thenReturn(List.of(Instancio.create(SerialNumber.class)));
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all/dates")
-                        .path("/" + TestConstants.PT_ART)
+                        .path("/art/" + TestConstants.PT_ART)
                         .queryParams(getQueryParamsWithDateParams()).build())
                 .exchange().expectStatus().isOk()
                 .expectBody(List.class);
@@ -112,7 +112,8 @@ class SerialNumberControllerTest {
     void shouldGetSerialsByNumber() {
         Mockito.when(serialNumberService.findByNumber(TestConstants.NUMBER))
                 .thenReturn(List.of(Instancio.create(SerialNumber.class)));
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/number/" + TestConstants.NUMBER).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/number/" + TestConstants.NUMBER).build())
                 .exchange().expectStatus().isOk().expectBody(List.class);
 
         Mockito.verify(serialNumberService, Mockito.times(1)).findByNumber(TestConstants.NUMBER);
@@ -122,7 +123,7 @@ class SerialNumberControllerTest {
     void shouldFindAllSerialsByArt() {
         Mockito.when(serialNumberService.findByArt(TestConstants.SORTING_PARAMS, TestConstants.PT_ART))
                 .thenReturn(List.of(Instancio.create(SerialNumber.class)));
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").path("/" + TestConstants.PT_ART)
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").path("/art/" + TestConstants.PT_ART)
                         .queryParams(getQuerySortingParamsOnly()).build())
                 .exchange().expectStatus().isOk()
                 .expectBody(List.class);
@@ -135,7 +136,7 @@ class SerialNumberControllerTest {
     void shouldFindSerialById() {
         Mockito.when(serialNumberService.findById(TestConstants.SERIAL_ID.toString()))
                 .thenReturn(Instancio.create(SerialNumber.class));
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/" + TestConstants.SERIAL_ID)
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/id/" + TestConstants.SERIAL_ID)
                         .build())
                 .exchange().expectStatus().isOk().expectBody(SerialNumber.class);
 
@@ -151,8 +152,8 @@ class SerialNumberControllerTest {
                         TestConstants.DATE_PARAMS))
                 .thenReturn(List.of(Instancio.create(SerialNumber.class)));
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all/dates")
-                        .path("/" + TestConstants.PT_ART)
-                        .path("/" + TestConstants.CUSTOMER_ID)
+                        .path("/art/" + TestConstants.PT_ART)
+                        .path("/customer/" + TestConstants.CUSTOMER_ID)
                         .queryParams(getQueryParamsWithDateParams()).build())
                 .exchange().expectStatus().isOk()
                 .expectBody(List.class);

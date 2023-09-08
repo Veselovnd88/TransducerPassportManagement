@@ -68,7 +68,7 @@ public class SerialNumberServiceImpl implements SerialNumberService {
         ArrayList<SerialNumberEntity> serialNumberEntities = new ArrayList<>();
         serials.forEach(serial -> {
             SerialNumberEntity serialNumberEntity = createAndSetUpEntity(serialsDto);
-            serialNumberEntity.setTransducerEntity(transducerEntity);
+            serialNumberEntity.setTransducer(transducerEntity);
             serialNumberEntity.setCustomer(customerEntity);
             serialNumberEntity.setPtArt(transducerEntity.getArt());
             serialNumberEntity.setNumber(serial);
@@ -153,7 +153,12 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     @Override
     public void deleteSerial(String serialId) {
         UUID serialNumberUUID = UUID.fromString(serialId);
-        serialNumberRepository.deleteById(serialNumberUUID);
+        Optional<SerialNumberEntity> optional = serialNumberRepository.findById(serialNumberUUID);
+        SerialNumberEntity serialNumberEntity = optional.orElseThrow(() -> {
+            log.error("Device with serial [number: {}] not found", serialId);
+            throw new EntityNotFoundException("Device with serial [number: %s] not found".formatted(serialId));
+        });
+        serialNumberRepository.delete(serialNumberEntity);
         log.info("Serial number with [id: {}] was deleted from DB", serialId);
     }
 

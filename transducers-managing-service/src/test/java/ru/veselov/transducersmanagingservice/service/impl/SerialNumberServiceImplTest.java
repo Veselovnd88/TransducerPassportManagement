@@ -212,9 +212,21 @@ class SerialNumberServiceImplTest {
 
     @Test
     void deleteSerial() {
-        serialNumberService.deleteSerial(TestConstants.SERIAL_ID.toString());
+        SerialNumberEntity serialNumberEntity = getBaseSerialNumberEntity();
+        Mockito.when(serialNumberRepository.findById(serialNumberEntity.getId()))
+                .thenReturn(Optional.of(serialNumberEntity));
 
-        Mockito.verify(serialNumberRepository, Mockito.times(1)).deleteById(TestConstants.SERIAL_ID);
+        serialNumberService.deleteSerial(serialNumberEntity.getId().toString());
+
+        Mockito.verify(serialNumberRepository, Mockito.times(1)).delete(serialNumberEntity);
+    }
+
+    @Test
+    void shouldThrowNotFoundExceptionIfNoIdForDeleting() {
+        Mockito.when(serialNumberRepository.findById(ArgumentMatchers.any())).thenReturn(Optional.empty());
+        String serial = TestConstants.SERIAL_ID.toString();
+        Assertions.assertThatThrownBy(() -> serialNumberService.deleteSerial(serial))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
@@ -243,7 +255,7 @@ class SerialNumberServiceImplTest {
         Assertions.assertThat(captured.get(0)).isNotNull();
         SerialNumberEntity serialNumberEntity = captured.get(0);
         Assertions.assertThat(serialNumberEntity.getCustomer()).isEqualTo(customerEntity);
-        Assertions.assertThat(serialNumberEntity.getTransducerEntity()).isEqualTo(transducerEntity);
+        Assertions.assertThat(serialNumberEntity.getTransducer()).isEqualTo(transducerEntity);
         Assertions.assertThat(serialNumberEntity.getPtArt()).isEqualTo(transducerEntity.getArt());
     }
 
