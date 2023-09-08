@@ -62,7 +62,6 @@ class SerialNumberControllerTest {
         multipartBodyBuilder.part("serials", serialsDto);
         multipartBodyBuilder.part("file", BYTES).filename("serials.xlsx");
 
-
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isAccepted();

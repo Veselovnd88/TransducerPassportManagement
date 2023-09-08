@@ -1,5 +1,6 @@
 package ru.veselov.transducersmanagingservice.app;
 
+import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.instancio.Instancio;
@@ -10,11 +11,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.web.reactive.function.BodyInserters;
 import ru.veselov.transducersmanagingservice.TestConstants;
 import ru.veselov.transducersmanagingservice.app.testcontainers.PostgresContainersConfig;
+import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.entity.CustomerEntity;
 import ru.veselov.transducersmanagingservice.entity.SerialNumberEntity;
 import ru.veselov.transducersmanagingservice.entity.TransducerEntity;
@@ -23,8 +27,11 @@ import ru.veselov.transducersmanagingservice.repository.CustomerRepository;
 import ru.veselov.transducersmanagingservice.repository.SerialNumberRepository;
 import ru.veselov.transducersmanagingservice.repository.TransducerRepository;
 
+import java.io.InputStream;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -65,6 +72,86 @@ class SerialControllerIntegrationTest extends PostgresContainersConfig {
         transducerRepository.deleteAll();
         customerRepository.deleteAll();
         serialNumberRepository.deleteAll();
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldSaveSerials() {
+        SerialsDto serialsDto = Instancio.of(SerialsDto.class)
+                .set(Select.field("ptArt"), transducerEntity.getArt())
+                .set(Select.field("customerId"), customerEntity.getId().toString()).create();
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("serials", serialsDto);
+        InputStream xlsxInputStream = getClass().getClassLoader().getResourceAsStream("test1.xlsx");
+        assert xlsxInputStream != null;
+        multipartBodyBuilder.part("file", xlsxInputStream.readAllBytes()).filename("serials.xlsx");
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange().expectStatus().isAccepted();
+
+        List<SerialNumberEntity> allByNumber = serialNumberRepository.findAllByNumber("124");
+        Assertions.assertThat(allByNumber).hasSize(1);
+        Assertions.assertThat(allByNumber.get(0).getNumber()).isEqualTo("124");
+
+        xlsxInputStream.close();
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnErrorIfCustomerForSerialNotFound() {
+        SerialsDto serialsDto = Instancio.of(SerialsDto.class)
+                .set(Select.field("ptArt"), transducerEntity.getArt())
+                .set(Select.field("customerId"), UUID.randomUUID().toString())
+                .create();
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("serials", serialsDto);
+        InputStream xlsxInputStream = getClass().getClassLoader().getResourceAsStream("test1.xlsx");
+        assert xlsxInputStream != null;
+        multipartBodyBuilder.part("file", xlsxInputStream.readAllBytes()).filename("serials.xlsx");
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange().expectStatus().isNotFound()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+
+        xlsxInputStream.close();
+    }
+
+    @Test
+    void shouldReturnNoOfficeFileError() {
+        SerialsDto serialsDto = Instancio.of(SerialsDto.class)
+                .set(Select.field("ptArt"), transducerEntity.getArt())
+                .set(Select.field("customerId"), customerEntity.getId().toString()).create();
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("serials", serialsDto);
+        multipartBodyBuilder.part("file", new byte[]{1, 2}).filename("serials.xlsx");
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange().expectStatus().isBadRequest()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_BAD_FILE.toString());
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldReturnErrorIfArtForSerialNotFound() {
+        SerialsDto serialsDto = Instancio.of(SerialsDto.class)
+                .set(Select.field("ptArt"), "notArt")
+                .set(Select.field("customerId"), customerEntity.getId().toString())
+                .create();
+        MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
+        multipartBodyBuilder.part("serials", serialsDto);
+        InputStream xlsxInputStream = getClass().getClassLoader().getResourceAsStream("test1.xlsx");
+        assert xlsxInputStream != null;
+        multipartBodyBuilder.part("file", xlsxInputStream.readAllBytes()).filename("serials.xlsx");
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
+                .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                .exchange().expectStatus().isNotFound()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+
+        xlsxInputStream.close();
     }
 
     @Test

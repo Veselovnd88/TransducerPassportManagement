@@ -5,7 +5,6 @@ import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockMultipartFile;
-import ru.veselov.transducersmanagingservice.exception.ParseXlsxFileException;
 import ru.veselov.transducersmanagingservice.service.XlsxParseService;
 
 import java.io.InputStream;
@@ -20,10 +19,10 @@ class XlsxParseServiceImplTest {
     void shouldReturnListOfSerials() {
         InputStream xlsxInputStream = getClass().getClassLoader().getResourceAsStream("test1.xlsx");
         MockMultipartFile multipartFile = new MockMultipartFile("file", xlsxInputStream);
+
         List<String> serials = xlsxParseService.parseSerials(multipartFile);
 
         Assertions.assertThat(serials).hasSize(4).contains("12F3", "124", "125", "126");
-
         assert xlsxInputStream != null;
         xlsxInputStream.close();
     }
@@ -33,7 +32,7 @@ class XlsxParseServiceImplTest {
         MockMultipartFile multipartFile = new MockMultipartFile("file", new byte[]{1,2,3});
 
         Assertions.assertThatThrownBy(()-> xlsxParseService.parseSerials(multipartFile))
-                .isInstanceOf(ParseXlsxFileException.class).cause().isInstanceOf(NotOfficeXmlFileException.class);
+                .isInstanceOf(NotOfficeXmlFileException.class);
     }
 
 }

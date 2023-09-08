@@ -4,6 +4,7 @@ import jakarta.persistence.EntityExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,11 +22,23 @@ import java.util.List;
 @Slf4j
 public class ApiExceptionHandler {
 
-
     @ExceptionHandler(DateTimeParseException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleDateTimeParseException(DateTimeParseException e) {
         return new ApiErrorResponse(ErrorCode.ERROR_WRONG_DATE, e.getMessage());
+    }
+
+    @ExceptionHandler(NotOfficeXmlFileException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleNotOfficeXmlFileException(NotOfficeXmlFileException e) {
+        log.warn("Not Office file was sent: [{}]", e.getMessage());
+        return new ApiErrorResponse(ErrorCode.ERROR_BAD_FILE, e.getMessage());
+    }
+
+    @ExceptionHandler(ParseXlsxFileException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiErrorResponse handleXlsxFileParseException(ParseXlsxFileException e) {
+        return new ApiErrorResponse(ErrorCode.ERROR_XLSX_PARSE_ERROR, e.getMessage());
     }
 
     @ExceptionHandler(PageExceedsMaximumValueException.class)
@@ -48,14 +61,15 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(ConstraintViolationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse handleConstraintViolationException(ConstraintViolationException exception) {
-        List<ViolationError> violationErrors = exception.getConstraintViolations().stream()
+    public ApiErrorResponse handleConstraintViolationException(ConstraintViolationException e) {
+        List<ViolationError> violations = e.getConstraintViolations().stream()
                 .map(v -> new ViolationError(
                         fieldNameFromPath(v.getPropertyPath().toString()),
                         v.getMessage(),
                         v.getInvalidValue().toString()))
                 .toList();
-        return new ValidationErrorResponse(exception.getMessage(), violationErrors);
+        log.error("Validation error occurred: [{}-{}]", e.getMessage(), violations);
+        return new ValidationErrorResponse(e.getMessage(), violations);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -65,6 +79,7 @@ public class ApiExceptionHandler {
                 .map(error -> new ViolationError(error.getField(), error.getDefaultMessage(),
                         error.getRejectedValue() != null ? error.getRejectedValue().toString() : "null"))
                 .toList();
+        log.error("Validation error occurred: [{}-{}]", e.getMessage(), violations);
         return new ValidationErrorResponse(e.getMessage(), violations);
     }
 

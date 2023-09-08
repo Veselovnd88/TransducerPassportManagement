@@ -10,6 +10,10 @@ public enum ErrorCode {
 
     ERROR_WRONG_DATE,
 
+    ERROR_BAD_FILE,
+
+    ERROR_XLSX_PARSE_ERROR,
+
     ERROR_CONFLICT
 
 }
