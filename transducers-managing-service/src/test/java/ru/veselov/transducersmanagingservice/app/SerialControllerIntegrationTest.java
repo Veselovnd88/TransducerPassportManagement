@@ -1,5 +1,6 @@
 package ru.veselov.transducersmanagingservice.app;
 
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.instancio.Instancio;
 import org.instancio.Select;
@@ -23,6 +24,7 @@ import ru.veselov.transducersmanagingservice.repository.SerialNumberRepository;
 import ru.veselov.transducersmanagingservice.repository.TransducerRepository;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
@@ -203,6 +205,23 @@ class SerialControllerIntegrationTest extends PostgresContainersConfig {
                         Matchers.is(older.getNumber())));
     }
 
+    @Test
+    void shouldDeleteSerialById() {
+        SerialNumberEntity todaySerial = saveSerialNumberInRepo(LocalDate.of(2023, 9, 5));
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/" + todaySerial.getId()).build())
+                .exchange().expectStatus().isAccepted();
+
+        Optional<TransducerEntity> optional = transducerRepository.findById(todaySerial.getId());
+        Assertions.assertThat(optional).isNotPresent();
+    }
+
+    @Test
+    void shouldReturnNotFoundErrorInSerialForDeletingNotExists() {
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/" + TestConstants.SERIAL_ID)
+                        .build())
+                .exchange().expectStatus().isNotFound().expectBody()
+                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+    }
 
     private TransducerEntity saveTransducerInRepo() {
         return transducerRepository.save(Instancio.of(TransducerEntity.class)
@@ -225,6 +244,5 @@ class SerialControllerIntegrationTest extends PostgresContainersConfig {
         );
         return serialNumberRepository.save(serialNumberEntity);
     }
-
 
 }
