@@ -118,9 +118,21 @@ class CustomerServiceImplTest {
 
     @Test
     void shouldDeleteCustomer() {
+        CustomerEntity customerEntity = Instancio.of(CustomerEntity.class)
+                .set(Select.field("inn"), TestConstants.INN).create();
+        Mockito.when(customerRepository.findById(TestConstants.CUSTOMER_ID)).thenReturn(Optional.of(customerEntity));
+
         customerService.deleteCustomer(TestConstants.CUSTOMER_ID.toString());
 
-        Mockito.verify(customerRepository, Mockito.times(1)).deleteById(TestConstants.CUSTOMER_ID);
+        Mockito.verify(customerRepository, Mockito.times(1)).delete(customerEntity);
+    }
+
+    @Test
+    void shouldThrowNotFoundExceptionIfCustomerNotExistsForDeleting() {
+        Mockito.when(customerRepository.findById(TestConstants.CUSTOMER_ID)).thenReturn(Optional.empty());
+        String customerId = TestConstants.CUSTOMER_ID.toString();
+        Assertions.assertThatThrownBy(() -> customerService.deleteCustomer(customerId))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test

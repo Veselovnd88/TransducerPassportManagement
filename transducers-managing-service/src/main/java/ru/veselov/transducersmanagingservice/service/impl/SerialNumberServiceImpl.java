@@ -151,6 +151,7 @@ public class SerialNumberServiceImpl implements SerialNumberService {
     }
 
     @Override
+    @Transactional
     public void deleteSerial(String serialId) {
         UUID serialNumberUUID = UUID.fromString(serialId);
         Optional<SerialNumberEntity> optional = serialNumberRepository.findById(serialNumberUUID);

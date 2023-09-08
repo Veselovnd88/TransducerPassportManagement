@@ -74,7 +74,12 @@ public class TransducerServiceImpl implements TransducerService {
     @Transactional
     public void deleteTransducer(String transducerId) {
         UUID uuid = UUID.fromString(transducerId);
-        transducerRepository.deleteById(uuid);
+        Optional<TransducerEntity> optional = transducerRepository.findById(uuid);
+        TransducerEntity transducerEntity = optional.orElseThrow(() -> {
+            log.error("Transducer with such [id: {}] not found", transducerId);
+            throw new EntityNotFoundException("Transducer with such id %s not found".formatted(transducerId));
+        });
+        transducerRepository.delete(transducerEntity);
         log.info("Transducer with [id: {}] was deleted", transducerId);
     }
 

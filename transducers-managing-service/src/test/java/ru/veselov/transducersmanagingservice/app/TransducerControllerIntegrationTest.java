@@ -126,6 +126,14 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
     }
 
     @Test
+    void shouldReturnNotFoundErrorIfNoIdForDeleting() {
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/delete/" + TestConstants.TRANSDUCER_ID).build())
+                .exchange().expectStatus().isNotFound()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+    }
+
+    @Test
     void shouldUpdate() {
         TransducerEntity transducerEntity = saveTransducerToRepo();
         TransducerDto transducerDto = Instancio.create(TransducerDto.class);

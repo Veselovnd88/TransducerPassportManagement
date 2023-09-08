@@ -118,9 +118,23 @@ class TransducerServiceImplTest {
 
     @Test
     void shouldDelete() {
+        TransducerEntity transducerEntity = Instancio.of(TransducerEntity.class)
+                .set(Select.field("art"), TestConstants.PT_ART).create();
+        transducerEntity.setId(TestConstants.TRANSDUCER_ID);
+        Mockito.when(transducerRepository.findById(TestConstants.TRANSDUCER_ID))
+                .thenReturn(Optional.of(transducerEntity));
+
         transducerService.deleteTransducer(TestConstants.TRANSDUCER_ID.toString());
 
-        Mockito.verify(transducerRepository, Mockito.times(1)).deleteById(TestConstants.TRANSDUCER_ID);
+        Mockito.verify(transducerRepository, Mockito.times(1)).delete(transducerEntity);
+    }
+
+    @Test
+    void shouldThrowExceptionIfNoIdForDeleting() {
+        Mockito.when(transducerRepository.findById(TestConstants.TRANSDUCER_ID)).thenReturn(Optional.empty());
+        String transducerId = TestConstants.TRANSDUCER_ID.toString();
+        Assertions.assertThatThrownBy(() -> transducerService.deleteTransducer(transducerId))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test

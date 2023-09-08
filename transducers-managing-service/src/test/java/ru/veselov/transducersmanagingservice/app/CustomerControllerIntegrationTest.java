@@ -135,6 +135,14 @@ class CustomerControllerIntegrationTest extends PostgresContainersConfig {
     }
 
     @Test
+    void shouldReturnNotFoundErrorIfNoCustomerForDeleting() {
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/delete/" + TestConstants.CUSTOMER_ID)
+                        .build()).exchange().expectStatus().isNotFound().expectBody()
+                .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+    }
+
+    @Test
     void shouldUpdateCustomerWithSameInn() {
         String newName = "new name";
         CustomerEntity customer = saveCustomer();

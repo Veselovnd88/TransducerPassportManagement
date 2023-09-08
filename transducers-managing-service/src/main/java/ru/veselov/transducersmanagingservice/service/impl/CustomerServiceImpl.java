@@ -82,7 +82,12 @@ public class CustomerServiceImpl implements CustomerService {
     @Transactional
     public void deleteCustomer(String customerId) {
         UUID customerUUID = UUID.fromString(customerId);
-        customerRepository.deleteById(customerUUID);
+        Optional<CustomerEntity> optional = customerRepository.findById(customerUUID);
+        CustomerEntity customer = optional.orElseThrow(() -> {
+            log.error("Customer with such [id: {}] not found", customerId);
+            throw new EntityNotFoundException("Customer with such id: %s not found".formatted(customerId));
+        });
+        customerRepository.delete(customer);
         log.info("Customer with [id {}] deleted", customerId);
     }
 
