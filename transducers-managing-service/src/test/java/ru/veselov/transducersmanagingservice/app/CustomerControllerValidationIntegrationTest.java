@@ -3,26 +3,31 @@ package ru.veselov.transducersmanagingservice.app;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.transducersmanagingservice.TestConstants;
-import ru.veselov.transducersmanagingservice.app.testcontainers.PostgresContainersConfig;
+import ru.veselov.transducersmanagingservice.controller.CustomerController;
 import ru.veselov.transducersmanagingservice.dto.CustomerDto;
 import ru.veselov.transducersmanagingservice.exception.error.ErrorCode;
+import ru.veselov.transducersmanagingservice.service.CustomerService;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
+@WebMvcTest(controllers = CustomerController.class)
 @DirtiesContext
-class CustomerControllerValidationIntegrationTest extends PostgresContainersConfig {
+class CustomerControllerValidationIntegrationTest {
 
     private final static String URL_PREFIX = "/api/v1/customer";
 
     @Autowired
     WebTestClient webTestClient;
+
+    @MockBean
+    CustomerService customerService;
 
     @Test
     void shouldReturnValidationErrorWithName() {

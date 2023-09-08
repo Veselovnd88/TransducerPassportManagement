@@ -7,22 +7,27 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import ru.veselov.transducersmanagingservice.app.testcontainers.PostgresContainersConfig;
+import ru.veselov.transducersmanagingservice.controller.TransducerController;
 import ru.veselov.transducersmanagingservice.dto.TransducerDto;
 import ru.veselov.transducersmanagingservice.exception.error.ErrorCode;
+import ru.veselov.transducersmanagingservice.service.TransducerService;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
+@WebMvcTest(controllers = TransducerController.class)
 @ActiveProfiles("test")
-class TransducerControllerValidationTest extends PostgresContainersConfig {
+class TransducerControllerValidationTest {
 
     public static final String URL_PREFIX = "/api/v1/transducer";
 
     @Autowired
     WebTestClient webTestClient;
+
+    @MockBean
+    TransducerService transducerService;
 
     @ParameterizedTest
     @ValueSource(strings = {"art", "pressureRange", "outputCode", "model", "code", "pressureType", "accuracy",
