@@ -22,7 +22,6 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(exclude = {"id"})
 @NoArgsConstructor
-@Where(clause = "synced=false")
 public class TemplateEntity {
 
     @Id

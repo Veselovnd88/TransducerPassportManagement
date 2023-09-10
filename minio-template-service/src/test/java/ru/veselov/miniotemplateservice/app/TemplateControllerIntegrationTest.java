@@ -119,6 +119,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     @SneakyThrows
     void shouldUpdateTemplate() {
+        saveTemplateEntity();
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES)
                 .filename(TestConstants.MULTIPART_FILENAME);
@@ -177,7 +178,8 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
 
     @Test
     @SneakyThrows
-    void shouldRollbackTxIfFileWasNotUpdated() {//FIXME
+    void shouldNotUpdateDbIfTemplateNotLoaded() {
+        saveTemplateEntity();
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES).filename(TestConstants.MULTIPART_FILENAME);
         Mockito.doThrow(CommonMinioException.class).when(minioClient).putObject(ArgumentMatchers.any());
@@ -194,10 +196,12 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
 
     @Test
     @SneakyThrows
-    void shouldRollbackTxIfMinioThrewException() {
+    void shouldNotDeleteIfException() {
+        saveTemplateEntity();
         Mockito.doThrow(CommonMinioException.class).when(minioClient).removeObject(ArgumentMatchers.any());
 
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete").path("/" + templateId).build())
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/delete").path("/" + templateId).build())
                 .exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_FILE_STORAGE.toString());
 

@@ -189,6 +189,7 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
         templateEntity.setFilename(TestConstants.SAMPLE_FILENAME);
         templateEntity.setTemplateName("801877-filename");
         templateEntity.setBucket(bucketName);
+        templateEntity.setSynced(true);
         templateEntity.setPtArt("801877");
         return templateRepository.save(templateEntity);
     }

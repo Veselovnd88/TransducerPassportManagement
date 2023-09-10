@@ -96,16 +96,16 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
         return templateMapper.toModels(templatePage.getContent());
     }
 
+    @Override
     @Transactional
-    public Template updateTemplate(String templateId) {
+    public void updateTemplate(String templateId) {
         UUID templateIdUUID = UUID.fromString(templateId);
         Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findById(templateIdUUID);
         if (optionalTemplateEntity.isPresent()) {
             TemplateEntity templateEntity = optionalTemplateEntity.get();
             templateEntity.setEditedAt(LocalDateTime.now());
-            TemplateEntity updated = templateRepository.save(templateEntity);
+            templateRepository.save(templateEntity);
             log.info("Template [id: {}] info updated in DB", templateId);
-            return templateMapper.toModel(updated);
         } else {
             log.error("Template with [id: {}] not found", templateId);
             throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));
@@ -113,16 +113,17 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
     }
 
     @Override
-    public Optional<Template> deleteTemplate(String templateId) {
+    @Transactional
+    public void deleteTemplate(String templateId) {
         UUID templateIdUUID = UUID.fromString(templateId);
         Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findById(templateIdUUID);
         if (optionalTemplateEntity.isPresent()) {
             TemplateEntity templateEntity = optionalTemplateEntity.get();
             templateRepository.delete(templateEntity);
             log.info("Template with [id: {}] deleted from DB", templateId);
-            return Optional.of(templateMapper.toModel(templateEntity));
         } else {
-            return Optional.empty();
+            log.error("Template with [id: {}] not found", templateId);
+            throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));
         }
     }
 
@@ -144,6 +145,5 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
                     .formatted(totalPages, page), page);
         }
     }
-
 
 }

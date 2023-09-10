@@ -29,7 +29,6 @@ import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
 import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
-import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
@@ -123,14 +122,16 @@ class PassportTemplateServiceImplTest {
 
     @Test
     void shouldCallServicesToUpdate() {
-        String templateId = UUID.randomUUID().toString();
+        String templateId = TestConstants.TEMPLATE_ID.toString();
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
                 MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
-        Template template = Instancio.create(Template.class);
-        Mockito.when(templateStorageService.updateTemplate(templateId)).thenReturn(template);
+        Template template = Instancio.of(Template.class)
+                .set(Select.field("id"), TestConstants.TEMPLATE_ID).create();
+        Mockito.when(templateStorageService.findTemplateById(templateId)).thenReturn(template);
 
         passportTemplateService.updateTemplate(multipartFile, templateId);
 
+        Mockito.verify(templateStorageService, Mockito.times(1)).findTemplateById(templateId);
         Mockito.verify(templateStorageService, Mockito.times(1)).updateTemplate(templateId);
         Mockito.verify(templateMinioService, Mockito.times(1))
                 .updateTemplate(ArgumentMatchers.any(), templateArgumentCaptor.capture());
@@ -141,7 +142,7 @@ class PassportTemplateServiceImplTest {
     @Test
     void shouldNotCallMinioServiceToUpdateIfException() {
         String templateId = UUID.randomUUID().toString();
-        Mockito.doThrow(EntityNotFoundException.class).when(templateStorageService).updateTemplate(templateId);
+        Mockito.doThrow(EntityNotFoundException.class).when(templateStorageService).findTemplateById(templateId);
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
                 MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
 
@@ -158,21 +159,11 @@ class PassportTemplateServiceImplTest {
         Template template = Instancio.of(Template.class)
                 .set(Select.field(Template.class, "id"), UUID.fromString(templateId))
                 .create();
-        Mockito.when(templateStorageService.deleteTemplate(templateId)).thenReturn(Optional.of(template));
+        Mockito.when(templateStorageService.findTemplateById(templateId)).thenReturn(template);
         passportTemplateService.deleteTemplate(templateId);
 
         Mockito.verify(templateStorageService, Mockito.times(1)).deleteTemplate(templateId);
         Mockito.verify(templateMinioService, Mockito.times(1)).deleteTemplate(template.getFilename());
-    }
-
-    @Test
-    void shouldNotCallServicesToDeleteTemplate() {
-        String templateId = UUID.randomUUID().toString();
-        Mockito.when(templateStorageService.deleteTemplate(templateId)).thenReturn(Optional.empty());
-        passportTemplateService.deleteTemplate(templateId);
-
-        Mockito.verify(templateStorageService, Mockito.times(1)).deleteTemplate(templateId);
-        Mockito.verify(templateMinioService, Mockito.never()).deleteTemplate(ArgumentMatchers.anyString());
     }
 
 }

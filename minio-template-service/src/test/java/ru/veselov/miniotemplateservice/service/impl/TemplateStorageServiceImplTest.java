@@ -183,21 +183,20 @@ class TemplateStorageServiceImplTest {
 
     @Test
     void shouldUpdateTemplate() {
-        String templateIdUUID = ID.toString();
+        String templateIdUUID = TestConstants.TEMPLATE_ID.toString();
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setId(ID);
+        templateEntity.setId(TestConstants.TEMPLATE_ID);
         templateEntity.setFilename("filename");
-        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.of(templateEntity));
+        Mockito.when(templateRepository.findById(TestConstants.TEMPLATE_ID))
+                .thenReturn(Optional.of(templateEntity));
         Mockito.when(templateRepository.save(ArgumentMatchers.any())).thenReturn(templateEntity);
-        Template template = templateStorageService.updateTemplate(templateIdUUID);
+        templateStorageService.updateTemplate(templateIdUUID);
 
-        Mockito.verify(templateRepository, Mockito.times(1)).findById(ID);
+        Mockito.verify(templateRepository, Mockito.times(1)).findById(TestConstants.TEMPLATE_ID);
         Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
         TemplateEntity captured = templateArgumentCaptor.getValue();
         Assertions.assertThat(captured.getId()).isEqualTo(templateEntity.getId());
         Assertions.assertThat(captured.getEditedAt()).isNotNull();
-        Assertions.assertThat(template.getId()).isEqualTo(captured.getId());
-        Assertions.assertThat(template.getFilename()).isEqualTo(templateEntity.getFilename());
     }
 
     @Test
@@ -217,22 +216,18 @@ class TemplateStorageServiceImplTest {
         templateEntity.setFilename("filename");
         Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.of(templateEntity));
 
-        Optional<Template> templateOptional = templateStorageService.deleteTemplate(templateId);
+        templateStorageService.deleteTemplate(templateId);
 
         Mockito.verify(templateRepository, Mockito.times(1)).delete(templateEntity);
-        Assertions.assertThat(templateOptional).isPresent();
-        Template template = templateOptional.get();
-        Assertions.assertThat(template.getFilename()).isEqualTo(templateEntity.getFilename());
     }
 
     @Test
-    void shouldReturnEmptyOptionalIfTemplateNotExists() {
+    void shouldThrowExceptionIfNotTemplateForDelete() {
         String templateId = ID.toString();
         Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
 
-        Optional<Template> templateOptional = templateStorageService.deleteTemplate(templateId);
-
-        Assertions.assertThat(templateOptional).isNotPresent();
+        Assertions.assertThatThrownBy(() -> templateStorageService.deleteTemplate(templateId))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
 }

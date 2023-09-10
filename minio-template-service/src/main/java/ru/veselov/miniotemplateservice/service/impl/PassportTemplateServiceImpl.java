@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.miniotemplateservice.dto.TemplateDto;
 import ru.veselov.miniotemplateservice.entity.TemplateEntity;
@@ -15,8 +14,6 @@ import ru.veselov.miniotemplateservice.service.PassportTemplateService;
 import ru.veselov.miniotemplateservice.service.TemplateMinioService;
 import ru.veselov.miniotemplateservice.service.TemplateStorageService;
 import ru.veselov.miniotemplateservice.validator.TemplateValidator;
-
-import java.util.Optional;
 
 /**
  * Service for managing templates of passports
@@ -63,24 +60,21 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     }
 
     @Override
-    @Transactional//FIXME
     public void updateTemplate(MultipartFile file, String templateId) {
-        Template template = templateStorageService.updateTemplate(templateId);
+        Template template = templateStorageService.findTemplateById(templateId);
         templateMinioService.updateTemplate(file.getResource(), template);
+        templateStorageService.updateTemplate(templateId);
         log.info("Template for [id: {}] successfully updated", templateId);
     }
 
     @Override
-    @Transactional
     public void deleteTemplate(String templateId) {
-        Optional<Template> templateOptional = templateStorageService.deleteTemplate(templateId);
-        if (templateOptional.isPresent()) {
-            String filename = templateOptional.get().getFilename();
-            templateMinioService.deleteTemplate(filename);
-            log.info("Template for [id: {}] successfully deleted", templateId);
-        } else {
-            log.info("Template with [id: {}] not found, nothing to delete", templateId);
-        }
+        Template template = templateStorageService.findTemplateById(templateId);
+        String filename = template.getFilename();
+        templateMinioService.deleteTemplate(filename);
+        templateStorageService.deleteTemplate(templateId);
+        log.info("Template for [id: {}] successfully deleted", templateId);
+
     }
 
     private String generateFileName(TemplateDto templateDto) {

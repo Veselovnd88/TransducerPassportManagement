@@ -58,6 +58,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         templateEntity.setFilename(TestConstants.SAMPLE_FILENAME);
         templateEntity.setTemplateName(TestConstants.SAMPLE_TEMPLATE);
         templateEntity.setBucket(bucketName);
+        templateEntity.setSynced(true);
         templateEntity.setPtArt(TestConstants.ART);
         savedTemplate = templateRepository.save(templateEntity);
         templateId = savedTemplate.getId();
@@ -229,12 +230,14 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         templateEntity1.setTemplateName("801855-abc");
         templateEntity1.setBucket(bucketName);
         templateEntity1.setPtArt("801855");
+        templateEntity1.setSynced(true);
         templateRepository.save(templateEntity1);
 
         TemplateEntity templateEntity2 = new TemplateEntity();
         templateEntity2.setFilename("101855-zzz.docx");
         templateEntity2.setTemplateName("101855-zzz");
         templateEntity2.setBucket(bucketName);
+        templateEntity2.setSynced(true);
         templateEntity2.setPtArt("101855");
         templateRepository.save(templateEntity2);
     }
