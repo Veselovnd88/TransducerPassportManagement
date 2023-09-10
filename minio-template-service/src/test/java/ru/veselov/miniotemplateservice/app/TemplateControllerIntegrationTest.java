@@ -8,7 +8,6 @@ import io.minio.RemoveObjectArgs;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
@@ -71,18 +70,6 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     @Captor
     ArgumentCaptor<RemoveObjectArgs> removeObjectArgsCaptor;
 
-    @BeforeEach
-    void init() {
-        TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setFilename(TestConstants.SAMPLE_FILENAME);
-        templateEntity.setTemplateName("801877-filename");
-        templateEntity.setBucket(bucketName);
-        templateEntity.setPtArt(TestConstants.ART);
-        TemplateEntity save = templateRepository.save(templateEntity);
-        templateId = save.getId();
-
-    }
-
     @AfterEach
     void clear() {
         templateRepository.deleteAll();
@@ -91,6 +78,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     @SneakyThrows
     void shouldGetSourceById() {
+        saveTemplateEntity();
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestConstants.SOURCE_BYTES);
         Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
@@ -121,6 +109,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
 
         Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findByName("801877-name");
         Assertions.assertThat(optionalTemplateEntity).isPresent();
+        Assertions.assertThat(optionalTemplateEntity.get().getSynced()).isTrue();
         Mockito.verify(minioClient, Mockito.times(1)).putObject(putObjectArgsCaptor.capture());
         PutObjectArgs captured = putObjectArgsCaptor.getValue();
         Assertions.assertThat(captured.bucket()).isEqualTo(bucketName);
@@ -152,6 +141,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     @SneakyThrows
     void shouldDeleteTemplate() {
+        saveTemplateEntity();
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete")
                         .path("/" + templateId).build())
                 .exchange().expectStatus().isOk();
@@ -167,7 +157,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
 
     @Test
     @SneakyThrows
-    void shouldRollbackTxIfFileWasNotSaved() {
+    void shouldStayUnSyncedFileWasNotSaved() {
         TemplateDto templateDto = new TemplateDto("name", TestConstants.ART, bucketName);
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES)
@@ -181,12 +171,13 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_FILE_STORAGE.toString());
 
         Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findByName("801877-name");
-        Assertions.assertThat(optionalTemplateEntity).isNotPresent();
+        Assertions.assertThat(optionalTemplateEntity).isPresent();
+        Assertions.assertThat(optionalTemplateEntity.get().getSynced()).isFalse();
     }
 
     @Test
     @SneakyThrows
-    void shouldRollbackTxIfFileWasNotUpdated() {
+    void shouldRollbackTxIfFileWasNotUpdated() {//FIXME
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES).filename(TestConstants.MULTIPART_FILENAME);
         Mockito.doThrow(CommonMinioException.class).when(minioClient).putObject(ArgumentMatchers.any());
@@ -212,6 +203,17 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
 
         Optional<TemplateEntity> templateEntityOptional = templateRepository.findById(templateId);
         Assertions.assertThat(templateEntityOptional).isPresent();
+    }
+
+    private void saveTemplateEntity() {
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setFilename(TestConstants.SAMPLE_FILENAME);
+        templateEntity.setTemplateName("801877-filename");
+        templateEntity.setBucket(bucketName);
+        templateEntity.setSynced(true);
+        templateEntity.setPtArt(TestConstants.ART);
+        TemplateEntity save = templateRepository.save(templateEntity);
+        templateId = save.getId();
     }
 
 }

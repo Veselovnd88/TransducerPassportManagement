@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
+import ru.veselov.miniotemplateservice.TestConstants;
 import ru.veselov.miniotemplateservice.dto.SortingParams;
 import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 import ru.veselov.miniotemplateservice.exception.PageExceedsMaximumValueException;
@@ -54,14 +55,14 @@ class TemplateStorageServiceImplTest {
     }
 
     @Test
-    void shouldSaveTemplateToRepo() {
+    void shouldSaveTemplateUnSyncedToRepo() {
         Template template = Instancio.of(Template.class)
                 .ignore(Select.field(Template::getId))
                 .ignore(Select.field(Template::getCreatedAt))
                 .ignore(Select.field(Template::getEditedAt))
                 .set(Select.field(Template::getBucket), BUCKET).create();
 
-        templateStorageService.saveTemplate(template);
+        templateStorageService.saveTemplateUnSynced(template);
 
         Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
         TemplateEntity captured = templateArgumentCaptor.getValue();
@@ -69,6 +70,30 @@ class TemplateStorageServiceImplTest {
         Assertions.assertThat(captured.getTemplateName()).isEqualTo(template.getTemplateName());
         Assertions.assertThat(captured.getPtArt()).isEqualTo(template.getPtArt());
         Assertions.assertThat(captured.getFilename()).isEqualTo(template.getFilename());
+        Assertions.assertThat(captured.getSynced()).isFalse();
+    }
+
+    @Test
+    void shouldSync() {
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setId(TestConstants.TEMPLATE_ID);
+        Mockito.when(templateRepository.findById(TestConstants.TEMPLATE_ID)).thenReturn(
+                Optional.of(templateEntity));
+
+        templateStorageService.syncTemplate(TestConstants.TEMPLATE_ID);
+
+        Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
+        TemplateEntity captured = templateArgumentCaptor.getValue();
+        Assertions.assertThat(captured.getSynced()).isTrue();
+    }
+
+    @Test
+    void shouldThrowExceptionIfTemplateNotFoundForSync() {
+        Mockito.when(templateRepository.findById(TestConstants.TEMPLATE_ID)).thenReturn(
+                Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> templateStorageService.syncTemplate(TestConstants.TEMPLATE_ID))
+                .isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test

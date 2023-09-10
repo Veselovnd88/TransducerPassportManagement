@@ -1,14 +1,18 @@
 package ru.veselov.miniotemplateservice.service;
 
 import ru.veselov.miniotemplateservice.dto.SortingParams;
+import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 import ru.veselov.miniotemplateservice.model.Template;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface TemplateStorageService {
 
-    void saveTemplate(Template template);
+    TemplateEntity saveTemplateUnSynced(Template template);
+
+    void syncTemplate(UUID templateId);
 
     Template findTemplateById(String templateId);
 

@@ -19,7 +19,9 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
+import ru.veselov.miniotemplateservice.TestConstants;
 import ru.veselov.miniotemplateservice.dto.TemplateDto;
+import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapper;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapperImpl;
 import ru.veselov.miniotemplateservice.model.Template;
@@ -61,14 +63,19 @@ class PassportTemplateServiceImplTest {
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
                 MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
         TemplateDto templateDto = new TemplateDto("name", "801877", "templates");
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setId(TestConstants.TEMPLATE_ID);
 
+        Mockito.when(templateStorageService.saveTemplateUnSynced(ArgumentMatchers.any()))
+                .thenReturn(templateEntity);
         passportTemplateService.saveTemplate(multipartFile, templateDto);
 
-        Mockito.verify(templateStorageService, Mockito.times(1)).saveTemplate(templateArgumentCaptor.capture());
+        Mockito.verify(templateStorageService, Mockito.times(1)).saveTemplateUnSynced(templateArgumentCaptor.capture());
         Mockito.verify(templateMinioService, Mockito.times(1))
                 .saveTemplate(ArgumentMatchers.any(), templateArgumentCaptor.capture());
         Template captured = templateArgumentCaptor.getValue();
         Assertions.assertThat(captured.getFilename()).isEqualTo("801877-name.docx");
+        Mockito.verify(templateStorageService, Mockito.times(1)).syncTemplate(templateEntity.getId());
     }
 
     @Test
@@ -82,7 +89,7 @@ class PassportTemplateServiceImplTest {
         Assertions.assertThatThrownBy(() -> passportTemplateService.saveTemplate(multipartFile, templateDto))
                 .isInstanceOf(EntityExistsException.class);
 
-        Mockito.verify(templateStorageService, Mockito.never()).saveTemplate(ArgumentMatchers.any());
+        Mockito.verify(templateStorageService, Mockito.never()).saveTemplateUnSynced(ArgumentMatchers.any());
     }
 
     @Test

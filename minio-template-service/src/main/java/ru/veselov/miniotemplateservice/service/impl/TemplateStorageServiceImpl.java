@@ -10,6 +10,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.miniotemplateservice.dto.SortingParams;
 import ru.veselov.miniotemplateservice.entity.TemplateEntity;
@@ -38,11 +39,28 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
     private final TemplateMapper templateMapper;
 
     @Override
-    @Transactional
-    public void saveTemplate(Template template) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public TemplateEntity saveTemplateUnSynced(Template template) {
         TemplateEntity templateEntity = templateMapper.toEntity(template);
-        templateRepository.save(templateEntity);
+        templateEntity.setSynced(false);
+        TemplateEntity saved = templateRepository.save(templateEntity);
         log.info("New [template:art-{}, name-{}] saved to repo", template.getPtArt(), template.getTemplateName());
+        return saved;
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void syncTemplate(UUID templateId) {
+        Optional<TemplateEntity> optionalTemplate = templateRepository.findById(templateId);
+        if (optionalTemplate.isPresent()) {
+            TemplateEntity templateEntity = optionalTemplate.get();
+            templateEntity.setSynced(true);
+            templateRepository.save(templateEntity);
+            log.info("Template successfully saved to MinIO and synced with DB");
+        } else {
+            log.error("Template with [id: {}] for sync not found", templateId);
+            throw new EntityNotFoundException("Template with [id: %s] for sync not found".formatted(templateId));
+        }
     }
 
     @Override

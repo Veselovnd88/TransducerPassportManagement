@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import ru.veselov.miniotemplateservice.dto.TemplateDto;
+import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 import ru.veselov.miniotemplateservice.mapper.TemplateMapper;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.service.PassportTemplateService;
@@ -17,6 +18,10 @@ import ru.veselov.miniotemplateservice.validator.TemplateValidator;
 
 import java.util.Optional;
 
+/**
+ * Service for managing templates of passports
+ * Docx templates saved in minio storage, metadata and information saved in DB
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -33,15 +38,18 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     private final TemplateMapper templateMapper;
 
     @Override
-    @Transactional
     public void saveTemplate(MultipartFile file, TemplateDto templateInfo) {
         templateValidator.validateTemplateName(generateTemplateName(templateInfo));
         Resource resource = file.getResource();
         Template template = templateMapper.dtoToTemplate(templateInfo);
         template.setTemplateName(generateTemplateName(templateInfo));
         template.setFilename(generateFileName(templateInfo));
-        templateStorageService.saveTemplate(template);
+        //saved with sync=false
+        TemplateEntity templateEntity = templateStorageService.saveTemplateUnSynced(template);
+        //upload template
         templateMinioService.saveTemplate(resource, template);
+        //update with sync=true
+        templateStorageService.syncTemplate(templateEntity.getId());
         log.info("Template [art: {}, name: {}] saved to MinIO storage and to DB",
                 templateInfo.getPtArt(), templateInfo.getTemplateDescription());
     }
@@ -55,7 +63,7 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     }
 
     @Override
-    @Transactional
+    @Transactional//FIXME
     public void updateTemplate(MultipartFile file, String templateId) {
         Template template = templateStorageService.updateTemplate(templateId);
         templateMinioService.updateTemplate(file.getResource(), template);
