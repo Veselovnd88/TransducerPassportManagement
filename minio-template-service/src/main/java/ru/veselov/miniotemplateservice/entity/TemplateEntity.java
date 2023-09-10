@@ -12,6 +12,7 @@ import jakarta.persistence.TemporalType;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.Where;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -21,6 +22,7 @@ import java.util.UUID;
 @Data
 @EqualsAndHashCode(exclude = {"id"})
 @NoArgsConstructor
+@Where(clause = "synced=false")
 public class TemplateEntity {
 
     @Id
