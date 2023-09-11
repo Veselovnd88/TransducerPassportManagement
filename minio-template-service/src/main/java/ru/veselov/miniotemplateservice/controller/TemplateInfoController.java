@@ -25,7 +25,7 @@ public class TemplateInfoController {
 
     private final TemplateStorageService templateStorageService;
 
-    @GetMapping("/{templateId}")
+    @GetMapping("/id/{templateId}")
     public ResponseEntity<Template> getTemplateInfo(@PathVariable("templateId") @UUID String templateId) {
         Template foundTemplate = templateStorageService.findTemplateById(templateId);
         return new ResponseEntity<>(foundTemplate, HttpStatus.OK);
@@ -37,7 +37,7 @@ public class TemplateInfoController {
         return new ResponseEntity<>(templates, HttpStatus.OK);
     }
 
-    @GetMapping("/all/{ptArt}")
+    @GetMapping("/all/ptArt/{ptArt}")
     public ResponseEntity<List<Template>> getTemplatesByPtArt(@PathVariable("ptArt") String ptArt,
                                                               @Valid @SortingParam SortingParams sortingParams) {
         List<Template> templates = templateStorageService.findAllByPtArt(ptArt, sortingParams);
