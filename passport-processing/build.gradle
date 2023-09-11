@@ -64,7 +64,6 @@ dependencies {
     testImplementation "org.testcontainers:postgresql:1.18.3"
     testImplementation 'org.awaitility:awaitility:4.2.0'
 
-
 }
 
 dependencyManagement {
