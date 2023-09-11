@@ -32,20 +32,19 @@ public class TemplateStorageHttpClientImpl implements TemplateStorageHttpClient 
 
     @Override
     public ByteArrayResource sendRequestToGetTemplate(String templateId) {
-        String fullUrl = templateStorageUrl + "/source/" + templateId;
+        String fullUrl = templateStorageUrl + "/source/id/" + templateId;
         Mono<DataBuffer> dataBufferMono = webClient.get().uri(fullUrl)
                 .retrieve().onStatus(HttpStatus.NOT_FOUND::equals, response -> {
-                    log.error("Template with [id: {}] doesnt exists", templateId);
                     throw new TemplateNotExistsException("Template with [id: %s] doesnt exists".formatted(templateId));
                 })
                 .onStatus(HttpStatusCode::is5xxServerError, response -> {
-                    log.error("Error occurred during retrieving template with [id: {}]", templateId);
                     throw new ServiceUnavailableException("Error occurred during retrieving template with [id: %s]"
                             .formatted(templateId));
                 }).bodyToMono(DataBuffer.class)
-                .doOnError(t -> log.error(t.getMessage()))
+                .doOnError(t -> log.error("Template Storage server is down: {}", t.getMessage()))
                 .onErrorResume(WebClientRequestException.class::isInstance, e -> {
-                    throw new ServiceUnavailableException("Template Storage server is down: %s".formatted(e.getMessage()));
+                    throw new ServiceUnavailableException("Template Storage server is down: %s"
+                            .formatted(e.getMessage()));
                 });
         DataBuffer dataBuffer = dataBufferMono.block();
         return bufferToByteArrayResource(dataBuffer);
