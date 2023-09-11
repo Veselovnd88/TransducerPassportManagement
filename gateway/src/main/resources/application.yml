@@ -21,7 +21,6 @@ spring:
           uri: lb://MANAGING
           predicates:
             - Path=/api/v1/customer/**,  /api/v1/transducer/**, /api/v1/serials/**
-
 eureka:
   client:
     service-url:

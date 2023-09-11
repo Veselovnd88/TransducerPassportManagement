@@ -1,5 +1,7 @@
 package ru.veselov.passportprocessing.service.impl;
 
+import io.micrometer.observation.ObservationRegistry;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,7 +31,15 @@ public class PdfHttpClientImpl implements PdfHttpClient {
     @Value("${pdf-service.filename}")
     private String filename;
 
-    private final WebClient webClient;
+    private final ObservationRegistry observationRegistry;
+
+    private WebClient webClient;
+
+    @PostConstruct
+    void createNotLoadBalancedWebClient() {
+        webClient = WebClient.builder()
+                .observationRegistry(observationRegistry).build();
+    }
 
     @Override
     public DataBuffer sendRequestForConvertingDocxToPdf(byte[] source) {
