@@ -4,6 +4,12 @@ import java.util.UUID;
 
 public class TestConstants {
 
+    public static final String PAGE = "page";
+
+    public static final String SORT = "sort";
+
+    public static final String ORDER = "order";
+
     public static final String SAMPLE_FILENAME = "801877-filename.docx";
 
     public static final String SAMPLE_TEMPLATE = "801877-filename";

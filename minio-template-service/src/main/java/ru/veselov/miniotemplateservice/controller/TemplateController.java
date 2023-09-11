@@ -29,7 +29,7 @@ public class TemplateController {
 
     private final PassportTemplateService passportTemplateService;
 
-    @GetMapping(value = "/source/{templateId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
+    @GetMapping(value = "/source/id/{templateId}", produces = MediaType.APPLICATION_OCTET_STREAM_VALUE)
     public ResponseEntity<byte[]> getTemplateSource(@PathVariable("templateId") @UUID String templateId) {
         ByteArrayResource template = passportTemplateService.getTemplate(templateId);
         return new ResponseEntity<>(template.getByteArray(), HttpStatus.OK);
@@ -42,14 +42,14 @@ public class TemplateController {
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @PutMapping(value = "/upload/{templateId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/update/upload/id/{templateId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Void> uploadUpdateTemplate(@PathVariable("templateId") @UUID String templateId,
                                                      @RequestPart("file") @Docx MultipartFile file) {
         passportTemplateService.updateTemplate(file, templateId);
         return new ResponseEntity<>(HttpStatus.ACCEPTED);
     }
 
-    @DeleteMapping("/delete/{templateId}")
+    @DeleteMapping("/delete/id/{templateId}")
     public ResponseEntity<Void> deleteTemplate(@PathVariable("templateId") @UUID String templateId) {
         passportTemplateService.deleteTemplate(templateId);
         return new ResponseEntity<>(HttpStatus.OK);

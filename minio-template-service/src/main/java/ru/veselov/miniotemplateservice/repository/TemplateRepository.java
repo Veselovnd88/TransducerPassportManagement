@@ -21,19 +21,19 @@ public interface TemplateRepository extends JpaRepository<TemplateEntity, UUID> 
     Optional<TemplateEntity> findById(@NotNull @Param("templateId") UUID templateId);
 
     @NotNull
-    @Query(value = "SELECT t FROM TemplateEntity t",
+    @Query(value = "SELECT t FROM TemplateEntity t where t.synced=true ",
             countQuery = "SELECT COUNT(t) FROM TemplateEntity t")
     Page<TemplateEntity> findAll(@NotNull Pageable pageable);
 
-    @Query("SELECT COUNT(t) FROM TemplateEntity t")
+    @Query("SELECT COUNT(t) FROM TemplateEntity t where t.synced=true ")
     long countAll();
 
-    @Query(value = "SELECT t FROM TemplateEntity t where t.ptArt LIKE %:ptArt%",
-            countQuery = "SELECT COUNT(t) FROM TemplateEntity t where t.ptArt LIKE %:ptArt%")
+    @Query(value = "SELECT t FROM TemplateEntity t where t.ptArt LIKE %:ptArt% AND  t.synced=true",
+            countQuery = "SELECT COUNT(t) FROM TemplateEntity t where t.ptArt LIKE %:ptArt% AND t.synced=true")
         //or CONCAT('%', :ptArt, '%')
     Page<TemplateEntity> findAllByPtArt(@Param("ptArt") String ptArt, Pageable pageable);
 
-    @Query("SELECT COUNT(t) FROM TemplateEntity t where t.ptArt LIKE %:ptArt%")
+    @Query("SELECT COUNT(t) FROM TemplateEntity t where t.ptArt LIKE %:ptArt% AND t.synced=true")
     long countAllByPtArt(@Param("ptArt") String ptArt);
 
 }

@@ -39,7 +39,7 @@ class TemplateInfoControllerTest {
     @Test
     void shouldReturnTemplateById() {
         Mockito.when(templateStorageService.findTemplateById(templateId)).thenReturn(new Template());
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/" + templateId).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/id/" + templateId).build())
                 .exchange().expectStatus().isOk().expectBody(Template.class);
     }
 
@@ -57,7 +57,7 @@ class TemplateInfoControllerTest {
         List<Template> templates = List.of(new Template());
         Mockito.when(templateStorageService.findAllByPtArt(ArgumentMatchers.anyString(),
                 ArgumentMatchers.any())).thenReturn(templates);
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all/801877").queryParam("page", 1).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all/ptArt/801877").queryParam("page", 1).build())
                 .exchange().expectStatus().isOk()
                 .expectBody(List.class);
     }

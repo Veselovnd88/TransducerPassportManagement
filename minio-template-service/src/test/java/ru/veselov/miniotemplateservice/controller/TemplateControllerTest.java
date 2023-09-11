@@ -56,7 +56,7 @@ class TemplateControllerTest {
     void shouldCallPassportTemplateServiceToGetTemplateSource() {
         String templateId = UUID.randomUUID().toString();
         Mockito.when(passportTemplateService.getTemplate(templateId)).thenReturn(new ByteArrayResource(BYTES));
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/source").path("/" + templateId).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/source").path("/id/" + templateId).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .expectBody(byte[].class);
@@ -90,7 +90,7 @@ class TemplateControllerTest {
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part("file", BYTES).filename("filename.docx");
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL).path("/upload").path("/" + templateId).build())
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL).path("/update/upload").path("/id/" + templateId).build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isAccepted();
 
@@ -107,7 +107,7 @@ class TemplateControllerTest {
     void shouldCallTemplateServiceToDelete() {
         String templateId = UUID.randomUUID().toString();
 
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL).path("/delete").path("/" + templateId).build())
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL).path("/delete").path("/id/" + templateId).build())
                 .exchange().expectStatus().isOk();
 
         Mockito.verify(passportTemplateService, Mockito.times(1)).deleteTemplate(templateIdCaptor.capture());
