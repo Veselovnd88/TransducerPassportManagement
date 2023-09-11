@@ -34,7 +34,7 @@ class TemplateStorageHttpClientTest {
         templateStorageHttpClient = new TemplateStorageHttpClientImpl(webClient);
         ReflectionTestUtils.setField(templateStorageHttpClient, "templateStorageUrl", templateStorageUrl, String.class);
         WireMock.configureFor("localhost", PORT);
-        urlPath = "source/" + TEMPLATE_ID;
+        urlPath = "source/id/" + TEMPLATE_ID;
     }
 
     @Test
