@@ -40,6 +40,7 @@ dependencies {
     implementation "org.apache.poi:poi:${poi}"
     implementation 'commons-io:commons-io:2.13.0'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
 
     implementation project(':liquibase-migration')
 

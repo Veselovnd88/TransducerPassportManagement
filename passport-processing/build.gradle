@@ -43,6 +43,7 @@ dependencies {
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
     implementation 'com.github.ben-manes.caffeine:caffeine:3.1.7'
     implementation 'org.springframework.boot:spring-boot-starter-cache:3.1.2'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation project(':liquibase-migration')
 
 
