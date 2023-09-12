@@ -24,7 +24,8 @@ spring:
     name: passport
   cache:
     cache-names: templates
-
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     url: jdbc:postgresql://localhost:5433/PtManagementDB
     username: admin

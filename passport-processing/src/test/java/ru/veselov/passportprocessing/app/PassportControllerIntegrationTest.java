@@ -16,6 +16,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,6 +40,7 @@ import java.util.UUID;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @WireMockTest(httpPort = 30003)
+@Import(WebClientTestConfiguration.class)
 @ActiveProfiles("test")
 public class PassportControllerIntegrationTest extends PostgresContainersConfig {
 
@@ -52,7 +54,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
 
     public static final byte[] BYTES = new byte[]{1, 2, 3};
 
-    public static final String templatePath = "source/" + TEMPLATE_ID;
+    public static final String templatePath = "source/id/" + TEMPLATE_ID;
 
     public byte[] DOCX_BYTES;
 

@@ -17,7 +17,7 @@ pdf-service:
   filename: "fileToConvert"
 
 template-storage:
-  url: "http://localhost:7176/api/v1/template"
+  url: "http://TEMPLATE-STORAGE/api/v1/template"
 
 spring:
   application:
@@ -47,7 +47,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka
     fetch-registry: true
     register-with-eureka: true
-    enabled: false
+    enabled: true
 
 management:
   tracing:

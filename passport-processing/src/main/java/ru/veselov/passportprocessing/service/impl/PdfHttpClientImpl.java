@@ -1,7 +1,8 @@
 package ru.veselov.passportprocessing.service.impl;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatusCode;
@@ -18,7 +19,6 @@ import ru.veselov.passportprocessing.service.PdfHttpClient;
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 public class PdfHttpClientImpl implements PdfHttpClient {
 
     public static final String CONTENT_DISPOSITION = "Content-Disposition";
@@ -30,6 +30,11 @@ public class PdfHttpClientImpl implements PdfHttpClient {
     private String filename;
 
     private final WebClient webClient;
+
+    @Autowired
+    public PdfHttpClientImpl(@Qualifier("simpleWebClient") WebClient webClient) {
+        this.webClient = webClient;
+    }
 
     @Override
     public DataBuffer sendRequestForConvertingDocxToPdf(byte[] source) {
