@@ -15,7 +15,6 @@ public class WebClientConfiguration {
     private final ObservationRegistry observationRegistry;
 
     @Bean
-    @Qualifier("lbWebClient")
     public WebClient webClient() {
         return webClientBuilder().build();
     }

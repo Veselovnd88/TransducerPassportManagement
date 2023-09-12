@@ -1,7 +1,7 @@
 package ru.veselov.passportprocessing.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.buffer.DataBuffer;
@@ -22,16 +22,13 @@ import java.io.InputStream;
 
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class TemplateStorageHttpClientImpl implements TemplateStorageHttpClient {
 
     @Value("${template-storage.url}")
     private String templateStorageUrl;
-    @Qualifier("lbWebClient")
-    private final WebClient webClient;
 
-    public TemplateStorageHttpClientImpl(@Qualifier("lbWebClient") WebClient webClient) {
-        this.webClient = webClient;
-    }
+    private final WebClient webClient;
 
     @Override
     public ByteArrayResource sendRequestToGetTemplate(String templateId) {

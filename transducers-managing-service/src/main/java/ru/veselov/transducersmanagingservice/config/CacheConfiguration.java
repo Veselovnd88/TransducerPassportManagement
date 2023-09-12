@@ -1,4 +1,4 @@
-package ru.veselov.passportprocessing.config;
+package ru.veselov.transducersmanagingservice.config;
 
 import com.github.benmanes.caffeine.cache.Caffeine;
 import org.springframework.cache.CacheManager;
@@ -26,3 +26,4 @@ public class CacheConfiguration {
     }
 
 }
+
