@@ -4,31 +4,8 @@ server:
 spring:
   application:
     name: api-gateway
-  cloud:
-    gateway:
-      routes:
-        - id: passport
-          uri: lb://PASSPORT
-          predicates:
-            - Path=/api/v1/passport/**
+  profiles:
+    active: default
 
-        - id: template-storage
-          uri: lb://TEMPLATE-STORAGE
-          predicates:
-            - Path=/api/v1/template/**
-
-        - id: managing
-          uri: lb://MANAGING
-          predicates:
-            - Path=/api/v1/customer/**,  /api/v1/transducer/**, /api/v1/serials/**
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
-
-management:
-  tracing:
-    sampling:
-      probability: 1.0
+  config:
+    import: "optional:configserver:http://localhost:8071"

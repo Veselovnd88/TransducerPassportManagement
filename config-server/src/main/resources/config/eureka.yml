@@ -1,0 +1,19 @@
+server:
+  port: 8761
+eureka:
+  client:
+    fetch-registry: false
+    register-with-eureka: false
+
+spring:
+  application:
+    name: eureka
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health
+  tracing:
+    sampling:
+      probability: 1.0

@@ -1,9 +1,29 @@
 server:
-  port: 7177
+  port: 7175
+
+placeholder:
+  upper-serial: NUMBERUP
+  bottom-serial: NUMBERDOWN
+  date: DATE
+  date-format: "dd.MM.yyyy"
+
+task-executor:
+  core-pool-size: 10
+  max-pool-size: 10
+  queue-capacity: 15
+
+pdf-service:
+  url: "http://localhost:3000/forms/libreoffice/convert"
+  filename: "fileToConvert"
+
+template-storage:
+  url: "http://TEMPLATE-STORAGE/api/v1/template"
 
 spring:
   application:
-    name: managing
+    name: passport
+  cache:
+    cache-names: templates
 
   datasource:
     url: jdbc:postgresql://localhost:5433/PtManagementDB
@@ -19,8 +39,7 @@ spring:
         format_sql: false
         hbm2ddl:
           auto: validate
-  liquibase:
-    enabled: true
+
 
 eureka:
   client:
@@ -35,21 +54,6 @@ management:
     web:
       exposure:
         include: refresh, health
-
   tracing:
     sampling:
       probability: 1.0
-
-serial:
-  serialsPerPage: 120
-
-customer:
-  customersPerPage: 10
-
-transducer:
-  transducersPerPage: 10
-
-logging:
-  level:
-    ru.veselov.passportprocessing: debug
-

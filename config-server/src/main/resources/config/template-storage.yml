@@ -1,9 +1,9 @@
 server:
-  port: 7177
+  port: 7176
 
 spring:
   application:
-    name: managing
+    name: template-storage
 
   datasource:
     url: jdbc:postgresql://localhost:5433/PtManagementDB
@@ -22,6 +22,16 @@ spring:
   liquibase:
     enabled: true
 
+  cache:
+    cache-names: template
+minio:
+  url: http://localhost:9000
+  accessKey: admin
+  secretKey: secretsecret
+  bucket-name: templates
+
+template:
+  templates-per-page: 10
 eureka:
   client:
     service-url:
@@ -35,21 +45,6 @@ management:
     web:
       exposure:
         include: refresh, health
-
   tracing:
     sampling:
       probability: 1.0
-
-serial:
-  serialsPerPage: 120
-
-customer:
-  customersPerPage: 10
-
-transducer:
-  transducersPerPage: 10
-
-logging:
-  level:
-    ru.veselov.passportprocessing: debug
-

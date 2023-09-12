@@ -1,15 +1,11 @@
 server:
   port: 8761
-eureka:
-  client:
-    fetch-registry: false
-    register-with-eureka: false
 
 spring:
   application:
-    name: Eureka
+    name: eureka
+  profiles:
+    active: default
 
-management:
-  tracing:
-    sampling:
-      probability: 1.0
+  config:
+    import: "optional:configserver:http://localhost:8071"
