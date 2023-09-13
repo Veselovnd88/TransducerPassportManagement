@@ -53,13 +53,13 @@ public class CustomerController {
         return customerService.getAllCustomers(sortingParams);
     }
 
-    @DeleteMapping("/delete/{customerId}")
+    @DeleteMapping("/delete/id/{customerId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteCustomer(@PathVariable("customerId") @UUID String customerId) {
         customerService.deleteCustomer(customerId);
     }
 
-    @PutMapping("/update/{customerId}")
+    @PutMapping("/update/id/{customerId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Customer updateCustomer(@PathVariable("customerId") @UUID String customerId,
                                    @Valid @RequestBody CustomerDto customerDto) {

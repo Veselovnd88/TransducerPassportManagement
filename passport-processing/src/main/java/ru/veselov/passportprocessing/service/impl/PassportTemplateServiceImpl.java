@@ -2,7 +2,6 @@ package ru.veselov.passportprocessing.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import ru.veselov.passportprocessing.service.PassportTemplateService;
@@ -16,7 +15,6 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     private final TemplateStorageHttpClient templateStorageHttpClient;
 
     @Override
-    //@Cacheable(value = "templates")//FIXME delete caching from here
     public ByteArrayResource getTemplate(String templateId) {
         log.info("Retrieving template with [id:{}]", templateId);
         return templateStorageHttpClient.sendRequestToGetTemplate(templateId);

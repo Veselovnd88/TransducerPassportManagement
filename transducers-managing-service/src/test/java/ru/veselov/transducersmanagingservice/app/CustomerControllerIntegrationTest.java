@@ -127,7 +127,7 @@ class CustomerControllerIntegrationTest extends PostgresContainersConfig {
     void shouldDeleteCustomer() {
         CustomerEntity customer = saveCustomer();
 
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete/" + customer.getId())
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete/id/" + customer.getId())
                 .build()).exchange().expectStatus().isAccepted();
 
         Optional<CustomerEntity> foundCustomer = customerRepository.findById(customer.getId());
@@ -137,7 +137,7 @@ class CustomerControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     void shouldReturnNotFoundErrorIfNoCustomerForDeleting() {
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/delete/" + TestConstants.CUSTOMER_ID)
+                        .path("/delete/id/" + TestConstants.CUSTOMER_ID)
                         .build()).exchange().expectStatus().isNotFound().expectBody()
                 .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }
@@ -149,7 +149,7 @@ class CustomerControllerIntegrationTest extends PostgresContainersConfig {
         CustomerDto customerDto = CustomerDto.builder().name(newName).inn(customer.getInn())
                 .build();
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/" + customer.getId())
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/id/" + customer.getId())
                         .build())
                 .bodyValue(customerDto)
                 .exchange().expectStatus().isAccepted().expectBody()
@@ -164,7 +164,7 @@ class CustomerControllerIntegrationTest extends PostgresContainersConfig {
         CustomerDto customerDto = CustomerDto.builder().name(newName).inn("666")
                 .build();
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/" + customer.getId())
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/id/" + customer.getId())
                         .build())
                 .bodyValue(customerDto)
                 .exchange().expectStatus().isAccepted().expectBody()
@@ -179,7 +179,7 @@ class CustomerControllerIntegrationTest extends PostgresContainersConfig {
         CustomerDto customerDto = CustomerDto.builder().name("Boba").inn("666")
                 .build();
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/" + customer.getId())
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/id/" + customer.getId())
                         .build())
                 .bodyValue(customerDto)
                 .exchange().expectStatus().isEqualTo(HttpStatus.CONFLICT).expectBody()

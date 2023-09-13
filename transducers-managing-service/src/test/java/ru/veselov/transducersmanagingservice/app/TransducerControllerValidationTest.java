@@ -83,7 +83,7 @@ class TransducerControllerValidationTest {
     @Test
     void shouldReturnValidationErrorIfNotUUIDForDelete() {
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/delete/notUuid").build())
+                        .path("/delete/id/notUuid").build())
                 .exchange().expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
@@ -93,7 +93,7 @@ class TransducerControllerValidationTest {
     @Test
     void shouldReturnValidationErrorIfNotUUIDForUpdate() {
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/update/notUuid").build())
+                        .path("/update/id/notUuid").build())
                 .bodyValue(Instancio.create(TransducerDto.class))
                 .exchange().expectStatus().isBadRequest()
                 .expectBody()

@@ -167,7 +167,7 @@ class SerialNumberControllerTest {
 
     @Test
     void shouldDeleteSerialById() {
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/" + TestConstants.SERIAL_ID).build())
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/id/" + TestConstants.SERIAL_ID).build())
                 .exchange().expectStatus().isAccepted();
 
         Mockito.verify(serialNumberService, Mockito.times(1)).deleteSerial(TestConstants.SERIAL_ID.toString());

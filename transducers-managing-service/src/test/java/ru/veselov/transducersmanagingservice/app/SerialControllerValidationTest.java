@@ -35,7 +35,7 @@ class SerialControllerValidationTest {
 
     @Test
     void shouldReturnValidationErrorIfNotUUIDForDeleting() {
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/" + "notUUID")
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/id/" + "notUUID")
                         .build()).exchange().expectStatus().isBadRequest()
                 .expectBody()
                 .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())

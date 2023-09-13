@@ -4,48 +4,9 @@ server:
 spring:
   application:
     name: template-storage
-  cache:
-    cache-names: template
-  datasource:
-    url: jdbc:postgresql://localhost:5433/PtManagementDB
-    username: admin
-    password: admin
-    driver-class-name: org.postgresql.Driver
+  profiles:
+    active: default
 
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-        show_sql: true
-        format_sql: false
-        hbm2ddl:
-          auto: validate
-  liquibase:
-    enabled: true
 
-minio:
-  url: http://localhost:9000
-  accessKey: admin
-  secretKey: secretsecret
-  bucket-name: templates
-
-template:
-  templates-per-page: 10
-eureka:
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-    fetch-registry: true
-    register-with-eureka: true
-    enabled: true
-
-management:
-  tracing:
-    sampling:
-      probability: 1.0
-
-logging:
-  level:
-    ru.veselov.ru.veselov.miniotemplateservice: debug
-    org.hibernate: info
-
+  config:
+    import: "optional:configserver:http://localhost:8071"
