@@ -19,7 +19,7 @@ public class Transducer {
 
     private String art;
 
-    private String name;
+    private String transducerName;
 
     private PressureType pressureType;
 

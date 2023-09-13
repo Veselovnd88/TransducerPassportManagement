@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: insertCustomersAndTransducers
+      author: Veselov Nikolay
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/40-insertIntoCustomerAndTransducer.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/40-clear-tableCustomerAndTransducer.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true

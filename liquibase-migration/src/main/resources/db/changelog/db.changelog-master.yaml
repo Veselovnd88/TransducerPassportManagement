@@ -15,3 +15,5 @@ databaseChangeLog:
       file: db/changelog/changelogs/23-changelog-customer.yaml
   - include:
       file: db/changelog/changelogs/30-changelog-template-alter-table-sync.yaml
+  - include:
+      file: db/changelog/changelogs/40-changelog-insert-values.yaml
