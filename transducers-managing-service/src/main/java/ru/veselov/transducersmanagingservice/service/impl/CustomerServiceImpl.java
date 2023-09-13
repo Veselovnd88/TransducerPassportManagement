@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -82,6 +83,7 @@ public class CustomerServiceImpl implements CustomerService {
         return customerMapper.toModelList(foundCustomers.getContent());
     }
 
+    @CacheEvict(value = "customer", key = "#customerId")
     @Override
     @Transactional
     public void deleteCustomer(String customerId) {
@@ -94,7 +96,7 @@ public class CustomerServiceImpl implements CustomerService {
         customerRepository.delete(customer);
         log.info("Customer with [id {}] deleted", customerId);
     }
-
+    @CacheEvict(value = "customer", key = "#customerId")
     @Override
     @Transactional
     public Customer updateCustomer(String customerId, CustomerDto customerDto) {

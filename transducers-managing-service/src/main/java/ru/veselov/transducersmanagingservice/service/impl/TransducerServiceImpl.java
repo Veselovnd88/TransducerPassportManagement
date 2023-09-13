@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -72,6 +73,7 @@ public class TransducerServiceImpl implements TransducerService {
         return transducerMapper.toModel(transducerEntity);
     }
 
+    @CacheEvict(value = "transducer", key = "#transducerId")
     @Override
     @Transactional
     public void deleteTransducer(String transducerId) {
@@ -85,6 +87,7 @@ public class TransducerServiceImpl implements TransducerService {
         log.info("Transducer with [id: {}] was deleted", transducerId);
     }
 
+    @CacheEvict(value = "transducer", key = "#transducerId")
     @Override
     @Transactional
     public Transducer updateTransducer(String transducerId, TransducerDto transducerDto) {
