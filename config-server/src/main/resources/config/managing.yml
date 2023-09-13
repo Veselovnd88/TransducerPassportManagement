@@ -4,6 +4,10 @@ server:
 spring:
   application:
     name: managing
+  cache:
+    cache-names: customer, transducer
+    caffeine:
+      spec: initialCapacity=20,maximumSize=20,expireAfterAccess=3600s
 
   datasource:
     url: jdbc:postgresql://localhost:5433/PtManagementDB

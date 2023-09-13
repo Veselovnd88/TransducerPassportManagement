@@ -4,6 +4,7 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -46,6 +47,7 @@ public class CustomerServiceImpl implements CustomerService {
         log.info("Customer with [inn: {}], and name [{}] saved", customerDto.getInn(), customerDto.getName());
     }
 
+    @Cacheable(value = "customer")
     @Override
     public Customer findCustomerById(String customerId) {
         UUID customerUUID = UUID.fromString(customerId);
@@ -55,6 +57,7 @@ public class CustomerServiceImpl implements CustomerService {
                     throw new EntityNotFoundException("Customer with such id: %s not found".formatted(customerId));
                 }
         );
+        log.info("Customer with [id: {}] retrieved from DB", customerId);
         return customerMapper.toModel(customerEntity);
     }
 
@@ -65,6 +68,7 @@ public class CustomerServiceImpl implements CustomerService {
             log.error("Customer with such [inn: {}] not found", inn);
             throw new EntityNotFoundException("Customer with such inn: %s not found".formatted(inn));
         });
+        log.info("Customer with [inn: {}] retrieved from DB", inn);
         return customerMapper.toModel(customerEntity);
     }
 
