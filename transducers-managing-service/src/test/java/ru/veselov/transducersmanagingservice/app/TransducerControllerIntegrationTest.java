@@ -118,7 +118,7 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
         TransducerEntity transducerEntity = saveTransducerToRepo();
 
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/delete/" + transducerEntity.getId()).build())
+                        .path("/delete/id/" + transducerEntity.getId()).build())
                 .exchange().expectStatus().isAccepted();
 
         Optional<TransducerEntity> foundTransducer = transducerRepository.findById(transducerEntity.getId());
@@ -128,7 +128,7 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     void shouldReturnNotFoundErrorIfNoIdForDeleting() {
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/delete/" + TestConstants.TRANSDUCER_ID).build())
+                        .path("/delete/id/" + TestConstants.TRANSDUCER_ID).build())
                 .exchange().expectStatus().isNotFound()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }
@@ -139,7 +139,7 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
         TransducerDto transducerDto = Instancio.create(TransducerDto.class);
 
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/update/" + transducerEntity.getId()).build())
+                        .path("/update/id/" + transducerEntity.getId()).build())
                 .bodyValue(transducerDto).exchange().expectStatus().isAccepted();
 
         Optional<TransducerEntity> foundTransducer = transducerRepository.findById(transducerEntity.getId());
@@ -158,7 +158,7 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
                 .set(Select.field("art"), transducerEntityForConflict.getArt()).create();
 
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/update/" + transducerEntityForUpdate.getId()).build())
+                        .path("/update/id/" + transducerEntityForUpdate.getId()).build())
                 .bodyValue(transducerDto).exchange().expectStatus().isEqualTo(HttpStatus.CONFLICT)
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_CONFLICT.toString());
     }
@@ -168,7 +168,7 @@ class TransducerControllerIntegrationTest extends PostgresContainersConfig {
         TransducerDto transducerDto = Instancio.create(TransducerDto.class);
 
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/update/" + TestConstants.TRANSDUCER_ID).build())
+                        .path("/update/id/" + TestConstants.TRANSDUCER_ID).build())
                 .bodyValue(transducerDto).exchange().expectStatus().isNotFound()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }

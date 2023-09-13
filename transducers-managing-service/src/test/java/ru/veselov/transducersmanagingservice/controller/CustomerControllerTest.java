@@ -87,7 +87,7 @@ class CustomerControllerTest {
 
     @Test
     void shouldDeleteCustomer() {
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete/" + TestConstants.CUSTOMER_ID)
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete/id/" + TestConstants.CUSTOMER_ID)
                 .build()).exchange().expectStatus().isAccepted();
 
         Mockito.verify(customerService, Mockito.times(1)).deleteCustomer(TestConstants.CUSTOMER_ID.toString());
@@ -99,7 +99,7 @@ class CustomerControllerTest {
         Mockito.when(customerService.updateCustomer(TestConstants.CUSTOMER_ID.toString(), customerDto))
                 .thenReturn(Instancio.create(Customer.class));
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/" + TestConstants.CUSTOMER_ID)
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/id/" + TestConstants.CUSTOMER_ID)
                         .build())
                 .bodyValue(customerDto)
                 .exchange().expectStatus().isAccepted().expectBody(Customer.class);

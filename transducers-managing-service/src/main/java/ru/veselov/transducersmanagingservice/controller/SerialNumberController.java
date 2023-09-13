@@ -83,7 +83,7 @@ public class SerialNumberController {
     }
 
 
-    @DeleteMapping("/{serialId}")
+    @DeleteMapping("/id/{serialId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteSerialNumberById(@UUID @PathVariable("serialId") String serialId) {
         serialNumberService.deleteSerial(serialId);

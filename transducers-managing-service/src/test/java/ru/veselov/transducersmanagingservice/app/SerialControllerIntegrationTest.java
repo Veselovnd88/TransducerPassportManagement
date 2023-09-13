@@ -208,7 +208,7 @@ class SerialControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     void shouldDeleteSerialById() {
         SerialNumberEntity todaySerial = saveSerialNumberInRepo(LocalDate.of(2023, 9, 5));
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/" + todaySerial.getId()).build())
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/id/" + todaySerial.getId()).build())
                 .exchange().expectStatus().isAccepted();
 
         Optional<TransducerEntity> optional = transducerRepository.findById(todaySerial.getId());
@@ -217,7 +217,7 @@ class SerialControllerIntegrationTest extends PostgresContainersConfig {
 
     @Test
     void shouldReturnNotFoundErrorInSerialForDeletingNotExists() {
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/" + TestConstants.SERIAL_ID)
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/id/" + TestConstants.SERIAL_ID)
                         .build())
                 .exchange().expectStatus().isNotFound().expectBody()
                 .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());

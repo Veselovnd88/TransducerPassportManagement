@@ -86,7 +86,7 @@ class TransducerControllerTest {
     @Test
     void shouldDelete() {
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/delete/" + TestConstants.TRANSDUCER_ID).build())
+                        .path("/delete/id/" + TestConstants.TRANSDUCER_ID).build())
                 .exchange().expectStatus().isAccepted();
 
         Mockito.verify(transducerService, Mockito.times(1)).deleteTransducer(TestConstants.TRANSDUCER_ID.toString());
@@ -96,7 +96,7 @@ class TransducerControllerTest {
     void shouldUpdate() {
         TransducerDto transducerDto = Instancio.create(TransducerDto.class);
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/update/" + TestConstants.TRANSDUCER_ID).build())
+                        .path("/update/id/" + TestConstants.TRANSDUCER_ID).build())
                 .bodyValue(transducerDto).exchange().expectStatus().isAccepted();
 
         Mockito.verify(transducerService, Mockito.times(1))

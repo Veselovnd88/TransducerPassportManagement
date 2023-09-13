@@ -53,13 +53,13 @@ public class TransducerController {
         return transducerService.getAll(sortingParams);
     }
 
-    @DeleteMapping("/delete/{transducerId}")
+    @DeleteMapping("/delete/id/{transducerId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void deleteTransducer(@PathVariable("transducerId") @UUID String transducerId) {
         transducerService.deleteTransducer(transducerId);
     }
 
-    @PutMapping("/update/{transducerId}")
+    @PutMapping("/update/id/{transducerId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Transducer updateTransducer(@PathVariable("transducerId") @UUID String transducerId,
                                        @RequestBody @Valid TransducerDto transducerDto) {

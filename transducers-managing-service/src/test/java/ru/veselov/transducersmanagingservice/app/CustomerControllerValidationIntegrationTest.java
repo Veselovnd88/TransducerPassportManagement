@@ -78,7 +78,7 @@ class CustomerControllerValidationIntegrationTest {
 
     @Test
     void shouldReturnValidationErrorForDeletingWithNotUUID() {
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete/" + "notUUID")
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete/id/" + "notUUID")
                         .build()).exchange().expectStatus().isBadRequest().expectBody()
                 .jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
                 .jsonPath("$.violations[0].fieldName").isEqualTo("customerId");
@@ -88,7 +88,7 @@ class CustomerControllerValidationIntegrationTest {
     void shouldReturnValidationErrorForUpdatingWithNotUUID() {
         CustomerDto customerDto = CustomerDto.builder().name("name").inn(TestConstants.INN).build();
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/" + "notUUID")
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/id/" + "notUUID")
                         .build())
                 .bodyValue(customerDto)
                 .exchange().expectStatus().isBadRequest().expectBody()
@@ -100,7 +100,7 @@ class CustomerControllerValidationIntegrationTest {
     void ShouldReturnValidationErrorForUpdatingWithWrongNameDto() {
         CustomerDto customerDto = CustomerDto.builder().name("").inn(TestConstants.INN).build();
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/" + TestConstants.CUSTOMER_ID)
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/id/" + TestConstants.CUSTOMER_ID)
                         .build())
                 .bodyValue(customerDto)
                 .exchange().expectStatus().isBadRequest().expectBody()
@@ -112,7 +112,7 @@ class CustomerControllerValidationIntegrationTest {
     void ShouldReturnValidationErrorForUpdatingWithWrongInnDto() {
         CustomerDto customerDto = CustomerDto.builder().name("Vasya").inn("").build();
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/" + TestConstants.CUSTOMER_ID)
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/id/" + TestConstants.CUSTOMER_ID)
                         .build())
                 .bodyValue(customerDto)
                 .exchange().expectStatus().isBadRequest().expectBody()
