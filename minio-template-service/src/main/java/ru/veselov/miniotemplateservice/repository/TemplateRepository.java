@@ -6,11 +6,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 
 import java.util.Optional;
 import java.util.UUID;
-
+@Repository
 public interface TemplateRepository extends JpaRepository<TemplateEntity, UUID> {
 
     @Query("SELECT t FROM TemplateEntity t where t.templateName= :templateName")

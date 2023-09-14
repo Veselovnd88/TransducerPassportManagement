@@ -2,34 +2,25 @@ package ru.veselov.transducersmanagingservice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Entity
 @Table(name = "passport")
 @Data
-@EqualsAndHashCode(exclude = {"id", "createdAt"})
+@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
-public class PassportEntity {
-
-    @Id
-    @GeneratedValue
-    @Column(name = "id", columnDefinition = "uuid", updatable = false)
-    private UUID id;
-
-    @Column(name = "template_id", updatable = false)
-    private UUID templateId;
+@AllArgsConstructor
+public class PassportEntity extends BaseEntity{
 
     @Column(name = "serial_number")
     private String serial;
@@ -37,24 +28,17 @@ public class PassportEntity {
     @Column(name = "pt_art")
     private String ptArt;
 
+    @ManyToOne
+    @JoinColumn(name = "pt_id", referencedColumnName = "id")
+    private TransducerEntity transducer;
+
+    @ManyToOne
+    @JoinColumn(name = "template_id", referencedColumnName = "id")
+    private TemplateEntity templateEntity;
+
+
     @Column(name = "print_date")
     @Temporal(TemporalType.DATE)
     private LocalDate printDate;
-
-    @Column(name = "created_at", updatable = false)
-    @Temporal(TemporalType.TIMESTAMP)
-    private LocalDateTime createdAt;
-
-    public PassportEntity(UUID templateId, String serial, String ptArt, LocalDate printDate) {
-        this.templateId = templateId;
-        this.serial = serial;
-        this.ptArt = ptArt;
-        this.printDate = printDate;
-    }
-
-    @PrePersist
-    public void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 
 }

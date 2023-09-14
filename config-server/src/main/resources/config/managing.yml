@@ -53,6 +53,9 @@ customer:
 transducer:
   transducersPerPage: 10
 
+passport:
+  passportsPerPage: 50
+
 logging:
   level:
     ru.veselov.passportprocessing: debug

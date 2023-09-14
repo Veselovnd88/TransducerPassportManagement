@@ -2,8 +2,8 @@ package ru.veselov.transducersmanagingservice.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
-import ru.veselov.passportprocessing.entity.PassportEntity;
-import ru.veselov.passportprocessing.model.Passport;
+import ru.veselov.transducersmanagingservice.entity.PassportEntity;
+import ru.veselov.transducersmanagingservice.model.Passport;
 
 import java.util.List;
 

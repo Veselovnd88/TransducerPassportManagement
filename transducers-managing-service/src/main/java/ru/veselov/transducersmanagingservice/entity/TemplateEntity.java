@@ -1,4 +1,4 @@
-package ru.veselov.miniotemplateservice.entity;
+package ru.veselov.transducersmanagingservice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
