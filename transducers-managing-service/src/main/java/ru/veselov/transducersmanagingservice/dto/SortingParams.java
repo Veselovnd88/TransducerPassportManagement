@@ -5,9 +5,11 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import ru.veselov.transducersmanagingservice.annotation.OrderDirection;
 import ru.veselov.transducersmanagingservice.annotation.SortByCustomerField;
+import ru.veselov.transducersmanagingservice.annotation.SortByPassportField;
 import ru.veselov.transducersmanagingservice.annotation.SortBySerialField;
 import ru.veselov.transducersmanagingservice.annotation.SortByTransducerField;
 import ru.veselov.transducersmanagingservice.validator.groups.CustomerField;
+import ru.veselov.transducersmanagingservice.validator.groups.PassportField;
 import ru.veselov.transducersmanagingservice.validator.groups.SerialNumberField;
 import ru.veselov.transducersmanagingservice.validator.groups.TransducerField;
 
@@ -21,6 +23,7 @@ public class SortingParams {
     @SortBySerialField(groups = SerialNumberField.class)
     @SortByCustomerField(groups = CustomerField.class)
     @SortByTransducerField(groups = TransducerField.class)
+    @SortByPassportField(groups = PassportField.class)
     private String sort;
 
     @OrderDirection
