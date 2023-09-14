@@ -26,8 +26,8 @@ public class SortingParamsUtils {
         return PageRequest.of(page, itemsPerPage).withSort(sortOrder);
     }
 
-    public static void validatePageNumber(int page, long count, int serialsPerPage) {
-        long totalPages = count / serialsPerPage;
+    public static void validatePageNumber(int page, long count, int itemsPerPage) {
+        long totalPages = count / itemsPerPage;
         if (page > totalPages) {
             log.error("Page number exceeds maximum value [max: {}, was: {}}]", totalPages, page);
             throw new PageExceedsMaximumValueException("Page number exceeds maximum value [max: %s, was: %s]"

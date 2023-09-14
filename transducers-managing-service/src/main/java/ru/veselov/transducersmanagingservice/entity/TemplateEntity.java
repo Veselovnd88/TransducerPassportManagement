@@ -1,10 +1,12 @@
-package ru.veselov.miniotemplateservice.entity;
+package ru.veselov.transducersmanagingservice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -16,6 +18,8 @@ import java.time.LocalDateTime;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class TemplateEntity extends BaseEntity {
 
     @Column(name = "pt_art", nullable = false)

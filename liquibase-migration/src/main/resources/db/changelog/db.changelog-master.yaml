@@ -17,3 +17,6 @@ databaseChangeLog:
       file: db/changelog/changelogs/30-changelog-template-alter-table-sync.yaml
   - include:
       file: db/changelog/changelogs/40-changelog-insert-values.yaml
+  - include:
+      file: db/changelog/changelogs/41-changelog-alter-passport-table.yaml
+

@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(exclude = {"transducer"}, callSuper = false)
 @ToString(exclude = {"transducer"})
+@Builder
 public class SerialNumberEntity extends BaseEntity {
 
     @Column(name = "number", nullable = false)
@@ -34,7 +36,7 @@ public class SerialNumberEntity extends BaseEntity {
     @Column(name = "ext_comment")
     private String comment;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private CustomerEntity customer;
 
@@ -42,7 +44,7 @@ public class SerialNumberEntity extends BaseEntity {
     @Temporal(TemporalType.DATE)
     private LocalDate savedAt;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pt_id", referencedColumnName = "id")
     TransducerEntity transducer;
 

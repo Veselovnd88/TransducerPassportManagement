@@ -1,2 +1,2 @@
 alter table pass_template
-    ADD COLUMN synced BOOLEAN NOT NULL DEFAULT FALSE;
+    ADD COLUMN synced BOOLEAN DEFAULT FALSE;
