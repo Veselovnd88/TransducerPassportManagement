@@ -8,16 +8,16 @@ alter table public.passport
 GO
 
 alter table public.passport
-    add column pt_id UUID REFERENCES public.transducer (id) ON DELETE SET NULL;
-
-GO
-
-alter table public.passport
     drop column if exists pt_art;
 
 GO
 
 alter table public.passport
-    add column pt_art varchar DEFAULT 'unknown' REFERENCES public.transducer (art) ON DELETE SET DEFAULT;
+    drop column if exists serial_number;
+
+GO
+
+alter table public.passport
+    add column serial_id UUID REFERENCES public.serial_number (id) ON DELETE SET NULL;
 
 GO

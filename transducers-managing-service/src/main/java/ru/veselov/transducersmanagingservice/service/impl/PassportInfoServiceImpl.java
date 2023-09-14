@@ -29,9 +29,9 @@ public class PassportInfoServiceImpl implements PassportInfoService {
     @Value("${passport.passportsPerPage}")
     private int passportsPerPage;
 
-    private PassportRepository passportRepository;
+    private final PassportRepository passportRepository;
 
-    private PassportMapper passportMapper;
+    private final PassportMapper passportMapper;
 
     @Override
     public Passport getById(String passportId) {
@@ -60,12 +60,26 @@ public class PassportInfoServiceImpl implements PassportInfoService {
     public List<Passport> getAllForSerialBetweenDates(String serialNumber,
                                                       SortingParams sortingParams,
                                                       DateParams dateParams) {
-        return null;
+        long count = passportRepository
+                .countBySerialAllBetweenDates(serialNumber, dateParams.getAfter(), dateParams.getBefore());
+        SortingParamsUtils.validatePageNumber(sortingParams.getPage(), count, passportsPerPage);
+        Pageable pageable = SortingParamsUtils.createPageable(sortingParams, passportsPerPage);
+        Page<PassportEntity> foundPassports = passportRepository
+                .findAllBySerialBetweenDates(serialNumber, dateParams.getAfter(), dateParams.getBefore(), pageable);
+        log.info("Found [{} passports] for serial number [{}]", foundPassports.getTotalElements(), serialNumber);
+        return passportMapper.toModels(foundPassports.getContent());
     }
 
     @Override
     public List<Passport> getAllForPtArtBetweenDates(String ptArt, SortingParams sortingParams, DateParams dateParams) {
-        return null;
+        long count = passportRepository
+                .countByPtArtAllBetweenDates(ptArt, dateParams.getAfter(), dateParams.getBefore());
+        SortingParamsUtils.validatePageNumber(sortingParams.getPage(), count, passportsPerPage);
+        Pageable pageable = SortingParamsUtils.createPageable(sortingParams, passportsPerPage);
+        Page<PassportEntity> foundPassports = passportRepository
+                .findAllByPtArtBetweenDates(ptArt, dateParams.getAfter(), dateParams.getBefore(), pageable);
+        log.info("Found [{} passports for pt art [{}]", foundPassports.getTotalElements(), ptArt);
+        return passportMapper.toModels(foundPassports.getContent());
     }
 
     @Override

@@ -14,14 +14,55 @@ import java.util.UUID;
 @Repository
 public interface PassportRepository extends JpaRepository<PassportEntity, UUID> {
 
-    @Query(value = "SELECT p FROM PassportEntity  p where p.printDate BETWEEN :after AND :before",
+    @Query(value = "SELECT p FROM PassportEntity  p" +
+            " left join fetch p.template" +
+            " left join fetch  p.serialNumber " +
+            "where p.printDate BETWEEN :after AND :before",
             countQuery = "SELECT COUNT(p) FROM PassportEntity  p where p.printDate BETWEEN :after AND :before")
     Page<PassportEntity> findAllBetweenDates(@Param("after") LocalDate after,
-                                                 @Param("before") LocalDate before, Pageable pageable);
+                                             @Param("before") LocalDate before, Pageable pageable);
 
     @Query("SELECT COUNT(p) FROM PassportEntity p where p.printDate BETWEEN :after AND :before")
     long countAllBetweenDates(@Param("after") LocalDate after,
                               @Param("before") LocalDate before);
+
+    @Query(value = "SELECT p FROM PassportEntity  p" +
+            " left join fetch p.template" +
+            " left join fetch  p.serialNumber " +
+            "where p.serialNumber.number= :serialNumber" +
+            " AND p.printDate BETWEEN :after AND :before",
+            countQuery = "SELECT COUNT(p) FROM PassportEntity  p " +
+                    "where p.serialNumber.number= :serialNumber " +
+                    "AND p.printDate BETWEEN :after AND :before")
+    Page<PassportEntity> findAllBySerialBetweenDates(@Param("serialNumber") String serialNumber,
+                                                     @Param("after") LocalDate after,
+                                                     @Param("before") LocalDate before,
+                                                     Pageable pageable);
+
+    @Query("SELECT COUNT(p) FROM PassportEntity p where p.serialNumber.number= :serialNumber" +
+            " AND p.printDate BETWEEN :after AND :before")
+    long countBySerialAllBetweenDates(@Param("serialNumber") String serialNumber,
+                                      @Param("after") LocalDate after,
+                                      @Param("before") LocalDate before);
+
+    @Query(value = "SELECT p FROM PassportEntity  p" +
+            " left join fetch p.template" +
+            " left join fetch  p.serialNumber " +
+            "where p.serialNumber.ptArt= :ptArt" +
+            " AND p.printDate BETWEEN :after AND :before",
+            countQuery = "SELECT COUNT(p) FROM PassportEntity  p " +
+                    "where p.serialNumber.ptArt= :ptArt " +
+                    "AND p.printDate BETWEEN :after AND :before")
+    Page<PassportEntity> findAllByPtArtBetweenDates(@Param("ptArt") String ptArt,
+                                                    @Param("after") LocalDate after,
+                                                    @Param("before") LocalDate before,
+                                                    Pageable pageable);
+
+    @Query("SELECT COUNT(p) FROM PassportEntity p where p.serialNumber.ptArt= :ptArt" +
+            " AND p.printDate BETWEEN :after AND :before")
+    long countByPtArtAllBetweenDates(@Param("ptArt") String ptArt,
+                                     @Param("after") LocalDate after,
+                                     @Param("before") LocalDate before);
 
 
 }

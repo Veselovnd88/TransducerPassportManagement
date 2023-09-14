@@ -9,14 +9,14 @@ alter table public.passport
 GO
 
 alter table public.passport
-    drop column if exists pt_id;
-
-GO
-
-alter table public.passport
-    drop column if exists pt_art;
+    drop column if exists serial_id;
 
 GO
 
 alter table public.passport
     add column pt_art varchar default 'unknown';
+
+GO
+
+alter table public.passport
+    add column serial_number varchar DEFAULT 'unknown';

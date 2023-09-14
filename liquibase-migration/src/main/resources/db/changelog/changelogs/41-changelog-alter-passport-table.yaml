@@ -7,7 +7,7 @@ databaseChangeLog:
             dbms: postgresql
             encoding: utf8
             endDelimiter: GO
-            path: scripts/41-alter-passport-table-references-to-template-and-transducer.sql
+            path: scripts/41-alter-passport-table-references-to-template-and-serial.sql
             relativeToChangelogFile: true
             splitStatements: true
             stripComments: true

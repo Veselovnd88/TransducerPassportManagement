@@ -15,7 +15,7 @@ public class Passport {
 
     private String serial;
 
-    private String prArt;
+    private String ptArt;
 
     private String printDate;
 

@@ -40,7 +40,7 @@ public class SerialNumberController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public void saveSerials(@Valid @RequestPart("serials") SerialsDto serialsDto,
                             @RequestPart("file") @Xlsx MultipartFile multipartFile) {
-        serialNumberService.saveSerials(serialsDto, multipartFile);
+        serialNumberService.saveSerials(serialsDto, multipartFile);//TODO return all list
     }
 
     @GetMapping("/all/dates")

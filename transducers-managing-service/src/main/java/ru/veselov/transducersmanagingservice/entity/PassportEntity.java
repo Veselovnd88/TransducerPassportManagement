@@ -2,6 +2,7 @@ package ru.veselov.transducersmanagingservice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -20,22 +21,14 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
-public class PassportEntity extends BaseEntity{
+public class PassportEntity extends BaseEntity {
 
-    @Column(name = "serial_number")
-    private String serial;
-
-    @Column(name = "pt_art")
-    private String ptArt;
-
-    @ManyToOne
-    @JoinColumn(name = "pt_id", referencedColumnName = "id")
-    private TransducerEntity transducer;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "serial_id", referencedColumnName = "id")
+    private SerialNumberEntity serialNumber;
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id", referencedColumnName = "id")
-    private TemplateEntity templateEntity;
-
+    private TemplateEntity template;
 
     @Column(name = "print_date")
     @Temporal(TemporalType.DATE)
