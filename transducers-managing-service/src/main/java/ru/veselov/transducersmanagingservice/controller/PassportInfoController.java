@@ -3,11 +3,13 @@ package ru.veselov.transducersmanagingservice.controller;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
+import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.veselov.transducersmanagingservice.annotation.DateParam;
 import ru.veselov.transducersmanagingservice.annotation.SortingParam;
@@ -52,7 +54,8 @@ public class PassportInfoController {
         return passportInfoService.getAllForPtArtBetweenDates(ptArt, sortingParams, dateParams);
     }
 
-    @DeleteMapping("/id/{passportId}")
+    @DeleteMapping("/delete/id/{passportId}")
+    @ResponseStatus(HttpStatus.ACCEPTED)
     public void deletePassport(@PathVariable("passportId") @UUID String passportId) {
         passportInfoService.deleteById(passportId);
     }
