@@ -17,14 +17,18 @@ public interface SerialNumberRepository extends JpaRepository<SerialNumberEntity
     @Query("SELECT s FROM SerialNumberEntity s where s.number= :number")
     List<SerialNumberEntity> findAllByNumber(@Param("number") String number);
 
-    @Query(value = "SELECT s FROM SerialNumberEntity s where s.ptArt= :ptArt",
+    @Query(value = "SELECT s FROM SerialNumberEntity s" +
+            " left join fetch s.customer" +
+            " where s.ptArt= :ptArt",
             countQuery = "SELECT COUNT(s) FROM  SerialNumberEntity  s where s.ptArt= :ptArt")
     Page<SerialNumberEntity> findAllByPtArt(@Param("ptArt") String ptArt, Pageable pageable);
 
     @Query("SELECT COUNT(s) FROM SerialNumberEntity s where s.ptArt= :ptArt")
     long countAllByPtArt(@Param("ptArt") String ptArt);
 
-    @Query(value = "SELECT s FROM SerialNumberEntity  s where s.ptArt= :ptArt " +
+    @Query(value = "SELECT s FROM SerialNumberEntity  s" +
+            " left join fetch s.customer" +
+            " where s.ptArt= :ptArt " +
             "AND s.savedAt BETWEEN :after AND :before",
             countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt " +
                     "AND s.savedAt BETWEEN :after AND :before")
@@ -37,7 +41,9 @@ public interface SerialNumberRepository extends JpaRepository<SerialNumberEntity
     long countAllByPtArtBetweenDates(@Param("ptArt") String ptArt, @Param("after") LocalDate after,
                                      @Param("before") LocalDate before);
 
-    @Query(value = "SELECT s FROM SerialNumberEntity s left join fetch s.customer where s.savedAt BETWEEN :after AND :before",
+    @Query(value = "SELECT s FROM SerialNumberEntity s" +
+            " left join fetch s.customer" +
+            " where s.savedAt BETWEEN :after AND :before",
             countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.savedAt BETWEEN :after AND :before")
     Page<SerialNumberEntity> findAllBetweenDates(@Param("after") LocalDate after,
                                                  @Param("before") LocalDate before, Pageable pageable);
@@ -46,7 +52,9 @@ public interface SerialNumberRepository extends JpaRepository<SerialNumberEntity
     long countAllBetweenDates(@Param("after") LocalDate after,
                               @Param("before") LocalDate before);
 
-    @Query(value = "SELECT s FROM SerialNumberEntity s left join fetch s.customer where s.ptArt= :ptArt AND s.customer.id= :customerId " +//FIXME join fetch?
+    @Query(value = "SELECT s FROM SerialNumberEntity s" +
+            " left join fetch s.customer" +
+            " where s.ptArt= :ptArt AND s.customer.id= :customerId " +
             "AND s.savedAt BETWEEN :after AND :before",
             countQuery = "SELECT COUNT(s) FROM SerialNumberEntity  s where s.ptArt= :ptArt AND s.customer.id= :customerId " +
                     "AND s.savedAt BETWEEN :after AND :before")

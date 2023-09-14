@@ -2,6 +2,7 @@ package ru.veselov.transducersmanagingservice.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -33,7 +34,7 @@ public class SerialNumberEntity extends BaseEntity {
     @Column(name = "ext_comment")
     private String comment;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", referencedColumnName = "id")
     private CustomerEntity customer;
 
@@ -41,7 +42,7 @@ public class SerialNumberEntity extends BaseEntity {
     @Temporal(TemporalType.DATE)
     private LocalDate savedAt;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "pt_id", referencedColumnName = "id")
     TransducerEntity transducer;
 

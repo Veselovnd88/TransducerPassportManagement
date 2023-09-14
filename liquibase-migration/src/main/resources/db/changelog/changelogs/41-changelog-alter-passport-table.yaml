@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: alterPassportTable
+      author: Veselov Nikolay
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/41-alter-passport-table-references-to-template-and-transducer.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/41-alter-passport-table-return-back.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
