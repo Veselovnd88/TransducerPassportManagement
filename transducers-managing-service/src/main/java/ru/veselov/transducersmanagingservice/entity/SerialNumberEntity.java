@@ -9,6 +9,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ import java.time.LocalDate;
 @Data
 @EqualsAndHashCode(exclude = {"transducer"}, callSuper = false)
 @ToString(exclude = {"transducer"})
+@Builder
 public class SerialNumberEntity extends BaseEntity {
 
     @Column(name = "number", nullable = false)
