@@ -94,4 +94,5 @@ public class PassportInfoServiceImpl implements PassportInfoService {
         passportRepository.delete(passportEntity);
         log.info("Passport with [id: {}] deleted", passportId);
     }
+
 }
