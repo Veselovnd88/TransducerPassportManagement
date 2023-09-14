@@ -6,7 +6,6 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.transducersmanagingservice.TestConstants;
@@ -18,7 +17,6 @@ import ru.veselov.transducersmanagingservice.service.CustomerService;
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 @WebMvcTest(controllers = CustomerController.class)
-@DirtiesContext
 class CustomerControllerValidationIntegrationTest {
 
     private final static String URL_PREFIX = "/api/v1/customer";

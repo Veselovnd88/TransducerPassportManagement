@@ -1,5 +1,6 @@
 package ru.veselov.transducersmanagingservice.controller;
 
+import jakarta.validation.Valid;
 import jakarta.validation.groups.Default;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
@@ -35,14 +36,14 @@ public class PassportInfoController {
     }
 
     @GetMapping("/all")
-    public List<Passport> getAllPassports(@SortingParam SortingParams sortingParams,
+    public List<Passport> getAllPassports(@SortingParam @Valid SortingParams sortingParams,
                                           @DateParam DateParams dateParams) {
         return passportInfoService.getAllBetweenDates(sortingParams, dateParams);
     }
 
     @GetMapping("/all/serial/{serialNumber}")
     public List<Passport> getAllPassportsForSerial(@PathVariable("serialNumber") String serialNumber,
-                                                   @SortingParam SortingParams sortingParams,
+                                                   @SortingParam @Valid SortingParams sortingParams,
                                                    @DateParam DateParams dateParams) {
         return passportInfoService.getAllForSerialBetweenDates(serialNumber, sortingParams, dateParams);
     }
