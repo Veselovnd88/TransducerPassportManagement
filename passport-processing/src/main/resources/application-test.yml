@@ -7,11 +7,6 @@ placeholder:
   date: DATE
   date-format: "dd.MM.yyyy"
 
-task-executor:
-  core-pool-size: 10
-  max-pool-size: 10
-  queue-capacity: 15
-
 pdf-service:
   url: "http://localhost:3000/forms/libreoffice/convert"
   filename: "fileToConvert"
@@ -45,7 +40,6 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     passport-topic: passports
-
 
 eureka:
   client:

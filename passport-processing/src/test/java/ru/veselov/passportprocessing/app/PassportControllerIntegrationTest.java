@@ -13,6 +13,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.kafka.test.EmbeddedKafkaBroker;
+import org.springframework.kafka.test.context.EmbeddedKafka;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -28,6 +31,8 @@ import java.util.UUID;
 @AutoConfigureWebTestClient
 @WireMockTest(httpPort = 30003)
 @Import(WebClientTestConfiguration.class)
+@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
+@DirtiesContext
 @ActiveProfiles("test")
 public class PassportControllerIntegrationTest extends PostgresContainersConfig {
 
@@ -47,6 +52,9 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
 
     @Autowired
     WebTestClient webTestClient;
+
+    @Autowired
+    private EmbeddedKafkaBroker embeddedKafkaBroker;
 
     @BeforeEach
     @SneakyThrows
@@ -78,7 +86,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(BYTES.length)
                 .expectBody(byte[].class);
-        //TODO check if kafka template was called
+
     }
 
     @Test
