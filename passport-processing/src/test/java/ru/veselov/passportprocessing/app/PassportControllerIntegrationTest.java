@@ -3,11 +3,8 @@ package ru.veselov.passportprocessing.app;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import lombok.SneakyThrows;
-import org.assertj.core.api.Assertions;
-import org.awaitility.Awaitility;
 import org.instancio.Instancio;
 import org.instancio.Select;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,14 +19,9 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.passportprocessing.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
-import ru.veselov.passportprocessing.entity.PassportEntity;
 import ru.veselov.passportprocessing.exception.error.ErrorCode;
-import ru.veselov.passportprocessing.repository.PassportRepository;
-import ru.veselov.passportprocessing.service.PassportStorageService;
 
 import java.io.InputStream;
-import java.time.Duration;
-import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -56,12 +48,6 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
     @Autowired
     WebTestClient webTestClient;
 
-    @Autowired
-    PassportStorageService passportStorageService;
-
-    @Autowired
-    PassportRepository passportRepository;
-
     @BeforeEach
     @SneakyThrows
     void init() {
@@ -72,11 +58,6 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
         }
     }
 
-    @AfterEach
-    void clear() {
-        passportRepository.deleteAll();
-    }
-
     @DynamicPropertySource
     static void setUpUrls(DynamicPropertyRegistry registry) {
         registry.add("pdf-service.url", () -> sideApi);
@@ -85,7 +66,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
 
     @Test
     @SneakyThrows
-    void shouldReturnByteArrayAndSaveGeneratedDataToDB() {
+    void shouldReturnByteArrayAndSendDataToKafkaTopic() {
         WireMock.stubFor(WireMock.get("/" + templatePath)
                 .willReturn(WireMock.aResponse().withStatus(HttpStatus.OK.value()).withBody(DOCX_BYTES)));
         WireMock.stubFor(WireMock.post("/")
@@ -97,16 +78,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(BYTES.length)
                 .expectBody(byte[].class);
-        Awaitility.await().pollDelay(Duration.ofMillis(2000)).until(() -> true);
-        List<PassportEntity> savedPassports = passportRepository.findAll();
-        Assertions.assertThat(savedPassports).hasSize(generatePassportsDto.getSerials().size());
-        Assertions.assertThat(savedPassports.get(0).getPtArt()).isEqualTo(generatePassportsDto.getPtArt());
-        Assertions.assertThat(savedPassports.get(0).getTemplateId())
-                .isEqualTo(UUID.fromString(generatePassportsDto.getTemplateId()));
-        Assertions.assertThat(savedPassports.get(0).getSerial()).isIn(generatePassportsDto.getSerials());
-        Assertions.assertThat(savedPassports.get(0).getId()).isNotNull();
-        Assertions.assertThat(savedPassports.get(0).getCreatedAt()).isNotNull();
-        Assertions.assertThat(savedPassports.get(0).getPrintDate()).isNotNull();
+        //TODO check if kafka template was called
     }
 
     @Test

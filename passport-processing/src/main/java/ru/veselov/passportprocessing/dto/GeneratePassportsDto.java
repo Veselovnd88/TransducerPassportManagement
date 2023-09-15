@@ -1,5 +1,6 @@
 package ru.veselov.passportprocessing.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,16 +17,16 @@ import java.util.List;
 public class GeneratePassportsDto {
 
     @NotEmpty
-    private List<String> serials = new ArrayList<>();
+    private List<SerialNumberDto> serials = new ArrayList<>();
 
     @NotNull
     @org.hibernate.validator.constraints.UUID
     private String templateId;
 
-    @NotNull
+    @NotBlank
     private String ptArt;
 
-    @NotNull
-    private LocalDate date;
+    @NotBlank
+    private LocalDate printDate;
 
 }

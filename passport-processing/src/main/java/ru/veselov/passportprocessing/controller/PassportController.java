@@ -26,6 +26,8 @@ public class PassportController {
 
     private final PassportService passportService;
 
+
+
     @PostMapping(value = "/generate", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPassportsPdf(@RequestBody @Valid GeneratePassportsDto generatePassportsDto) {
         byte[] pdfBytes = passportService.createPassportsPdf(generatePassportsDto);

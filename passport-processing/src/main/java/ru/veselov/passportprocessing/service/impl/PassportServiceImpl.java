@@ -4,17 +4,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
+import ru.veselov.passportprocessing.dto.SerialNumberDto;
 import ru.veselov.passportprocessing.service.PassportGeneratorService;
 import ru.veselov.passportprocessing.service.PassportService;
-import ru.veselov.passportprocessing.service.PassportStorageService;
 import ru.veselov.passportprocessing.service.PassportTemplateService;
 import ru.veselov.passportprocessing.service.PdfService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.CompletableFuture;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -24,36 +25,37 @@ public class PassportServiceImpl implements PassportService {
     @Value("${placeholder.date-format}")
     private String dateFormat;
 
+    @Value("${spring.kafka.passport-topic}")
+    private String topic;
+
     private final PassportGeneratorService passportGeneratorService;
 
     private final PdfService pdfService;
 
     private final PassportTemplateService passportTemplateService;
 
-    private final PassportStorageService passportStorageService;
+    private final KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate;
 
     @Override
     public byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
         log.info("Starting process of generating passports");
         ByteArrayResource templateByteArrayResource = passportTemplateService
                 .getTemplate(generatePassportsDto.getTemplateId());
+        List<String> serials = generatePassportsDto.getSerials()
+                .stream().map(SerialNumberDto::getSerial).toList();
         byte[] sourceBytes = passportGeneratorService
                 .generatePassports(
-                        generatePassportsDto.getSerials(),
+                        serials,
                         templateByteArrayResource,
-                        getFormattedDate(generatePassportsDto.getDate()));
+                        getFormattedDate(generatePassportsDto.getPrintDate()));
         byte[] pdfBytes = pdfService.createPdf(sourceBytes);
-        saveGeneratedResult(generatePassportsDto);
+        kafkaTemplate.send(topic, generatePassportsDto);
         return pdfBytes;
     }
 
     private String getFormattedDate(LocalDate localDate) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
         return dateTimeFormatter.format(localDate);
-    }
-
-    private void saveGeneratedResult(GeneratePassportsDto generatePassportsDto) {
-        CompletableFuture.supplyAsync(() -> passportStorageService.savePassports(generatePassportsDto));
     }
 
 }

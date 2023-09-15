@@ -95,7 +95,7 @@ class PassportControllerTest {
     @Test
     void shouldReturnBadRequestStatusIfDateIsNull() {
         GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getDate), () -> null)
+                .supply(Select.field(GeneratePassportsDto::getPrintDate), () -> null)
                 .create();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
