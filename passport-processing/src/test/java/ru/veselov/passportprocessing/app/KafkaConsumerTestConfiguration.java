@@ -45,5 +45,4 @@ public class KafkaConsumerTestConfiguration {
         return factory;
     }
 
-
 }
