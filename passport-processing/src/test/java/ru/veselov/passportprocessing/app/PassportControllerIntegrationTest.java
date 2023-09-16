@@ -13,7 +13,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.kafka.test.EmbeddedKafkaBroker;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -22,15 +21,17 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.passportprocessing.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
+import ru.veselov.passportprocessing.dto.SerialNumberDto;
 import ru.veselov.passportprocessing.exception.error.ErrorCode;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @WireMockTest(httpPort = 30003)
-@Import(WebClientTestConfiguration.class)
+@Import({WebClientTestConfiguration.class, KafkaConsumerTestConfiguration.class})
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 @DirtiesContext
 @ActiveProfiles("test")
@@ -54,7 +55,7 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
     WebTestClient webTestClient;
 
     @Autowired
-    private EmbeddedKafkaBroker embeddedKafkaBroker;
+    KafkaTestConsumer kafkaTestConsumer;
 
     @BeforeEach
     @SneakyThrows
@@ -86,7 +87,6 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(BYTES.length)
                 .expectBody(byte[].class);
-
     }
 
     @Test
@@ -160,9 +160,15 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
     }
 
     private GeneratePassportsDto getGeneratePassportDto() {
-        return Instancio.of(GeneratePassportsDto.class)
+        SerialNumberDto serialNumberDto = new SerialNumberDto("123", UUID.randomUUID().toString());
+        SerialNumberDto serialNumberDto2 = new SerialNumberDto("456", UUID.randomUUID().toString());
+        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
+                .ignore(Select.field("serials"))
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
                 .create();
+
+        generatePassportsDto.setSerials(List.of(serialNumberDto, serialNumberDto2));
+        return generatePassportsDto;
     }
 
 }

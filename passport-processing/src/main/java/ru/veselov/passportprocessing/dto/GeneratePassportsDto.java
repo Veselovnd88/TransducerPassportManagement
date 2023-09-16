@@ -26,7 +26,7 @@ public class GeneratePassportsDto {
     @NotBlank
     private String ptArt;
 
-    @NotBlank
+    @NotNull
     private LocalDate printDate;
 
 }
