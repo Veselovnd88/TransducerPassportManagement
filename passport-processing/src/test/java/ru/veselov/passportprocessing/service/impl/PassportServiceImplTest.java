@@ -1,14 +1,19 @@
 package ru.veselov.passportprocessing.service.impl;
 
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.Message;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 import ru.veselov.passportprocessing.dto.SerialNumberDto;
@@ -20,8 +25,10 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings({"rawtypes", "unchecked"})
 class PassportServiceImplTest {
 
     public static byte[] SOURCE = new byte[]{1, 2, 3, 4};
@@ -49,8 +56,14 @@ class PassportServiceImplTest {
     @Mock
     PassportTemplateService passportTemplateService;
 
+    @Mock
+    KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate;
+
     @InjectMocks
     PassportServiceImpl passportService;
+
+    @Captor
+    ArgumentCaptor<Message<GeneratePassportsDto>> argumentCaptor;
 
     @BeforeEach
     void init() {
@@ -69,6 +82,8 @@ class PassportServiceImplTest {
                 SERIALS, byteArrayResource, DTF.format(DATE)
         )).thenReturn(SOURCE);
         Mockito.when(pdfService.createPdf(ArgumentMatchers.any())).thenReturn(SOURCE);
+        CompletableFuture mockCF = Mockito.mock(CompletableFuture.class);
+        Mockito.when(kafkaTemplate.send(ArgumentMatchers.any(Message.class))).thenReturn(mockCF);
 
         passportService.createPassportsPdf(generatePassportsDto);
 
@@ -76,6 +91,10 @@ class PassportServiceImplTest {
         Mockito.verify(passportGeneratorService, Mockito.times(1))
                 .generatePassports(SERIALS, byteArrayResource, DTF.format(DATE));
         Mockito.verify(pdfService, Mockito.times(1)).createPdf(SOURCE);
+
+        Mockito.verify(kafkaTemplate, Mockito.times(1)).send(argumentCaptor.capture());
+        Message<GeneratePassportsDto> captured = argumentCaptor.getValue();
+        Assertions.assertThat(captured.getPayload()).isEqualTo(generatePassportsDto);
     }
 
 }

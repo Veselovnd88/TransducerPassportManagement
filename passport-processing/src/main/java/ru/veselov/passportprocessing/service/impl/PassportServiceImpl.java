@@ -5,7 +5,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.kafka.support.SendResult;
+import org.springframework.messaging.Message;
+import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Service;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 import ru.veselov.passportprocessing.dto.SerialNumberDto;
@@ -57,8 +60,10 @@ public class PassportServiceImpl implements PassportService {
     }
 
     private void sendToMessageBroker(GeneratePassportsDto generatePassportsDto) {
+        Message<GeneratePassportsDto> message = MessageBuilder.withPayload(generatePassportsDto)
+                .setHeader(KafkaHeaders.TOPIC, topic).build();
         CompletableFuture<SendResult<String, GeneratePassportsDto>> send =
-                kafkaTemplate.send(topic, generatePassportsDto);
+                kafkaTemplate.send(message);
         send.whenComplete((result, ex) -> {
             if (ex == null) {
                 log.info("Message successfully sent to Kafka broker: {}", generatePassportsDto);

@@ -3,6 +3,7 @@ package ru.veselov.passportprocessing.app;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import lombok.SneakyThrows;
+import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
 import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,7 +20,6 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import ru.veselov.passportprocessing.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 import ru.veselov.passportprocessing.dto.SerialNumberDto;
 import ru.veselov.passportprocessing.exception.error.ErrorCode;
@@ -35,7 +35,7 @@ import java.util.UUID;
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 @DirtiesContext
 @ActiveProfiles("test")
-public class PassportControllerIntegrationTest extends PostgresContainersConfig {
+public class PassportControllerIntegrationTest {
 
     public static final String URL_PREFIX = "/api/v1/passport";
 
@@ -87,6 +87,8 @@ public class PassportControllerIntegrationTest extends PostgresContainersConfig 
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(BYTES.length)
                 .expectBody(byte[].class);
+
+        Assertions.assertThat(generatePassportsDto).isEqualTo(kafkaTestConsumer.getListenedResult());
     }
 
     @Test

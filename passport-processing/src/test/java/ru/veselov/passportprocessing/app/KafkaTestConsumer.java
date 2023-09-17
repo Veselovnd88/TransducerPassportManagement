@@ -6,10 +6,16 @@ import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 
 @Component
 public class KafkaTestConsumer {
+    private GeneratePassportsDto listenedResult;
 
     @KafkaListener(groupId = "passport", topics = "passports", containerFactory = "listenerFactory")
-
     public void listen(GeneratePassportsDto generatePassportsDto) {
-        System.out.println("Message received: " + generatePassportsDto);
+        System.out.println("Consumer received message from broker: " + generatePassportsDto);
+        listenedResult = generatePassportsDto;
     }
+
+    public GeneratePassportsDto getListenedResult() {
+        return listenedResult;
+    }
+
 }

@@ -5,16 +5,19 @@ import org.instancio.Select;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import ru.veselov.passportprocessing.controller.PassportController;
 import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
 import ru.veselov.passportprocessing.exception.error.ErrorCode;
+import ru.veselov.passportprocessing.service.PassportService;
 
 import java.util.Collections;
 import java.util.UUID;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@WebMvcTest(controllers = PassportController.class)
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 public class PassportControllerValidationIntegrationTest {
@@ -24,6 +27,9 @@ public class PassportControllerValidationIntegrationTest {
 
     @Autowired
     WebTestClient webTestClient;
+
+    @MockBean
+    PassportService passportService;
 
     @Test
     void shouldReturnValidationErrorForEmptyList() {
@@ -79,13 +85,13 @@ public class PassportControllerValidationIntegrationTest {
     void shouldReturnValidationErrorForEmptyDate() {
         GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .set(Select.field(GeneratePassportsDto.class, "date"), null)
+                .set(Select.field(GeneratePassportsDto.class, "printDate"), null)
                 .create();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("date");
+                .jsonPath("$.violations[0].fieldName").isEqualTo("printDate");
     }
 
 }
