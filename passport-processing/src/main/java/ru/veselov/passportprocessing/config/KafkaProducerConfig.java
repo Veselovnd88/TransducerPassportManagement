@@ -35,7 +35,9 @@ public class KafkaProducerConfig {
 
     @Bean
     public KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate(ProducerFactory<String, GeneratePassportsDto> producerFactory) {
-        return new KafkaTemplate<>(producerFactory);
+        KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate = new KafkaTemplate<>(producerFactory);
+        kafkaTemplate.setObservationEnabled(true);
+        return kafkaTemplate;
     }
 
 }

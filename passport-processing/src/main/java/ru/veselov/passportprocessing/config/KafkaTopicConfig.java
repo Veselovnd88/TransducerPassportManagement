@@ -33,7 +33,7 @@ public class KafkaTopicConfig {
     @Bean
     public NewTopic createdPassportTopic() {
         return TopicBuilder.name(topic)
-                .partitions(1)
+                .partitions(3)
                 .replicas(1)
                 //messages would be deleted after 5 days
                 .config(TopicConfig.RETENTION_MS_CONFIG, String.valueOf(Duration.ofDays(5).toMillis()))
