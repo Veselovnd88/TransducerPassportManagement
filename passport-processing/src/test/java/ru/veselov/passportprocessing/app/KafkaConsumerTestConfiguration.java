@@ -28,7 +28,9 @@ public class KafkaConsumerTestConfiguration {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        props.put(JsonDeserializer.REMOVE_TYPE_INFO_HEADERS, false);
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.veselov.passportprocessing.dto.GeneratePassportsDto");
+        props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.veselov.passportprocessing.dto");
         return props;
     }
 
