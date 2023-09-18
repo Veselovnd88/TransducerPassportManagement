@@ -20,6 +20,14 @@ spring:
   liquibase:
     enabled: false
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    passport-topic: passports
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: passport
+      auto-offset-reset: earliest
+
 eureka:
   client:
     service-url:

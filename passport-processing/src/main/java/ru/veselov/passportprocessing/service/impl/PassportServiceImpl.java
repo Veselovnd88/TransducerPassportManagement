@@ -43,8 +43,8 @@ public class PassportServiceImpl implements PassportService {
 
     @Override
     public byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
-        sendToMessageBroker(generatePassportsDto);
         log.info("Starting process of generating passports");
+        sendToMessageBroker(generatePassportsDto);//TODO ONLY FOR TESTING PURPOSE
         ByteArrayResource templateByteArrayResource = passportTemplateService
                 .getTemplate(generatePassportsDto.getTemplateId());
         List<String> serials = generatePassportsDto.getSerials()
