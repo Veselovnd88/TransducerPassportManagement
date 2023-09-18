@@ -29,19 +29,19 @@ ext {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     implementation 'io.zipkin.brave:brave-instrumentation-http:5.16.0'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
     implementation "org.apache.poi:poi-ooxml:${poi}"
     implementation "org.apache.poi:poi:${poi}"
     implementation 'commons-io:commons-io:2.13.0'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
+    implementation 'org.springframework.kafka:spring-kafka'
+
     implementation project(':liquibase-migration')
 
 
@@ -62,6 +62,7 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.18.3'
     testImplementation "org.testcontainers:postgresql:1.18.3"
     testImplementation 'org.awaitility:awaitility:4.2.0'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 
 }
 

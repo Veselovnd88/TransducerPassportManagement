@@ -7,11 +7,6 @@ placeholder:
   date: DATE
   date-format: "dd.MM.yyyy"
 
-task-executor:
-  core-pool-size: 10
-  max-pool-size: 10
-  queue-capacity: 15
-
 pdf-service:
   url: "http://localhost:3000/forms/libreoffice/convert"
   filename: "fileToConvert"
@@ -31,7 +26,6 @@ spring:
     username: admin
     password: admin
     driver-class-name: org.postgresql.Driver
-
   jpa:
     properties:
       hibernate:
@@ -43,6 +37,13 @@ spring:
   liquibase:
     enabled: false
 
+  kafka:
+    bootstrap-servers: localhost:9092
+    passport-topic: passports
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: passport
+      auto-offset-reset: earliest
 
 eureka:
   client:
