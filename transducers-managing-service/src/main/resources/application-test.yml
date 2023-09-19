@@ -52,6 +52,12 @@ transducer:
 passport:
   passportsPerPage: 50
 
+task-executor:
+  core-pool-size: 10
+  max-pool-size: 20
+  queue-capacity: 20
+
+
 logging:
   level:
     ru.veselov.passportprocessing: debug
