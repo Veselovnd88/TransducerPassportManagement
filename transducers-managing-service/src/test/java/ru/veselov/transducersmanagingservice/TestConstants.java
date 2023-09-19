@@ -40,4 +40,5 @@ public class TestConstants {
 
     public static final String BEFORE = "before";
 
+    public static final UUID TEMPLATE_ID = UUID.randomUUID();
 }
