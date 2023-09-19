@@ -13,7 +13,7 @@ public class KafkaGeneratePassportsConsumer {
 
     @KafkaListener(groupId = "passport", topics = "passports", containerFactory = "listenerFactory")
     public void listen(GeneratePassportsDto generatePassportsDto) {
-        log.info("Received message from Kafka broker: [topic: {}, group: {}", "passports", "passport");
+        log.info("Received message from Kafka broker: [topic: {}, group: {}", "passports", "passport]");
         //TODO to passport service to save async
     }
 

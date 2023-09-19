@@ -1,5 +1,6 @@
 package ru.veselov.transducersmanagingservice.config;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -20,6 +21,7 @@ import java.util.Map;
 
 @Configuration
 @Slf4j
+@RequiredArgsConstructor
 @EnableKafka
 public class KafkaConsumerConfiguration {
     @Value("${spring.kafka.consumer.bootstrap-servers}")
@@ -37,6 +39,7 @@ public class KafkaConsumerConfiguration {
                         ":ru.veselov.transducersmanagingservice.dto.GeneratePassportsDto");
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.veselov.transducersmanagingservice.dto.GeneratePassportsDto");
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.veselov.transducersmanagingservice.dto");
+        log.debug("Configuring consumer properties");
         return props;
     }
 
@@ -51,6 +54,9 @@ public class KafkaConsumerConfiguration {
         ConcurrentKafkaListenerContainerFactory<String, GeneratePassportsDto> factory =
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
+        factory.setConcurrency(3);
+        factory.getContainerProperties().setObservationEnabled(true);
+        log.debug("Configuring ConcurrentKafkaListenerContainerFactory");
         return factory;
     }
 
