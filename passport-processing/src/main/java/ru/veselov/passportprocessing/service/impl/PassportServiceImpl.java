@@ -43,8 +43,8 @@ public class PassportServiceImpl implements PassportService {
 
     @Override
     public byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
-        sendToMessageBroker(generatePassportsDto);
         log.info("Starting process of generating passports");
+        sendToMessageBroker(generatePassportsDto);//TODO ONLY FOR TESTING PURPOSE
         ByteArrayResource templateByteArrayResource = passportTemplateService
                 .getTemplate(generatePassportsDto.getTemplateId());
         List<String> serials = generatePassportsDto.getSerials()
@@ -67,7 +67,8 @@ public class PassportServiceImpl implements PassportService {
                 kafkaTemplate.send(message);
         send.whenComplete((result, ex) -> {
             if (ex == null) {
-                log.info("Message successfully sent to Kafka broker, to topic {}: {}", topic, generatePassportsDto);
+                log.info("Message successfully sent to Kafka broker, to [topic {}: message: {}]",
+                        topic, generatePassportsDto);
             } else {
                 log.error("Message wan not sent to broker with exception: {}", ex.getMessage());
             }

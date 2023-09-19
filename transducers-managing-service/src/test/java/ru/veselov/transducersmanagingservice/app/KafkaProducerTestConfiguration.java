@@ -1,22 +1,23 @@
-package ru.veselov.passportprocessing.config;
+package ru.veselov.transducersmanagingservice.app;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.core.DefaultKafkaProducerFactory;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.core.ProducerFactory;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import ru.veselov.passportprocessing.dto.GeneratePassportsDto;
+import ru.veselov.transducersmanagingservice.dto.GeneratePassportsDto;
 
 import java.util.HashMap;
 import java.util.Map;
 
-@Configuration
-public class KafkaProducerConfig {
-    @Value("${spring.kafka.bootstrap-servers}")
+@TestConfiguration
+public class KafkaProducerTestConfiguration {
+
+    @Value("${spring.kafka.consumer.bootstrap-servers}")
     private String bootstrapServer;
 
     @Bean
@@ -36,9 +37,6 @@ public class KafkaProducerConfig {
 
     @Bean
     public KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate(ProducerFactory<String, GeneratePassportsDto> producerFactory) {
-        KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate = new KafkaTemplate<>(producerFactory);
-        kafkaTemplate.setObservationEnabled(true);
-        return kafkaTemplate;
+        return new KafkaTemplate<>(producerFactory);
     }
-
 }
