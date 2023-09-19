@@ -21,7 +21,6 @@ spring:
     enabled: false
 
   kafka:
-    bootstrap-servers: localhost:9092
     passport-topic: passports
     consumer:
       bootstrap-servers: localhost:9092

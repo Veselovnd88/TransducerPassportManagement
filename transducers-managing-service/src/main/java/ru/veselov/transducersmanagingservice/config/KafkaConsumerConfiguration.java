@@ -6,6 +6,7 @@ import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.KafkaListenerContainerFactory;
 import org.springframework.kafka.core.ConsumerFactory;
@@ -19,6 +20,7 @@ import java.util.Map;
 
 @Configuration
 @Slf4j
+@EnableKafka
 public class KafkaConsumerConfiguration {
     @Value("${spring.kafka.consumer.bootstrap-servers}")
     private String bootstrapServer;
@@ -29,12 +31,14 @@ public class KafkaConsumerConfiguration {
         props.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServer);
         props.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         props.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        props.put(JsonDeserializer.REMOVE_TYPE_INFO_HEADERS, false);
+        props.put(JsonDeserializer.REMOVE_TYPE_INFO_HEADERS, true);
+        props.put(JsonDeserializer.TYPE_MAPPINGS,
+                "ru.veselov.passportprocessing.dto.GeneratePassportsDto" +
+                        ":ru.veselov.transducersmanagingservice.dto.GeneratePassportsDto");
         props.put(JsonDeserializer.VALUE_DEFAULT_TYPE, "ru.veselov.transducersmanagingservice.dto.GeneratePassportsDto");
         props.put(JsonDeserializer.TRUSTED_PACKAGES, "ru.veselov.transducersmanagingservice.dto");
         return props;
     }
-
 
     @Bean
     public ConsumerFactory<String, GeneratePassportsDto> consumerFactory() {
@@ -49,4 +53,5 @@ public class KafkaConsumerConfiguration {
         factory.setConsumerFactory(consumerFactory());
         return factory;
     }
+
 }
