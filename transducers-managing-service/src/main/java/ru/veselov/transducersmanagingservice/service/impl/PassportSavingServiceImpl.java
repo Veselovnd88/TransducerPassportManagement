@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+/**
+ * Service receive generated passports dto and map it to PassportEntities for saving to DB, async
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -42,14 +45,19 @@ public class PassportSavingServiceImpl implements PassportSavingService {
         serials.forEach(x -> {
             Optional<SerialNumberEntity> serialOptional = serialNumberRepository
                     .findById(UUID.fromString(x.getSerialId()));
-            PassportEntity passportEntity = new PassportEntity();
-            passportEntity.setSerialNumber(serialOptional.orElse(null));
-            passportEntity.setTemplate(templateOptional.orElse(null));
-            passportEntity.setPrintDate(generatePassportsDto.getPrintDate());
-            passportsToSave.add(passportEntity);
+            if (serialOptional.isPresent()) {
+                PassportEntity passportEntity = new PassportEntity();
+                passportEntity.setSerialNumber(serialOptional.get());
+                passportEntity.setTemplate(templateOptional.orElse(null));
+                passportEntity.setPrintDate(generatePassportsDto.getPrintDate());
+                passportsToSave.add(passportEntity);
+            } else {
+                log.warn("Serial number with [id: {}] doesn't exists, passport won't be saved", x.getSerialId());
+            }
+
         });
         passportRepository.saveAll(passportsToSave);
-        log.info("Passports saved to db: [total: {}]", serials.size());
+        log.info("Passports saved to db: [total: {}]", passportsToSave.size());
     }
 
 }

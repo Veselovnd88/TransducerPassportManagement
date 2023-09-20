@@ -14,7 +14,7 @@ import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import ru.veselov.transducersmanagingservice.TestConstants;
 import ru.veselov.transducersmanagingservice.model.Passport;
 import ru.veselov.transducersmanagingservice.service.PassportInfoService;
-import ru.veselov.transducersmanagingservice.validator.impl.TestUtils;
+import ru.veselov.transducersmanagingservice.TestUtils;
 
 import java.util.List;
 
