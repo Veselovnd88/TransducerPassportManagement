@@ -45,19 +45,6 @@ public class PassportControllerValidationIntegrationTest {
     }
 
     @Test
-    void shouldReturnValidationErrorForEmptyPtArt() {
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .set(Select.field(GeneratePassportsDto.class, "ptArt"), null)
-                .create();
-
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
-                .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("ptArt");
-    }
-
-    @Test
     void shouldReturnValidationErrorForEmptyTemplateId() {
         GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> null)

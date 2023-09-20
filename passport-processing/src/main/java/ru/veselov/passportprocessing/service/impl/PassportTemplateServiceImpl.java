@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import ru.veselov.passportprocessing.service.PassportTemplateService;
 import ru.veselov.passportprocessing.service.TemplateStorageHttpClient;
 
+/*
+ *Service responsible for getting template bytes from storage
+ * */
 @Service
 @RequiredArgsConstructor
 @Slf4j

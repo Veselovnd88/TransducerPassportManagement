@@ -22,6 +22,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * Service responsible for generating .docx document from template (one page) for all serial numbers
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -31,7 +34,7 @@ public class PassportGeneratorServiceImpl implements PassportGeneratorService {
 
     @Override
     public byte[] generatePassports(List<String> serials, ByteArrayResource templateByteArrayResource, String date) {
-        log.info("Starting generate [{} passports] at [date {}]", serials.size(), date);
+        log.info("Starting generate .docx for [{} passports] at [date {}]", serials.size(), date);
         try (InputStream templateInputStreamFirst = templateByteArrayResource.getInputStream()) {
             try (XWPFDocument mainDoc = new XWPFDocument(templateInputStreamFirst)) {
                 //First time we load doc as template and change fields here for saving first page.

@@ -22,6 +22,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+/**
+ * Service responsible for all actions for generating passports and pdf:
+ * -get template from storage microservice;
+ * -generate .docx with all serial numbers;
+ * -send to pdf service for converting to pdf;
+ * -send Dto to broker after getting result, and return pdf bytes to user
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -44,7 +51,6 @@ public class PassportServiceImpl implements PassportService {
     @Override
     public byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
         log.info("Starting process of generating passports");
-        sendToMessageBroker(generatePassportsDto);//TODO ONLY FOR TESTING PURPOSE
         ByteArrayResource templateByteArrayResource = passportTemplateService
                 .getTemplate(generatePassportsDto.getTemplateId());
         List<String> serials = generatePassportsDto.getSerials()

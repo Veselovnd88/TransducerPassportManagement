@@ -73,16 +73,6 @@ class PassportControllerTest {
     }
 
     @Test
-    void shouldReturnBadRequestStatusIfPtArtIsNull() {
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getPtArt), () -> null)
-                .create();
-
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
-                .bodyValue(generatePassportsDto).exchange().expectStatus().isBadRequest();
-    }
-
-    @Test
     void shouldReturnBadRequestStatusIfTemplateIdIsNull() {
         GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> null)

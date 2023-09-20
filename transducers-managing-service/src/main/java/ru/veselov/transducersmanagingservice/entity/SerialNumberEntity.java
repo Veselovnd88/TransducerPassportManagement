@@ -22,7 +22,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Data
-@EqualsAndHashCode(exclude = {"transducer"}, callSuper = false)
+@EqualsAndHashCode(exclude = {"transducer","customer"}, callSuper = false)
 @ToString(exclude = {"transducer"})
 @Builder
 public class SerialNumberEntity extends BaseEntity {

@@ -22,7 +22,7 @@ import ru.veselov.transducersmanagingservice.TestConstants;
 import ru.veselov.transducersmanagingservice.dto.SerialsDto;
 import ru.veselov.transducersmanagingservice.model.SerialNumber;
 import ru.veselov.transducersmanagingservice.service.SerialNumberService;
-import ru.veselov.transducersmanagingservice.validator.impl.TestUtils;
+import ru.veselov.transducersmanagingservice.TestUtils;
 
 import java.util.List;
 

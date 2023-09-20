@@ -12,6 +12,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/*
+ *Service responsible for sending bytes with generated docx to pdf converter, and return back pdf bytes
+ * */
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -21,7 +24,6 @@ public class PdfServiceImpl implements PdfService {
 
     @Override
     public byte[] createPdf(byte[] source) {
-
         DataBuffer pdfDatabuffer = pdfHttpClient.sendRequestForConvertingDocxToPdf(source);
         log.info("Document successfully converted to pdf");
         return convertToByteArray(pdfDatabuffer);
