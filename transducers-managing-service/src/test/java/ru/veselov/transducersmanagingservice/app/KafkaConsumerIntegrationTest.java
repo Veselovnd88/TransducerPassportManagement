@@ -89,9 +89,8 @@ class KafkaConsumerIntegrationTest extends PostgresContainersConfig {
                 new SerialNumberDto(serialNumberEntity.getNumber(), serialNumberEntity.getId().toString())));
         generatePassportsDto.setTemplateId(templateEntity.getId().toString());
         generatePassportsDto.setPrintDate(LocalDate.of(2023, 9, 20));
-        Awaitility.await().pollDelay(Duration.of(3, ChronoUnit.SECONDS)).until(() -> true);
-        kafkaTemplate.send("passports", generatePassportsDto);
 
+        kafkaTemplate.send("passports", generatePassportsDto);
         Awaitility.await().pollDelay(Duration.of(3, ChronoUnit.SECONDS)).until(() -> true);
 
         List<PassportEntity> passportEntities = passportRepository.findAllBetweenDates(LocalDate.of(2023, 9, 20),
@@ -111,9 +110,8 @@ class KafkaConsumerIntegrationTest extends PostgresContainersConfig {
                 new SerialNumberDto(serialNumberEntity.getNumber(), serialNumberEntity.getId().toString())));
         generatePassportsDto.setTemplateId(TestConstants.TEMPLATE_ID.toString());
         generatePassportsDto.setPrintDate(LocalDate.of(2023, 9, 20));
-        Awaitility.await().pollDelay(Duration.of(3, ChronoUnit.SECONDS)).until(() -> true);
-        kafkaTemplate.send("passports", generatePassportsDto);
 
+        kafkaTemplate.send("passports", generatePassportsDto);
         Awaitility.await().pollDelay(Duration.of(3, ChronoUnit.SECONDS)).until(() -> true);
 
         List<PassportEntity> passportEntities = passportRepository.findAllBetweenDates(LocalDate.of(2023, 9, 20),
@@ -132,9 +130,8 @@ class KafkaConsumerIntegrationTest extends PostgresContainersConfig {
                 new SerialNumberDto("123", UUID.randomUUID().toString())));
         generatePassportsDto.setTemplateId(TestConstants.TEMPLATE_ID.toString());
         generatePassportsDto.setPrintDate(LocalDate.of(2023, 9, 20));
-        Awaitility.await().pollDelay(Duration.of(3, ChronoUnit.SECONDS)).until(() -> true);
-        kafkaTemplate.send("passports", generatePassportsDto);
 
+        kafkaTemplate.send("passports", generatePassportsDto);
         Awaitility.await().pollDelay(Duration.of(3, ChronoUnit.SECONDS)).until(() -> true);
 
         List<PassportEntity> passportEntities = passportRepository.findAllBetweenDates(LocalDate.of(2023, 9, 20),

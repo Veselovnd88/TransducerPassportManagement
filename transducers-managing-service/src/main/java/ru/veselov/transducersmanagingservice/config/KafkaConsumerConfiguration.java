@@ -15,6 +15,7 @@ import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
 import org.springframework.kafka.listener.ConcurrentMessageListenerContainer;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
 import ru.veselov.transducersmanagingservice.dto.GeneratePassportsDto;
+import ru.veselov.transducersmanagingservice.exception.KafkaConsumerErrorHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -26,6 +27,8 @@ import java.util.Map;
 public class KafkaConsumerConfiguration {
     @Value("${spring.kafka.consumer.bootstrap-servers}")
     private String bootstrapServer;
+
+    private final KafkaConsumerErrorHandler kafkaConsumerErrorHandler;
 
     @Bean
     public Map<String, Object> consumerConfig() {
@@ -55,6 +58,7 @@ public class KafkaConsumerConfiguration {
                 new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(consumerFactory());
         factory.setConcurrency(3);
+        factory.setCommonErrorHandler(kafkaConsumerErrorHandler);
         factory.getContainerProperties().setObservationEnabled(true);
         log.debug("Configuring ConcurrentKafkaListenerContainerFactory");
         return factory;
