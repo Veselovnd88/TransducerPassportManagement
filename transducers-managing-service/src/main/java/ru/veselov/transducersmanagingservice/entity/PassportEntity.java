@@ -25,10 +25,10 @@ import java.time.LocalDate;
 @Builder
 public class PassportEntity extends BaseEntity {
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)//fields would be filled with queries
     @JoinColumn(name = "serial_id", referencedColumnName = "id")
     private SerialNumberEntity serialNumber;
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)//fields would be filled with queries
     @JoinColumn(name = "template_id", referencedColumnName = "id")
     private TemplateEntity template;
 

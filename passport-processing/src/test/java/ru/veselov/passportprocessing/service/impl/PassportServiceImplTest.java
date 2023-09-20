@@ -43,8 +43,6 @@ class PassportServiceImplTest {
 
     public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
-    public static final String PT_ART = "801877";
-
     public static final LocalDate DATE = LocalDate.now();
 
     @Mock
@@ -73,8 +71,7 @@ class PassportServiceImplTest {
     @Test
     void shouldCallServicesForReturningByteArray() {
         GeneratePassportsDto generatePassportsDto = new GeneratePassportsDto(
-                SERIALS_DTOS, UUID.randomUUID().toString(), PT_ART, DATE
-        );
+                SERIALS_DTOS, UUID.randomUUID().toString(), DATE);
         ByteArrayResource byteArrayResource = new ByteArrayResource(SOURCE);
         Mockito.when(passportTemplateService.getTemplate(ArgumentMatchers.anyString()))
                 .thenReturn(byteArrayResource);

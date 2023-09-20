@@ -1,6 +1,5 @@
 package ru.veselov.passportprocessing.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -22,9 +21,6 @@ public class GeneratePassportsDto {
     @NotNull
     @org.hibernate.validator.constraints.UUID
     private String templateId;
-
-    @NotBlank
-    private String ptArt;
 
     @NotNull
     private LocalDate printDate;
