@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,8 +32,13 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class TemplateStorageServiceImpl implements TemplateStorageService {
 
+    public static final String TEMPLATE_WITH_ID_NOT_FOUND_LOG = "Template with [id: {}] not found";
+    public static final String TEMPLATE_WITH_ID_NOT_FOUND = "Template with [id: %s] not found";
     @Value("${template.templates-per-page}")
     private int templatesPerPage;
+
+    @Value("${scheduling.days-until-delete}")
+    private int daysUntilDelete;
 
     private final TemplateRepository templateRepository;
 
@@ -71,8 +77,8 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             log.info("[Template: {}] retrieved from DB", templateId);
             return templateMapper.toModel(optionalTemplate.get());
         } else {
-            log.error("Template with [id: {}] not found", templateId);
-            throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));
+            log.error(TEMPLATE_WITH_ID_NOT_FOUND_LOG, templateId);
+            throw new EntityNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
         }
     }
 
@@ -107,8 +113,8 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             templateRepository.save(templateEntity);
             log.info("Template [id: {}] info updated in DB", templateId);
         } else {
-            log.error("Template with [id: {}] not found", templateId);
-            throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));
+            log.error(TEMPLATE_WITH_ID_NOT_FOUND_LOG, templateId);
+            throw new EntityNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
         }
     }
 
@@ -122,9 +128,17 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             templateRepository.delete(templateEntity);
             log.info("Template with [id: {}] deleted from DB", templateId);
         } else {
-            log.error("Template with [id: {}] not found", templateId);
-            throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));
+            log.error(TEMPLATE_WITH_ID_NOT_FOUND_LOG, templateId);
+            throw new EntityNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
         }
+    }
+
+    @Scheduled(cron = "${scheduling.delete-unsync}")
+    @Transactional
+    @Override
+    public void deleteUnSynchronized() {
+        LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDelete);
+        templateRepository.deleteAllWithUnSyncFalse(deleteDate);
     }
 
     private Pageable createPageable(int page, String sort, String order) {

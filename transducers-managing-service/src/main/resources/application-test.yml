@@ -57,6 +57,8 @@ task-executor:
   max-pool-size: 20
   queue-capacity: 20
 
+scheduling:
+  delete-empty-passports: "*/3 * * * * *"
 
 logging:
   level:

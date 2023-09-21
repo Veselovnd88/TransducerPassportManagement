@@ -40,6 +40,10 @@ eureka:
     register-with-eureka: true
     enabled: true
 
+scheduling:
+  delete-unsync: "@weekly"
+  days-until-delete: 5
+
 management:
   endpoints:
     web:

@@ -23,4 +23,6 @@ public interface TemplateStorageService {
 
     void deleteTemplate(String templateId);
 
+    void deleteUnSynchronized();
+
 }

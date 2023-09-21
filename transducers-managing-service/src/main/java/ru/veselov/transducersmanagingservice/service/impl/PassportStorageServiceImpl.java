@@ -3,6 +3,7 @@ package ru.veselov.transducersmanagingservice.service.impl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.transducersmanagingservice.dto.GeneratePassportsDto;
@@ -13,7 +14,7 @@ import ru.veselov.transducersmanagingservice.entity.TemplateEntity;
 import ru.veselov.transducersmanagingservice.repository.PassportRepository;
 import ru.veselov.transducersmanagingservice.repository.SerialNumberRepository;
 import ru.veselov.transducersmanagingservice.repository.TemplateRepository;
-import ru.veselov.transducersmanagingservice.service.PassportSavingService;
+import ru.veselov.transducersmanagingservice.service.PassportStorageService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +27,7 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PassportSavingServiceImpl implements PassportSavingService {
+public class PassportStorageServiceImpl implements PassportStorageService {
 
     private final SerialNumberRepository serialNumberRepository;
 
@@ -58,6 +59,16 @@ public class PassportSavingServiceImpl implements PassportSavingService {
         });
         passportRepository.saveAll(passportsToSave);
         log.info("Passports saved to db: [total: {}]", passportsToSave.size());
+    }
+
+    @Scheduled(cron = "${scheduling.delete-empty-passports}")
+    @Async
+    @Transactional
+    @Override
+    public void deleteWithNullTemplateAndNullSerialNumber() {
+        log.info("Scheduled task for deleting empty passports started");
+        passportRepository.deleteWithNullSerialAndTemplate();
+        log.info("Passport records with null template and serial number deleted");
     }
 
 }

@@ -4,13 +4,16 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
+
 @Repository
 public interface TemplateRepository extends JpaRepository<TemplateEntity, UUID> {
 
@@ -36,5 +39,9 @@ public interface TemplateRepository extends JpaRepository<TemplateEntity, UUID> 
 
     @Query("SELECT COUNT(t) FROM TemplateEntity t where t.ptArt LIKE %:ptArt% AND t.synced=true")
     long countAllByPtArt(@Param("ptArt") String ptArt);
+
+    @Modifying
+    @Query("DELETE TemplateEntity t where t.synced=false AND t.createdAt < :deleteDate")
+    void deleteAllWithUnSyncFalse(@Param("deleteDate") LocalDateTime deleteDate);
 
 }

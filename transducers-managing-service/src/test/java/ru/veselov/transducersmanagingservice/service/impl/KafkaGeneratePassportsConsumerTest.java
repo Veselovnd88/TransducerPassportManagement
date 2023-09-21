@@ -8,13 +8,13 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.veselov.transducersmanagingservice.TestUtils;
 import ru.veselov.transducersmanagingservice.dto.GeneratePassportsDto;
-import ru.veselov.transducersmanagingservice.service.PassportSavingService;
+import ru.veselov.transducersmanagingservice.service.PassportStorageService;
 
 @ExtendWith(MockitoExtension.class)
 class KafkaGeneratePassportsConsumerTest {
 
     @Mock
-    PassportSavingService passportSavingService;
+    PassportStorageService passportStorageService;
 
     @InjectMocks
     KafkaGeneratePassportsConsumer kafkaGeneratePassportsConsumer;
@@ -24,7 +24,7 @@ class KafkaGeneratePassportsConsumerTest {
         GeneratePassportsDto generatePassportDtoWithRandomSerials = TestUtils.getGeneratePassportDtoWithRandomSerials();
         kafkaGeneratePassportsConsumer.listen(generatePassportDtoWithRandomSerials);
 
-        Mockito.verify(passportSavingService, Mockito.times(1)).save(generatePassportDtoWithRandomSerials);
+        Mockito.verify(passportStorageService, Mockito.times(1)).save(generatePassportDtoWithRandomSerials);
     }
 
 }

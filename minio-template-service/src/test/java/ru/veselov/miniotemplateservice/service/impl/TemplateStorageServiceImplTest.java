@@ -26,6 +26,7 @@ import ru.veselov.miniotemplateservice.mapper.TemplateMapperImpl;
 import ru.veselov.miniotemplateservice.model.Template;
 import ru.veselov.miniotemplateservice.repository.TemplateRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -52,6 +53,7 @@ class TemplateStorageServiceImplTest {
         TemplateMapper templateMapper = new TemplateMapperImpl();
         ReflectionTestUtils.setField(templateStorageService, "templateMapper", templateMapper, TemplateMapper.class);
         ReflectionTestUtils.setField(templateStorageService, "templatesPerPage", 5, int.class);
+        ReflectionTestUtils.setField(templateStorageService, "daysUntilDelete", 5, int.class);
     }
 
     @Test
@@ -228,6 +230,14 @@ class TemplateStorageServiceImplTest {
 
         Assertions.assertThatThrownBy(() -> templateStorageService.deleteTemplate(templateId))
                 .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void shouldDeleteUnSynchronized() {
+        templateStorageService.deleteUnSynchronized();
+
+        Mockito.verify(templateRepository, Mockito.times(1))
+                .deleteAllWithUnSyncFalse(ArgumentMatchers.any(LocalDateTime.class));
     }
 
 }

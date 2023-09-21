@@ -25,7 +25,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
-class PassportSavingServiceImplTest {
+class PassportStorageServiceImplTest {
 
     @Mock
     TemplateRepository templateRepository;
@@ -37,7 +37,7 @@ class PassportSavingServiceImplTest {
     PassportRepository passportRepository;
 
     @InjectMocks
-    PassportSavingServiceImpl passportSavingService;
+    PassportStorageServiceImpl passportStorageService;
 
     @Captor
     ArgumentCaptor<List<PassportEntity>> argumentCaptor;
@@ -62,7 +62,7 @@ class PassportSavingServiceImplTest {
         Mockito.when(serialNumberRepository.findById(UUID.fromString(serialNumberDto2.getSerialId())))
                 .thenReturn(Optional.of(serialNumberEntity2));
 
-        passportSavingService.save(generatePassportDto);
+        passportStorageService.save(generatePassportDto);
 
         Mockito.verify(passportRepository, Mockito.times(1)).saveAll(argumentCaptor.capture());
         List<PassportEntity> captured = argumentCaptor.getValue();
@@ -86,7 +86,7 @@ class PassportSavingServiceImplTest {
         Mockito.when(serialNumberRepository.findById(UUID.fromString(serialNumberDto2.getSerialId())))
                 .thenReturn(Optional.empty());
 
-        passportSavingService.save(generatePassportDto);
+        passportStorageService.save(generatePassportDto);
 
         Mockito.verify(passportRepository, Mockito.times(1)).saveAll(argumentCaptor.capture());
         List<PassportEntity> captured = argumentCaptor.getValue();
@@ -109,13 +109,20 @@ class PassportSavingServiceImplTest {
         Mockito.when(serialNumberRepository.findById(UUID.fromString(serialNumberDto2.getSerialId())))
                 .thenReturn(Optional.empty());
 
-        passportSavingService.save(generatePassportDto);
+        passportStorageService.save(generatePassportDto);
 
         PassportEntity passportEntity1 =
                 new PassportEntity(serialNumberEntity1, null, generatePassportDto.getPrintDate());
         Mockito.verify(passportRepository, Mockito.times(1)).saveAll(argumentCaptor.capture());
         List<PassportEntity> captured = argumentCaptor.getValue();
         Assertions.assertThat(captured).hasSize(1).contains(passportEntity1);
+    }
+
+    @Test
+    void shouldDeletePassportsWithNullTemplateAndSerialNumber() {
+        passportStorageService.deleteWithNullTemplateAndNullSerialNumber();
+
+        Mockito.verify(passportRepository, Mockito.times(1)).deleteWithNullSerialAndTemplate();
     }
 
 

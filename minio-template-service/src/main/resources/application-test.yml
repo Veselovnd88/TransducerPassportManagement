@@ -39,6 +39,10 @@ eureka:
     register-with-eureka: true
     enabled: false
 
+scheduling:
+  delete-unsync: "*/3 * * * * *"
+  days-until-delete: 5
+
 management:
   tracing:
     sampling:
