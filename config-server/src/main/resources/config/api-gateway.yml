@@ -20,7 +20,9 @@ spring:
         - id: managing
           uri: lb://MANAGING
           predicates:
-            - Path=/api/v1/customer/**,  /api/v1/transducer/**, /api/v1/serials/**
+            - Path=/api/v1/customer/**,  /api/v1/transducer/**, /api/v1/serials/**, /api/v1/passport/**
+      default-filters: TokenRelay
+
 eureka:
   client:
     service-url:
