@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.veselov.miniotemplateservice.entity.TemplateEntity;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,7 +41,7 @@ public interface TemplateRepository extends JpaRepository<TemplateEntity, UUID> 
     long countAllByPtArt(@Param("ptArt") String ptArt);
 
     @Modifying
-    @Query("DELETE TemplateEntity t where t.synced=false")
-    void deleteAllWithUnSyncFalse();
+    @Query("DELETE TemplateEntity t where t.synced=false AND t.createdAt < :deleteDate")
+    void deleteAllWithUnSyncFalse(@Param("deleteDate") LocalDateTime deleteDate);
 
 }

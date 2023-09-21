@@ -42,6 +42,7 @@ eureka:
 
 scheduling:
   delete-unsync: "@weekly"
+  days-until-delete: 5
 
 management:
   endpoints:

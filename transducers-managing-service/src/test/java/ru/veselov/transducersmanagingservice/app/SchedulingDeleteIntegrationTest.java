@@ -37,7 +37,6 @@ class SchedulingDeleteIntegrationTest extends PostgresContainersConfig {
     @MockBean
     KafkaGeneratePassportsConsumer kafkaGeneratePassportsConsumer;
 
-
     @Test
     void shouldDeletePassportsWithNullTemplateAndSerialNumber() {
         saveEmptyPassportsToRepo();
