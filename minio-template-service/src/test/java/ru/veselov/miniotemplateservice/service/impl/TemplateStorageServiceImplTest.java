@@ -230,4 +230,11 @@ class TemplateStorageServiceImplTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
+    @Test
+    void shouldDeleteUnSynchronized() {
+        templateStorageService.deleteUnSynchronized();
+
+        Mockito.verify(templateRepository, Mockito.times(1)).deleteAllWithUnSyncFalse();
+    }
+
 }

@@ -9,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -125,6 +126,14 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             log.error("Template with [id: {}] not found", templateId);
             throw new EntityNotFoundException("Template with [id: %s] not found".formatted(templateId));
         }
+    }
+
+    @Scheduled(cron = "${scheduling.delete-unsync}")
+    @Transactional
+    @Override
+    public void deleteUnSynchronized() {
+        //TODO where createdDate< today
+        templateRepository.deleteAllWithUnSyncFalse();
     }
 
     private Pageable createPageable(int page, String sort, String order) {
