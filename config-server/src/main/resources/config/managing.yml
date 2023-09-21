@@ -69,7 +69,7 @@ task-executor:
   queue-capacity: 20
 
 scheduling:
-  delete-empty-passports: "*/10 * * * * *"
+  delete-empty-passports: "@weekly"
 
 logging:
   level:
