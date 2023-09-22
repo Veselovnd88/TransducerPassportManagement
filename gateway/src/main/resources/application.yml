@@ -10,21 +10,6 @@ spring:
   config:
     import: "optional:configserver:http://localhost:8071"
 
-  security:
-    oauth2:
-      client:
-        provider:
-          keycloak:
-            token-uri: http://localhost:8080/auth/realms/master/protocol/openid-connect/token
-            authorization-uri: http://localhost:8080/auth/realms/master/protocol/openid-connect/auth
-            user-info-uri: http://localhost:8080/auth/realms/master/protocol/openid-connect/userinfo
-            issuer-uri: http://localhost:8080/realms/allimpex
-        registration:
-          keycloak:
-            provider: keycloak
-            client-id: pt-management
-            client-secret: secret
-            authorization-grant-type: authorization_code
-            scope:
-              - openid
-            redirect-uri: "{baseUrl}/login/oauth2/code/keycloak"
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE

@@ -21,7 +21,21 @@ spring:
           uri: lb://MANAGING
           predicates:
             - Path=/api/v1/customer/**,  /api/v1/transducer/**, /api/v1/serials/**, /api/v1/passport/**
-      default-filters: TokenRelay
+
+        - id: discovery
+          uri: http://localhost:8761
+          predicates:
+            - Path=/eureka
+          filters:
+            - StripPrefix=1
+
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8079/realms/pt-management/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8079/realms/pt-management
 
 eureka:
   client:
@@ -38,3 +52,7 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+logging:
+  level:
+    org.springframework.cloud.gateway: TRACE
