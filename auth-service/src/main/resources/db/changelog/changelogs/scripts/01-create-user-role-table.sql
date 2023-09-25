@@ -5,47 +5,54 @@ GO
 
 CREATE TABLE IF NOT EXISTS pt_user
 (
-    id            UUID         NOT NULL DEFAULT gen_random_uuid(),
+    id            UUID         NOT NULL       DEFAULT gen_random_uuid(),
 
-    firstname     varchar(255) NOT NULL,
+    firstname     VARCHAR(255) NOT NULL,
 
-    lastname      varchar(255) NOT NULL,
+    lastname      VARCHAR(255) NOT NULL,
 
-    company_name  varchar(255),
+    company_name  VARCHAR(255),
 
-    email         varchar(255) not null,
+    email         VARCHAR(255) NOT NULL UNIQUE,
 
-    user_password varchar(3000),
+    user_password VARCHAR(3000),
 
-    role_id       UUID         not null,
+    created_at    TIMESTAMP without time zone DEFAULT CURRENT_TIMESTAMP,
 
-    primary key (id)
+    deleted       BOOLEAN                     default FALSE,
+
+    PRIMARY KEY (id)
 
 );
-
-GO
-
-ALTER TABLE IF EXISTS pt_user
-    ADD CONSTRAINT user_email_uk UNIQUE (email);
 
 GO
 
 CREATE TABLE user_role
 (
-    id        UUID    NOT NULL DEFAULT gen_random_uuid(),
-    role_name varchar NOT NULL,
+    id         UUID    NOT NULL            DEFAULT gen_random_uuid(),
+    role_name  VARCHAR NOT NULL,
+    created_at TIMESTAMP without time zone DEFAULT CURRENT_TIMESTAMP,
     primary key (id)
 );
 
 GO
 
-ALTER TABLE IF EXISTS user_role
-    ADD CONSTRAINT role_uk UNIQUE (role_name)
-    GO
+CREATE TABLE users_roles
+(
+    user_id UUID NOT NULL,
+    role_id UUID NOT NULL,
+    PRIMARY KEY (user_id, role_id),
+    FOREIGN KEY (user_id) REFERENCES pt_user (id),
+    FOREIGN KEY (role_id) REFERENCES user_role (id)
+);
 
-ALTER TABLE IF EXISTS pt_user
-    ADD CONSTRAINT user_role_fk
-        FOREIGN KEY (role_id) REFERENCES user_role (id);
+
+GO
+
+INSERT INTO user_role(role_name)
+VALUES ('ADMIN'),
+       ('MANAGER'),
+       ('CUSTOMER');
 
 GO
 
