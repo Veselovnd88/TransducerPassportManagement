@@ -1,0 +1,11 @@
+server:
+  port: 7171
+
+spring:
+  application:
+    name: authservice
+  profiles:
+    active: default
+
+  config:
+    import: "optional:configserver:http://localhost:8071"

@@ -80,7 +80,21 @@ services:
     depends_on:
       - zookeeper
 
+  postgres-auth:
+    container_name: postgres-auth-pt
+    image: "postgres:15.2"
+    restart: unless-stopped
+    env_file:
+      - database-auth.env
+    ports:
+      - "5434:5432"
+    networks:
+      - postgres-auth
+    volumes:
+      - /var/docker-volumes/pg-pt-auth:/var/lib/postgresql/data/
 
 networks:
   postgres:
+    driver: bridge
+  postgres-auth:
     driver: bridge
