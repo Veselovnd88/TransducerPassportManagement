@@ -20,7 +20,15 @@ spring:
         - id: managing
           uri: lb://MANAGING
           predicates:
-            - Path=/api/v1/customer/**,  /api/v1/transducer/**, /api/v1/serials/**
+            - Path=/api/v1/customer/**,  /api/v1/transducer/**, /api/v1/serials/**, /api/v1/passport/**
+
+        - id: discovery
+          uri: http://localhost:8761
+          predicates:
+            - Path=/eureka
+          filters:
+            - StripPrefix=1
+
 eureka:
   client:
     service-url:
