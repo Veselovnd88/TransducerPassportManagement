@@ -1,9 +1,7 @@
 package ru.veselov.authservice.entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
@@ -38,10 +36,10 @@ public class UserEntity extends BaseEntity {
     @Column(name = "user_password")
     private String password;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "users_roles",
-            joinColumns = {@JoinColumn(name = "pt_user", referencedColumnName = "id")},
-            inverseJoinColumns = {@JoinColumn(name = "user_role", referencedColumnName = "id")}
+            joinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "id")},
+            inverseJoinColumns = {@JoinColumn(name = "role_id", referencedColumnName = "id")}
     )
     private Set<RoleEntity> roles;
 
