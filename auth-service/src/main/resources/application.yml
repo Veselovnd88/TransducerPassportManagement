@@ -9,3 +9,14 @@ spring:
 
   config:
     import: "optional:configserver:http://localhost:8071"
+
+access-token:
+  public: "access-token-public.key"
+  private: "access-token-private.key"
+refresh-token:
+  public: "refresh-token-public.key"
+  private: "refresh-token-private.key"
+
+logging:
+  level:
+    org.springframework.security: INFO

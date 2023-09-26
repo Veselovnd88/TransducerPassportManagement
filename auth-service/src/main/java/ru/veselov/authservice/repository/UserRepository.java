@@ -19,7 +19,7 @@ public interface UserRepository extends JpaRepository<UserEntity, UUID> {
     @NonNull
     Optional<UserEntity> findById(@NonNull @Param("id") UUID id);
 
-    @Query("SELECT u FROM UserEntity  u join fetch u.roles where  u.id= :email AND u.isDeleted=FALSE")
+    @Query("SELECT u FROM UserEntity  u join fetch u.roles where  u.email= :email AND u.isDeleted=FALSE")
     Optional<UserEntity> findByEmail(@NonNull @Param("email") String email);
 
     @Query("SELECT u FROM UserEntity u join fetch u.roles where u.isDeleted=FALSE")

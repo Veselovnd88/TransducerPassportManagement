@@ -5,12 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.web.SecurityFilterChain;
+import ru.veselov.authservice.security.KeyHelper;
 import ru.veselov.authservice.service.CustomUserDetailsService;
 
 @Configuration
@@ -20,26 +23,30 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
 
+    private final KeyHelper keyHelper;
+
+    @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        return http.authorizeHttpRequests(httpReq -> httpReq.requestMatchers("/api/auth/*").permitAll()
+        return http.authorizeHttpRequests(httpReq -> httpReq.requestMatchers("/api/v1/auth/*").permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
-                .oauth2ResourceServer(oauth -> oauth.jwt(jwt ->
-                        jwt.jwtAuthenticationConverter(jwtToUserConverter)))
+                .oauth2ResourceServer(oauth -> oauth.jwt(Customizer.withDefaults()))
+                //(jwt ->
+                //     jwt.jwtAuthenticationConverter(jwtToUserConverter)))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .exceptionHandling(exception -> exception.authenticationEntryPoint(
-                                bearerTokenAuthenticationEntryPoint
-                        )
-                        .accessDeniedHandler(bearerTokenAccesDeniedHandler))
+                //  .exceptionHandling(exception -> exception.authenticationEntryPoint(
+                //                bearerTokenAuthenticationEntryPoint
+                //        )
+                //       .accessDeniedHandler(bearerTokenAccesDeniedHandler))
                 .build();
     }
 
-    @Bean
+ /*   @Bean
     public JwtAuthenticationProvider jwtAccessTokenProvider() {
         JwtAuthenticationProvider provider = new JwtAuthenticationProvider();
         provider.setJwtAuthenticationConverter();
         return provider;
-    }
+    }*/
 
     @Bean
     public DaoAuthenticationProvider daoAuthenticationProvider() {
@@ -53,6 +60,11 @@ public class SecurityConfig {
     @Bean
     public BCryptPasswordEncoder bCryptPasswordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        return NimbusJwtDecoder.withPublicKey(keyHelper.getAccessTokenPublicKey()).build();
     }
 
 }
