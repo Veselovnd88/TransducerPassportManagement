@@ -10,6 +10,14 @@ spring:
   config:
     import: "optional:configserver:http://localhost:8071"
 
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8079/realms/pt-management/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8079/realms/pt-management
+
 logging:
   level:
-    org.springframework.cloud.gateway: TRACE
+    org.springframework.cloud.gateway: INFO
+    org.springframework.security: TRACE
