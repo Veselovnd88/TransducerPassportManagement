@@ -25,7 +25,7 @@ public class GrantedAuthoritiesExtractor implements Converter<Jwt, Collection<Gr
                 springRoles.stream().filter(role -> role.startsWith("ROLE_"))
                         .map(SimpleGrantedAuthority::new)
                         .map(GrantedAuthority.class::cast)).toList();
-        log.trace("Roles adn scopes: {}", actualRoles);
+        log.trace("Roles and scopes: {}", actualRoles);
         return actualRoles;
     }
 
