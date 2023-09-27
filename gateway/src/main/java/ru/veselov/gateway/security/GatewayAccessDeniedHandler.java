@@ -10,8 +10,8 @@ import org.springframework.security.web.server.authorization.ServerAccessDeniedH
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import ru.veselov.gateway.dto.ApiErrorResponse;
-import ru.veselov.gateway.dto.ErrorCode;
+import ru.veselov.gateway.exception.ApiErrorResponse;
+import ru.veselov.gateway.exception.ErrorCode;
 
 @Slf4j
 public class GatewayAccessDeniedHandler implements ServerAccessDeniedHandler {
