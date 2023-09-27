@@ -1,4 +1,4 @@
-package ru.veselov.gateway.dto;
+package ru.veselov.gateway.exception;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

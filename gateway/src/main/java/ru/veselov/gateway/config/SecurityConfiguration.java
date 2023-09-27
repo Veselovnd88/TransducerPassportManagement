@@ -33,12 +33,10 @@ public class SecurityConfiguration {
                         .anyExchange().authenticated()
                 )
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt ->
-                        jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
-                .csrf(ServerHttpSecurity.CsrfSpec::disable)
-                .exceptionHandling(exception -> exception
+                                jwt.jwtAuthenticationConverter(jwtAuthenticationConverter()))
                         .authenticationEntryPoint(new GatewayAuthenticationEntryPoint())
                         .accessDeniedHandler(new GatewayAccessDeniedHandler()))
-
+                .csrf(ServerHttpSecurity.CsrfSpec::disable)
                 .build();
     }
 
