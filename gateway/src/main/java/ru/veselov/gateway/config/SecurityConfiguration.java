@@ -13,6 +13,8 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.ReactiveJwtAuthenticationConverterAdapter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import reactor.core.publisher.Mono;
+import ru.veselov.gateway.security.GatewayAccessDeniedHandler;
+import ru.veselov.gateway.security.GatewayAuthenticationEntryPoint;
 import ru.veselov.gateway.security.GrantedAuthoritiesExtractor;
 
 @Configuration
@@ -33,6 +35,10 @@ public class SecurityConfiguration {
                 .oauth2ResourceServer(oauth2 -> oauth2.jwt(jwt ->
                         jwt.jwtAuthenticationConverter(jwtAuthenticationConverter())))
                 .csrf(ServerHttpSecurity.CsrfSpec::disable)
+                .exceptionHandling(exception -> exception
+                        .authenticationEntryPoint(new GatewayAuthenticationEntryPoint())
+                        .accessDeniedHandler(new GatewayAccessDeniedHandler()))
+
                 .build();
     }
 
