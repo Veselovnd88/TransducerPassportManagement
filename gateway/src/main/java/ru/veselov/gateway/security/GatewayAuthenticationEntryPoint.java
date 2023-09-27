@@ -1,10 +1,9 @@
 package ru.veselov.gateway.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.oauth2.server.resource.InvalidBearerTokenException;
 import org.springframework.security.web.server.ServerAuthenticationEntryPoint;
@@ -19,32 +18,23 @@ public class GatewayAuthenticationEntryPoint implements ServerAuthenticationEntr
 
     @Override
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException exception) {
-        ObjectMapper objectMapper = new ObjectMapper();
         exchange.getResponse().setStatusCode(HttpStatusCode.valueOf(401));
-        exchange.getResponse().getHeaders().add("Content-Type", "application/json");
-
+        SecurityErrorHelper.addContentTypeHeaderToResponse(exchange);
         ApiErrorResponse errorResponse = createErrorResponse(exception);
-        exchange.getResponse().getHeaders().add("WWW-Authenticate", computeWWWAuthenticateMessage(errorResponse));
-        byte[] messageBytes;
-        try {
-            messageBytes = objectMapper.writeValueAsBytes(errorResponse);
-        } catch (JsonProcessingException e) {
-            messageBytes = "Can't create correct error message".getBytes();
-        }
+        SecurityErrorHelper.addWWWAuthenticationHeaderWithErrorInformation(exchange, errorResponse);
+        byte[] messageBytes = SecurityErrorHelper.createJsonErrorMessage(errorResponse);
         DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(messageBytes);
         return exchange.getResponse().writeWith(Flux.just(buffer));
     }
 
     private static ApiErrorResponse createErrorResponse(AuthenticationException exception) {
-        if (exception instanceof InvalidBearerTokenException) {
-            if (exception.getMessage().startsWith("Jwt expired")) {
-                return new ApiErrorResponse(ErrorCode.ERROR_EXPIRED, exception.getMessage());
-            }
+        if (exception instanceof InvalidBearerTokenException && exception.getMessage().startsWith("Jwt expired")) {
+            return new ApiErrorResponse(ErrorCode.JWT_EXPIRED, exception.getMessage());
         }
-        return new ApiErrorResponse(ErrorCode.ERROR_UNAUTHENTICATED, exception.getMessage());
+        if (exception instanceof AuthenticationCredentialsNotFoundException) {
+            return new ApiErrorResponse(ErrorCode.UNAUTHENTICATED, "Token not found in header");
+        }
+        return new ApiErrorResponse(ErrorCode.UNAUTHENTICATED, exception.getMessage());
     }
 
-    private static String computeWWWAuthenticateMessage(ApiErrorResponse errorResponse) {
-        return "Error: " + errorResponse.getErrorCode().name() + ", message: " + errorResponse.getMessage();
-    }
 }

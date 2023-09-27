@@ -10,7 +10,7 @@ spring:
         - id: passport
           uri: lb://PASSPORT
           predicates:
-            - Path=/api/v1/passport/**
+            - Path=/api/v1/passport/generate
 
         - id: template-storage
           uri: lb://TEMPLATE-STORAGE
