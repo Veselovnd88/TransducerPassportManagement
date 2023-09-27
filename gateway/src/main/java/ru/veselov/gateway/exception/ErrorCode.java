@@ -1,9 +1,10 @@
 package ru.veselov.gateway.exception;
 
 public enum ErrorCode {
-    ERROR_UNAUTHENTICATED,
-    ERROR_UNAUTHORIZED,
+    UNAUTHENTICATED,
 
-    ERROR_EXPIRED
+    UNAUTHORIZED,
+
+    JWT_EXPIRED
 
 }

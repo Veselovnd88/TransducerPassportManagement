@@ -9,6 +9,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -21,6 +22,10 @@ public class GrantedAuthoritiesExtractor implements Converter<Jwt, Collection<Gr
         JwtGrantedAuthoritiesConverter basicJwtAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         Collection<GrantedAuthority> convertedScopes = basicJwtAuthoritiesConverter.convert(jwt);
         List<String> springRoles = jwt.getClaimAsStringList("spring_roles");
+        if (springRoles == null) {
+            log.warn("No roles from claim [sprint_roles] found");
+            springRoles = Collections.emptyList();
+        }
         List<GrantedAuthority> actualRoles = Stream.concat(convertedScopes.stream(),
                 springRoles.stream().filter(role -> role.startsWith("ROLE_"))
                         .map(SimpleGrantedAuthority::new)

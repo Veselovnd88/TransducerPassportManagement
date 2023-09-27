@@ -1,7 +1,5 @@
 package ru.veselov.gateway.security;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatusCode;
@@ -16,18 +14,13 @@ import ru.veselov.gateway.exception.ErrorCode;
 @Slf4j
 public class GatewayAccessDeniedHandler implements ServerAccessDeniedHandler {
     @Override
-    public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException ex) {
-        exchange.getResponse().getHeaders().add("Content-Type", "application/json");
-        ObjectMapper objectMapper = new ObjectMapper();
-        ApiErrorResponse apiErrorResponse = new ApiErrorResponse(ErrorCode.ERROR_UNAUTHORIZED,
-                "Something went wrong during authorization: " + ex.getMessage());
-        exchange.getResponse().setStatusCode(HttpStatusCode.valueOf(403));
-        byte[] messageBytes;
-        try {
-            messageBytes = objectMapper.writeValueAsBytes(apiErrorResponse);
-        } catch (JsonProcessingException e) {
-            messageBytes = "Can't create correct error message".getBytes();
-        }
+    public Mono<Void> handle(ServerWebExchange exchange, AccessDeniedException exception) {
+        exchange.getResponse().setStatusCode(HttpStatusCode.valueOf(401));
+        SecurityErrorHelper.addContentTypeHeaderToResponse(exchange);
+        ApiErrorResponse errorResponse = new ApiErrorResponse(ErrorCode.UNAUTHORIZED,
+                "Not correct role, " + exception.getMessage());
+        SecurityErrorHelper.addWWWAuthenticationHeaderWithErrorInformation(exchange, errorResponse);
+        byte[] messageBytes = SecurityErrorHelper.createJsonErrorMessage(errorResponse);
         DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(messageBytes);
         return exchange.getResponse().writeWith(Flux.just(buffer));
     }
