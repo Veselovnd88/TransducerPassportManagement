@@ -29,6 +29,12 @@ spring:
           filters:
             - StripPrefix=1
 
+        - id: zipkin
+          uri: http://localhost:9411
+          predicates:
+            - Path=/zipkin
+          filters:
+            - StripPrefix=1
 
   security:
     oauth2:
