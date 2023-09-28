@@ -20,21 +20,24 @@ public class GatewayAuthenticationEntryPoint implements ServerAuthenticationEntr
     public Mono<Void> commence(ServerWebExchange exchange, AuthenticationException exception) {
         exchange.getResponse().setStatusCode(HttpStatusCode.valueOf(401));
         SecurityErrorHelper.addContentTypeHeaderToResponse(exchange);
-        ApiErrorResponse errorResponse = createErrorResponse(exception);
+        ApiErrorResponse errorResponse = createErrorResponse(exchange, exception);
         SecurityErrorHelper.addWWWAuthenticationHeaderWithErrorInformation(exchange, errorResponse);
         byte[] messageBytes = SecurityErrorHelper.createJsonErrorMessage(errorResponse);
         DataBuffer buffer = exchange.getResponse().bufferFactory().wrap(messageBytes);
+        log.error("Error occurred during authentication: {}", errorResponse.getMessage());
         return exchange.getResponse().writeWith(Flux.just(buffer));
     }
 
-    private static ApiErrorResponse createErrorResponse(AuthenticationException exception) {
+    private static ApiErrorResponse createErrorResponse(ServerWebExchange exchange,
+                                                        AuthenticationException exception) {
+        String path = exchange.getRequest().getPath().value();
         if (exception instanceof InvalidBearerTokenException && exception.getMessage().startsWith("Jwt expired")) {
-            return new ApiErrorResponse(ErrorCode.JWT_EXPIRED, exception.getMessage());
+            return new ApiErrorResponse(ErrorCode.JWT_EXPIRED, exception.getMessage(), path);
         }
         if (exception instanceof AuthenticationCredentialsNotFoundException) {
-            return new ApiErrorResponse(ErrorCode.UNAUTHENTICATED, "Token not found in header");
+            return new ApiErrorResponse(ErrorCode.UNAUTHENTICATED, "Token not found in header", path);
         }
-        return new ApiErrorResponse(ErrorCode.UNAUTHENTICATED, exception.getMessage());
+        return new ApiErrorResponse(ErrorCode.UNAUTHENTICATED, exception.getMessage(), path);
     }
 
 }
