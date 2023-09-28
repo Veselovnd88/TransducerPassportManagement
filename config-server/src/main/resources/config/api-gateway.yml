@@ -10,7 +10,7 @@ spring:
         - id: passport
           uri: lb://PASSPORT
           predicates:
-            - Path=/api/v1/passport/**
+            - Path=/api/v1/passport/generate
 
         - id: template-storage
           uri: lb://TEMPLATE-STORAGE
@@ -20,7 +20,29 @@ spring:
         - id: managing
           uri: lb://MANAGING
           predicates:
-            - Path=/api/v1/customer/**,  /api/v1/transducer/**, /api/v1/serials/**
+            - Path=/api/v1/customer/**,  /api/v1/transducer/**, /api/v1/serials/**, /api/v1/passport/**
+
+        - id: discovery
+          uri: http://localhost:8761
+          predicates:
+            - Path=/eureka
+          filters:
+            - StripPrefix=1
+
+        - id: zipkin
+          uri: http://localhost:9411
+          predicates:
+            - Path=/zipkin
+          filters:
+            - StripPrefix=1
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: http://localhost:8079/realms/pt-management/protocol/openid-connect/certs
+          issuer-uri: http://localhost:8079/realms/pt-management
+
 eureka:
   client:
     service-url:
@@ -36,3 +58,7 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO

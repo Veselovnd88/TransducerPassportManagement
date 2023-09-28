@@ -71,7 +71,7 @@ services:
       KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-     # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
+      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       #kafka-console-consumer --topic passports --from-beginning --bootstrap-server localhost:9092 --partition 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
@@ -80,7 +80,46 @@ services:
     depends_on:
       - zookeeper
 
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    restart: unless-stopped
+    command: ["start-dev"]
+    environment:
+      KC_DB: postgres
+      KC_DB_USERNAME: admin
+      KC_DB_PASSWORD: admin
+      KC_DB_URL: "jdbc:postgresql://postgres-kc:5437/pt-keycloak"
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_LOG_LEVEL: info
+      KC_METRICS_ENABLED: true
+    ports:
+      - "8079:8080"
+    volumes:
+      - /var/docker-volumes/keycloak:/opt/keycloak/data/
+    networks:
+      - keycloak-postgres
+    depends_on:
+      - keycloak-postgres
+
+  keycloak-postgres:
+    container_name: postgres-kc
+    image: "postgres:15.2"
+    restart: unless-stopped
+    env_file:
+      - database-keycloak.env
+    command:
+      - "-p 5437"
+    ports:
+      - "5437:5437"
+    networks:
+      - keycloak-postgres
+    volumes:
+      - /var/docker-volumes/pg-keycloak-ps:/var/lib/postgresql/data/
+
 
 networks:
   postgres:
+    driver: bridge
+  keycloak-postgres:
     driver: bridge
