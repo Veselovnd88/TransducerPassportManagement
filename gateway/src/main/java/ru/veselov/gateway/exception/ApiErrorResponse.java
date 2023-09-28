@@ -13,4 +13,6 @@ public class ApiErrorResponse {
 
     private String message;
 
+    private String path;
+
 }

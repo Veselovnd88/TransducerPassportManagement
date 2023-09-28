@@ -6,6 +6,9 @@ import org.springframework.http.MediaType;
 import org.springframework.web.server.ServerWebExchange;
 import ru.veselov.gateway.exception.ApiErrorResponse;
 
+/**
+ * Utility class for creating error response and message
+ */
 public class SecurityErrorHelper {
 
     private SecurityErrorHelper() {
