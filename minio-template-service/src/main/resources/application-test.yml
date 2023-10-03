@@ -70,4 +70,4 @@ management:
 logging:
   level:
     ru.veselov.ru.veselov.miniotemplateservice: debug
-
+    org.apache.kafka: WARN

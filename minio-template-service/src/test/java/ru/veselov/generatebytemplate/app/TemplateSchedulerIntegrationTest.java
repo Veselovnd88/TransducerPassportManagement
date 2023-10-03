@@ -35,6 +35,9 @@ class TemplateSchedulerIntegrationTest extends PostgresContainersConfig {
     @MockBean
     MinioClient minioClient;
 
+    @MockBean
+    KafkaTestConsumer kafkaTestConsumer;
+
     @AfterEach
     void clear() {
         templateRepository.deleteAll();

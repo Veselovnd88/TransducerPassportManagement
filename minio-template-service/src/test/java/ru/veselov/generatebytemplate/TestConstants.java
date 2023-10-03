@@ -26,4 +26,6 @@ public class TestConstants {
 
     public static final UUID TEMPLATE_ID = UUID.randomUUID();
 
+    public static final String BUCKET = "bucket";
+
 }

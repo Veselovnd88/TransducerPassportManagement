@@ -26,6 +26,7 @@ public class TemplateInfoControllerValidationTest {
     @MockBean
     TemplateStorageService templateStorageService;
 
+
     @Test
     void shouldReturnErrorWithWrongUUID() {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/id/" + "notUUID").build())

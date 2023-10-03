@@ -61,6 +61,9 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     @MockBean
     MinioClient minioClient;
 
+    @MockBean
+    KafkaTestConsumer kafkaTestConsumer;
+
     @Captor
     ArgumentCaptor<GetObjectArgs> getObjectArgsCaptor;
 

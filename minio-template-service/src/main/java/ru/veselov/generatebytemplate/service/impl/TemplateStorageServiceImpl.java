@@ -33,7 +33,9 @@ import java.util.UUID;
 public class TemplateStorageServiceImpl implements TemplateStorageService {
 
     public static final String TEMPLATE_WITH_ID_NOT_FOUND_LOG = "Template with [id: {}] not found";
+
     public static final String TEMPLATE_WITH_ID_NOT_FOUND = "Template with [id: %s] not found";
+
     @Value("${template.templates-per-page}")
     private int templatesPerPage;
 
@@ -67,6 +69,7 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             log.error("Template with [id: {}] for sync not found", templateId);
             throw new EntityNotFoundException("Template with [id: %s] for sync not found".formatted(templateId));
         }
+
     }
 
     @Override

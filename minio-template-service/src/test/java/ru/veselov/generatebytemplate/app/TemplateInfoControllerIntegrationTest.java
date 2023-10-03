@@ -45,6 +45,9 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
     @MockBean
     MinioClient minioClient;
 
+    @MockBean
+    KafkaTestConsumer kafkaTestConsumer;
+
     @BeforeEach
     void init() {
         TemplateEntity templateEntity = new TemplateEntity();
