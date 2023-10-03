@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
 import ru.veselov.generatebytemplate.TestConstants;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
@@ -38,6 +38,9 @@ class TemplateSchedulerIntegrationTest extends PostgresContainersConfig {
     @MockBean
     KafkaTestConsumer kafkaTestConsumer;
 
+    @MockBean
+    KafkaAdmin kafkaAdmin;
+
     @AfterEach
     void clear() {
         templateRepository.deleteAll();
@@ -61,7 +64,6 @@ class TemplateSchedulerIntegrationTest extends PostgresContainersConfig {
         Assertions.assertThat(allAfterDelete).hasSize(1);
     }
 
-    @Transactional
     void saveUnSyncedTemplateToRepo(LocalDateTime createdAt) {
         TemplateEntity templateEntity = new TemplateEntity();
         templateEntity.setFilename(TestConstants.SAMPLE_FILENAME);
@@ -70,6 +72,7 @@ class TemplateSchedulerIntegrationTest extends PostgresContainersConfig {
         templateEntity.setSynced(false);
         templateEntity.setPtArt(TestConstants.ART);
         templateEntity.setCreatedAt(createdAt);
+        templateRepository.save(templateEntity);
     }
 
 }

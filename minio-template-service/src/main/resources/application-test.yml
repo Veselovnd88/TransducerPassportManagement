@@ -59,6 +59,7 @@ eureka:
     enabled: false
 
 scheduling:
+  #3 seconds
   delete-unsync: "*/3 * * * * *"
   days-until-delete: 5
 
