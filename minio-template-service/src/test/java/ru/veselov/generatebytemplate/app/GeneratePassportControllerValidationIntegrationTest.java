@@ -21,7 +21,7 @@ import java.util.UUID;
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 public class GeneratePassportControllerValidationIntegrationTest {
-    public static final String URL_PREFIX = "/api/v1/passport";
+    public static final String URL_PREFIX = "/api/v1/generate";
 
     public static final String TEMPLATE_ID = UUID.randomUUID().toString();
 
@@ -38,7 +38,7 @@ public class GeneratePassportControllerValidationIntegrationTest {
                 .set(Select.field(GeneratePassportsDto.class, "serials"), Collections.emptyList())
                 .create();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
                 .jsonPath("$.violations[0].fieldName").isEqualTo("serials");
@@ -50,7 +50,7 @@ public class GeneratePassportControllerValidationIntegrationTest {
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> null)
                 .create();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
                 .jsonPath("$.violations[0].fieldName").isEqualTo("templateId");
@@ -62,7 +62,7 @@ public class GeneratePassportControllerValidationIntegrationTest {
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> "notUUID")
                 .create();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
                 .jsonPath("$.violations[0].fieldName").isEqualTo("templateId");
@@ -75,7 +75,7 @@ public class GeneratePassportControllerValidationIntegrationTest {
                 .set(Select.field(GeneratePassportsDto.class, "printDate"), null)
                 .create();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
                 .jsonPath("$.violations[0].fieldName").isEqualTo("printDate");

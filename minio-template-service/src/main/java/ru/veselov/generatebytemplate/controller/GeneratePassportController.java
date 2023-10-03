@@ -18,7 +18,7 @@ import ru.veselov.generatebytemplate.service.PassportService;
 import java.time.Instant;
 
 @RestController
-@RequestMapping("api/v1/passport")
+@RequestMapping("api/v1/generate")
 @Validated
 @RequiredArgsConstructor
 @Slf4j
@@ -26,7 +26,7 @@ public class GeneratePassportController {
 
     private final PassportService passportService;
 
-    @PostMapping(value = "/generate", produces = MediaType.APPLICATION_PDF_VALUE)
+    @PostMapping(produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getPassportsPdf(@RequestBody @Valid GeneratePassportsDto generatePassportsDto) {
         byte[] pdfBytes = passportService.createPassportsPdf(generatePassportsDto);
         HttpHeaders headers = createHeaders(generatePassportsDto, pdfBytes.length);

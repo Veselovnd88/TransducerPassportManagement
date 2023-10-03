@@ -21,7 +21,7 @@ import java.util.UUID;
 @ExtendWith(MockitoExtension.class)
 class GeneratePassportControllerTest {
 
-    public static final String URL_PREFIX = "/api/v1/passport";
+    public static final String URL_PREFIX = "/api/v1/generate";
 
     public static final byte[] BYTES_OUT = new byte[]{1, 2, 4};
 
@@ -45,7 +45,7 @@ class GeneratePassportControllerTest {
                 .create();
         Mockito.when(passportService.createPassportsPdf(generatePassportsDto)).thenReturn(BYTES_OUT);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(BYTES_OUT.length)
@@ -58,7 +58,7 @@ class GeneratePassportControllerTest {
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> "not UUID")
                 .create();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isBadRequest();
     }
 
@@ -68,7 +68,7 @@ class GeneratePassportControllerTest {
                 .supply(Select.field(GeneratePassportsDto::getSerials), Collections::emptyList)
                 .create();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isBadRequest();
     }
 
@@ -78,7 +78,7 @@ class GeneratePassportControllerTest {
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> null)
                 .create();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isBadRequest();
     }
 
@@ -88,7 +88,7 @@ class GeneratePassportControllerTest {
                 .supply(Select.field(GeneratePassportsDto::getPrintDate), () -> null)
                 .create();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isBadRequest();
     }
 

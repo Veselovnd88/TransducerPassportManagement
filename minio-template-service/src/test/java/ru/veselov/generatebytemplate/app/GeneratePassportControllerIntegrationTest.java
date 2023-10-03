@@ -49,7 +49,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
     @Value("${minio.bucket-name}")
     private String bucketName;
 
-    public static final String URL_PREFIX = "/api/v1/passport";
+    public static final String URL_PREFIX = "/api/v1/generate";
 
     public static final int SIDE_PORT = 30003;
 
@@ -106,7 +106,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(DOCX_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(BYTES.length)
@@ -126,7 +126,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(new byte[]{1, 2, 3});
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_DOC_PROCESSING.toString());
     }
@@ -144,7 +144,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(DOCX_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_PDF_PROCESSING.toString());
     }
@@ -162,7 +162,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(DOCX_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_SERVICE_UNAVAILABLE.toString());
     }
@@ -171,7 +171,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
     void shouldReturnTemplateNotFoundError() {
         GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(TEMPLATE_ID);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/generate").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }
