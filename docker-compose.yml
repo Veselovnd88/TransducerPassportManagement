@@ -3,7 +3,7 @@ version: "3.8"
 
 services:
 
-  postgres:
+  postgres-pt:
     container_name: postgres-pt
     image: "postgres:15.2"
     restart: unless-stopped
@@ -12,7 +12,7 @@ services:
     ports:
       - "5433:5432"
     networks:
-      - postgres
+      - postgres-pt
     volumes:
       - /var/docker-volumes/pg-pt-management-ps:/var/lib/postgresql/data/
 
@@ -83,7 +83,7 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     restart: unless-stopped
-    command: ["start-dev"]
+    command: [ "start-dev" ]
     environment:
       KC_DB: postgres
       KC_DB_USERNAME: admin
@@ -118,8 +118,25 @@ services:
       - /var/docker-volumes/pg-keycloak-ps:/var/lib/postgresql/data/
 
 
+  postgres-template:
+    container_name: postgres-template
+    image: "postgres:15.2"
+    restart: unless-stopped
+    env_file:
+      - database-template.env
+    ports:
+      - "5434:5434"
+    command:
+      - "-p 5434"
+    networks:
+      - postgres-template
+    volumes:
+      - /var/docker-volumes/pg-pt-management-template:/var/lib/postgresql/data/
+
 networks:
-  postgres:
+  postgres-pt:
+    driver: bridge
+  postgres-template:
     driver: bridge
   keycloak-postgres:
     driver: bridge

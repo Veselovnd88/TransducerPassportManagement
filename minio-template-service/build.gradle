@@ -45,9 +45,7 @@ dependencies {
     implementation "org.apache.poi:poi:${poi}"
     implementation 'commons-io:commons-io:2.13.0'
     implementation 'org.springframework.kafka:spring-kafka'
-
-
-    implementation project(':liquibase-migration')
+    implementation 'org.liquibase:liquibase-core'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'

@@ -3,10 +3,13 @@ server:
 
 spring:
   application:
-    name: template-storage
+    name: generate-by-template
   profiles:
     active: default
 
-
   config:
     import: "optional:configserver:http://localhost:8071"
+
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.yaml

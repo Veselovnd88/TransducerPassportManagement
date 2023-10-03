@@ -6,6 +6,7 @@ spring:
     name: generate-by-template
   cache:
     cache-names: template
+
   datasource:
     url: jdbc:postgresql://localhost:5434/TemplateDB
     username: admin
@@ -46,8 +47,6 @@ placeholder:
 pdf-service:
   url: "http://localhost:3000/forms/libreoffice/convert"
   filename: "fileToConvert"
-
-
 
 template:
   templates-per-page: 10
