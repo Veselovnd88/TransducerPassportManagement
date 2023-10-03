@@ -47,6 +47,8 @@ pdf-service:
   url: "http://localhost:3000/forms/libreoffice/convert"
   filename: "fileToConvert"
 
+
+
 template:
   templates-per-page: 10
 
@@ -56,18 +58,17 @@ eureka:
       defaultZone: http://localhost:8761/eureka
     fetch-registry: true
     register-with-eureka: true
-    enabled: false
+    enabled: true
 
 scheduling:
-  delete-unsync: "*/3 * * * * *"
+  delete-unsync: "@weekly"
   days-until-delete: 5
 
 management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health
   tracing:
     sampling:
       probability: 1.0
-
-logging:
-  level:
-    ru.veselov.ru.veselov.miniotemplateservice: debug
-
