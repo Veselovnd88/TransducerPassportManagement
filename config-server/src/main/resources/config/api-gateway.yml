@@ -7,15 +7,10 @@ spring:
   cloud:
     gateway:
       routes:
-        - id: passport
-          uri: lb://PASSPORT
-          predicates:
-            - Path=/api/v1/passport/generate
-
         - id: template-storage
           uri: lb://TEMPLATE-STORAGE
           predicates:
-            - Path=/api/v1/template/**
+            - Path=/api/v1/template/**, /api/v1/generate
 
         - id: managing
           uri: lb://MANAGING
@@ -26,13 +21,6 @@ spring:
           uri: http://localhost:8761
           predicates:
             - Path=/eureka
-          filters:
-            - StripPrefix=1
-
-        - id: zipkin
-          uri: http://localhost:9411
-          predicates:
-            - Path=/zipkin
           filters:
             - StripPrefix=1
 
