@@ -1,4 +1,4 @@
-rootProject.name = 'minio-template-service'
+rootProject.name = 'generate-by-template-service'
 
 include ':liquibase-migration'
 
