@@ -6,10 +6,10 @@ import org.springframework.cloud.context.config.annotation.RefreshScope;
 
 @SpringBootApplication
 @RefreshScope
-public class MinioTemplateServiceApplication {
+public class GenerateByTemplateApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MinioTemplateServiceApplication.class, args);
+		SpringApplication.run(GenerateByTemplateApplication.class, args);
 	}
 
 }
