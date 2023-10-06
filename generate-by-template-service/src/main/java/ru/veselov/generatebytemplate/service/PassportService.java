@@ -4,6 +4,6 @@ import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 
 public interface PassportService {
 
-    byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto);
+    void createPassportsPdf(GeneratePassportsDto generatePassportsDto);
 
 }

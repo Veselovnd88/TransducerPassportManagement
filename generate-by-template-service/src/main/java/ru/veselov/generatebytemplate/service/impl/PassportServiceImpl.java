@@ -9,6 +9,7 @@ import org.springframework.kafka.support.KafkaHeaders;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.support.MessageBuilder;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
@@ -48,8 +49,9 @@ public class PassportServiceImpl implements PassportService {
 
     private final KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate;
 
+    @Async(value = "asyncThreadPoolTaskExecutor")
     @Override
-    public byte[] createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
+    public void createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
         log.info("Starting process of generating passports");
         ByteArrayResource templateByteArrayResource = passportTemplateService
                 .getTemplate(generatePassportsDto.getTemplateId());
@@ -63,7 +65,6 @@ public class PassportServiceImpl implements PassportService {
         byte[] pdfBytes = pdfService.createPdf(sourceBytes);
         log.debug("Sending message to broker: [{}]", generatePassportsDto);
         sendToMessageBroker(generatePassportsDto);
-        return pdfBytes;
     }
 
     private void sendToMessageBroker(GeneratePassportsDto generatePassportsDto) {
