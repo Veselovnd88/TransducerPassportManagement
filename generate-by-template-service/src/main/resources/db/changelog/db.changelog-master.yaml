@@ -1,3 +1,5 @@
 databaseChangeLog:
   - include:
       file: db/changelog/changelogs/01-changelog-create-template-table.yaml
+  - include:
+      file: db/changelog/changelogs/02-changelog-create-generated-result-file-table.yaml

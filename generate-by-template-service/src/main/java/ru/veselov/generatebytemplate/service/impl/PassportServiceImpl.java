@@ -13,12 +13,16 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
+import ru.veselov.generatebytemplate.model.GeneratedResultFile;
 import ru.veselov.generatebytemplate.service.PassportGeneratorService;
 import ru.veselov.generatebytemplate.service.PassportService;
 import ru.veselov.generatebytemplate.service.PassportTemplateService;
 import ru.veselov.generatebytemplate.service.PdfService;
+import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -49,6 +53,8 @@ public class PassportServiceImpl implements PassportService {
 
     private final KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate;
 
+    private final GeneratedResultFileService generatedResultFileService;
+
     @Async(value = "asyncThreadPoolTaskExecutor")
     @Override
     public void createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
@@ -62,7 +68,12 @@ public class PassportServiceImpl implements PassportService {
                         serials,
                         templateByteArrayResource,
                         getFormattedDate(generatePassportsDto.getPrintDate()));
-        byte[] pdfBytes = pdfService.createPdf(sourceBytes);
+        ByteArrayResource pdfBytes = pdfService.createPdf(sourceBytes);
+        GeneratedResultFile resultFile = GeneratedResultFile.builder()
+                .filename(createFilenameFromGeneratePassportsDto(generatePassportsDto))
+                .build();
+        log.debug("Saving generated file to storage");
+        generatedResultFileService.save(pdfBytes, resultFile);
         log.debug("Sending message to broker: [{}]", generatePassportsDto);
         sendToMessageBroker(generatePassportsDto);
     }
@@ -85,6 +96,15 @@ public class PassportServiceImpl implements PassportService {
     private String getFormattedDate(LocalDate localDate) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
         return dateTimeFormatter.format(localDate);
+    }
+
+    private String createFilenameFromGeneratePassportsDto(GeneratePassportsDto generatePassportsDto) {
+        String templateId = generatePassportsDto.getTemplateId();
+        LocalDate printDate = generatePassportsDto.getPrintDate();
+        int serialsCount = generatePassportsDto.getSerials().size();
+        String formattedPrintDate = getFormattedDate(printDate);
+        long dateTimePostfix = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+        return templateId + "-" + formattedPrintDate + "-" + serialsCount + dateTimePostfix;
     }
 
 }

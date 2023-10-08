@@ -1,0 +1,22 @@
+databaseChangeLog:
+  - changeSet:
+      id: createGeneratedResultFileTable
+      author: Veselov Nikolay
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: script/03-create-generated-result-file-table.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: scripts/04-drop-generated-result-file-table.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true

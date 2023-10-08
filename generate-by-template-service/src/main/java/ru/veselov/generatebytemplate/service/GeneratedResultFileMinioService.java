@@ -4,7 +4,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import ru.veselov.generatebytemplate.model.GeneratedResultFile;
 
-public interface ResultFileMinioService {
+public interface GeneratedResultFileMinioService {
 
     String saveResult(Resource resource, GeneratedResultFile resultFile);
 

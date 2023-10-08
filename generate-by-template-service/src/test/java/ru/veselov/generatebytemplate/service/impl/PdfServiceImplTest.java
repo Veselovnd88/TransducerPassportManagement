@@ -9,6 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.buffer.DataBuffer;
 import ru.veselov.generatebytemplate.exception.PdfProcessingException;
 import ru.veselov.generatebytemplate.service.PdfHttpClient;
@@ -34,9 +35,9 @@ class PdfServiceImplTest {
         Mockito.when(mockDataBuffer.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
         Mockito.when(pdfHttpClient.sendRequestForConvertingDocxToPdf(ArgumentMatchers.any()))
                 .thenReturn(mockDataBuffer);
-        byte[] pdfBytes = pdfService.createPdf(SOURCE);
+        ByteArrayResource pdfBytes = pdfService.createPdf(SOURCE);
 
-        Assertions.assertThat(pdfBytes).isNotNull();
+        Assertions.assertThat(pdfBytes.getByteArray()).isNotNull();
     }
 
     @Test

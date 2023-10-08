@@ -1,7 +1,9 @@
 package ru.veselov.generatebytemplate.service;
 
+import org.springframework.core.io.ByteArrayResource;
+
 public interface PdfService {
 
-    byte[] createPdf(byte[] source);
+    ByteArrayResource createPdf(byte[] source);
 
 }

@@ -11,14 +11,14 @@ import org.springframework.stereotype.Service;
 import ru.veselov.generatebytemplate.exception.CommonMinioException;
 import ru.veselov.generatebytemplate.model.GeneratedResultFile;
 import ru.veselov.generatebytemplate.service.MinioHelper;
-import ru.veselov.generatebytemplate.service.ResultFileMinioService;
+import ru.veselov.generatebytemplate.service.GeneratedResultFileMinioService;
 
 import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ResultFileMinioServiceImpl implements ResultFileMinioService {
+public class GeneratedGeneratedResultFileMinioServiceImpl implements GeneratedResultFileMinioService {
 
     @Value("${minio.bucket.results}")
     private String resultBucket;
