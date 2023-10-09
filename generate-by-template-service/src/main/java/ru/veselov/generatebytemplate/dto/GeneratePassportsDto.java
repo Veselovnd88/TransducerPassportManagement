@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.validator.constraints.UUID;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ public class GeneratePassportsDto {
     private List<SerialNumberDto> serials = new ArrayList<>();
 
     @NotNull
-    @org.hibernate.validator.constraints.UUID
+    @UUID
     private String templateId;
 
     @NotNull

@@ -21,6 +21,9 @@ public class GeneratedResultFile {
 
     private String bucket;
 
+    @org.hibernate.validator.constraints.UUID
+    private String templateId;
+
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime createdAt;
 

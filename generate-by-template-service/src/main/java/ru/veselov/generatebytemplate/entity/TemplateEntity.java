@@ -5,17 +5,18 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "pass_template")
-@Data
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
+@Getter
+@Setter
 public class TemplateEntity extends BaseEntity {
 
     @Column(name = "pt_art", nullable = false)
@@ -36,5 +37,20 @@ public class TemplateEntity extends BaseEntity {
 
     @Column(name = "synced")
     private Boolean synced;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TemplateEntity that = (TemplateEntity) o;
+        return Objects.equals(getPtArt(), that.getPtArt()) && Objects.equals(getTemplateName(), that.getTemplateName())
+                && Objects.equals(getFilename(), that.getFilename()) && Objects.equals(getBucket(), that.getBucket())
+                && Objects.equals(getEditedAt(), that.getEditedAt()) && Objects.equals(getSynced(), that.getSynced());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPtArt(), getTemplateName(), getFilename(), getBucket(), getEditedAt(), getSynced());
+    }
 
 }

@@ -14,11 +14,11 @@ import org.springframework.stereotype.Service;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
 import ru.veselov.generatebytemplate.model.GeneratedResultFile;
+import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
 import ru.veselov.generatebytemplate.service.PassportGeneratorService;
 import ru.veselov.generatebytemplate.service.PassportService;
 import ru.veselov.generatebytemplate.service.PassportTemplateService;
 import ru.veselov.generatebytemplate.service.PdfService;
-import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,6 +71,7 @@ public class PassportServiceImpl implements PassportService {
         ByteArrayResource pdfBytes = pdfService.createPdf(sourceBytes);
         GeneratedResultFile resultFile = GeneratedResultFile.builder()
                 .filename(createFilenameFromGeneratePassportsDto(generatePassportsDto))
+                .templateId(generatePassportsDto.getTemplateId())
                 .build();
         log.debug("Saving generated file to storage");
         generatedResultFileService.save(pdfBytes, resultFile);

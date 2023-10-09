@@ -40,9 +40,10 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
     private int templatesPerPage;
 
     @Value("${scheduling.days-until-delete}")
-    private int daysUntilDelete;
+    private int daysUntilDelete;//TODO delete from tests
 
     private final TemplateRepository templateRepository;
+
 
     private final TemplateMapper templateMapper;
 
@@ -136,7 +137,7 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
         }
     }
 
-    @Scheduled(cron = "${scheduling.delete-unsync}")
+    @Scheduled(cron = "${scheduling.delete-unsync}")//TODO delete
     @Transactional
     @Override
     public void deleteUnSynchronized() {

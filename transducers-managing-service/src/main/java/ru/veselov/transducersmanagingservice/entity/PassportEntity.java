@@ -10,19 +10,21 @@ import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "passport")
-@Data
-@EqualsAndHashCode(callSuper = false)
 @NoArgsConstructor
 @AllArgsConstructor
+@Getter
+@Setter
 @Builder
+
 public class PassportEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)//fields would be filled with queries
@@ -36,4 +38,17 @@ public class PassportEntity extends BaseEntity {
     @Temporal(TemporalType.DATE)
     private LocalDate printDate;
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        PassportEntity that = (PassportEntity) o;
+        return Objects.equals(getSerialNumber(), that.getSerialNumber()) && Objects.equals(getTemplate(), that.getTemplate()) && Objects.equals(getPrintDate(), that.getPrintDate());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), getSerialNumber(), getTemplate(), getPrintDate());
+    }
 }

@@ -13,6 +13,6 @@ public interface GeneratedResultFileStorageService {
 
     GeneratedResultFile findById(String resultFileId);
 
-    void delete(String resultFileId);
+    void deleteExpired(String resultFileId);
 
 }
