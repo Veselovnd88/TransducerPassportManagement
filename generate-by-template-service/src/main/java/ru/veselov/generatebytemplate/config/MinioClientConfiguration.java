@@ -37,22 +37,23 @@ public class MinioClientConfiguration {
     }
 
     @EventListener(ContextRefreshedEvent.class)
-    public void createTemplateBucket() {
-        BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder().bucket(minioProperty.getBucketName()).build();
-        try {
-            boolean isBucketCreated = minioClient().bucketExists(bucketExistsArgs);
-            if (!isBucketCreated) {
-                MakeBucketArgs makeBucket = MakeBucketArgs.builder().bucket(minioProperty.getBucketName()).build();
-                minioClient().makeBucket(makeBucket);
-                log.trace("Creating buckets");
-                //TODO create bucket for ready generated files
+    public void createBuckets() {
+        minioProperty.getBuckets().forEach((k, v) -> {
+            BucketExistsArgs bucketExistsArgs = BucketExistsArgs.builder().bucket(v).build();
+            try {
+                boolean isBucketCreated = minioClient().bucketExists(bucketExistsArgs);
+                if (!isBucketCreated) {
+                    MakeBucketArgs makeBucket = MakeBucketArgs.builder().bucket(v).build();
+                    minioClient().makeBucket(makeBucket);
+                    log.trace("Creating buckets");
+                }
+            } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
+                     InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException |
+                     XmlParserException e) {
+                log.error("Error during MinIO client constructing caused [{}]", e.getMessage());
+                throw new CommonMinioException(e.getMessage(), e);
             }
-        } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
-                 InvalidResponseException | IOException | NoSuchAlgorithmException | ServerException |
-                 XmlParserException e) {
-            log.error("Error during MinIO client constructing caused [{}]", e.getMessage());
-            throw new CommonMinioException(e.getMessage(), e);
-        }
+        });
     }
 
 }

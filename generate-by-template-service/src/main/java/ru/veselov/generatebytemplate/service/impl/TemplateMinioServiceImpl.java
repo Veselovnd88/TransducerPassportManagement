@@ -1,7 +1,6 @@
 package ru.veselov.generatebytemplate.service.impl;
 
 import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
 import lombok.RequiredArgsConstructor;
@@ -25,10 +24,8 @@ import java.io.IOException;
 @Slf4j
 public class TemplateMinioServiceImpl implements TemplateMinioService {
 
-    @Value("${minio.bucket.template}")
+    @Value("${minio.buckets.template}")
     private String templateBucket;
-
-    private final MinioClient minioClient;
 
     private final MinioHelper minioHelper;
 

@@ -17,8 +17,14 @@ import java.time.LocalDateTime;
 @Slf4j
 public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
 
-    @Value("${scheduling.days-until-delete}")
-    private int daysUntilDeleteUnSync;
+    @Value("${scheduling.days-until-delete-unsync-template}")
+    private int daysUntilDeleteUnSyncTemplate;
+
+    @Value("${scheduling.days-until-delete-unsync-result}")
+    private int daysUntilDeleteUnSyncResult;
+
+    @Value("${scheduling.days-until-delete-result}")
+    private int daysUntilDeleteResult;
 
     private TemplateRepository templateRepository;
 
@@ -26,20 +32,29 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
 
     @Override
     @Transactional
-    @Scheduled(cron = "${scheduling.delete-unsync}")
+    @Scheduled(cron = "${scheduling.delete-unsync-template}")
     public void deleteUnSynchronizedTemplates() {
-        LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteUnSync);
+        LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteUnSyncTemplate);
         templateRepository.deleteAllWithUnSyncFalse(deleteDate);
+        log.info("UnSynchronized template records deleted until");
     }
 
     @Override
+    @Transactional
+    @Scheduled(cron = "${scheduling.delete-unsync-result}")
     public void deleteUnSynchronizedGenerateResultFiles() {
-        LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteUnSync);
-        //TODO
+        LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteUnSyncResult);
+        generatedResultFileRepository.deleteAllWithUnSyncFalse(deleteDate);
+        log.info("UnSynchronized results deleted");
     }
 
     @Override
-    public void deleteGeneratedResultFilesWithNullTemplates() {
-
+    @Transactional
+    @Scheduled(cron = "${scheduling.delete-result}")
+    public void deleteExpiredResultFiles() {
+        LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteResult);
+        generatedResultFileRepository.deleteExpiredResultFiles(deleteDate);
+        log.info("Expired result files deleted");
     }
+
 }

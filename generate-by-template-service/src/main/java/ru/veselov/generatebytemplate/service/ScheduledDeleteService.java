@@ -6,6 +6,6 @@ public interface ScheduledDeleteService {
 
     void deleteUnSynchronizedGenerateResultFiles();
 
-    void deleteGeneratedResultFilesWithNullTemplates();
+    void deleteExpiredResultFiles();
 
 }

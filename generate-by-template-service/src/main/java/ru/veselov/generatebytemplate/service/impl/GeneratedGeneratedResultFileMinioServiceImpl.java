@@ -20,7 +20,7 @@ import java.io.IOException;
 @Slf4j
 public class GeneratedGeneratedResultFileMinioServiceImpl implements GeneratedResultFileMinioService {
 
-    @Value("${minio.bucket.results}")
+    @Value("${minio.buckets.result}")
     private String resultBucket;
 
     private final MinioHelper minioHelper;

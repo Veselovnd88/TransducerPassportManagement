@@ -76,8 +76,4 @@ public class GeneratedResultFileStorageServiceImpl implements GeneratedResultFil
         return generatedResultFileMapper.toModel(resultFileEntity);
     }
 
-    @Override
-    public void delete(String resultFileId) {
-
-    }
 }

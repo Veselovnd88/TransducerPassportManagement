@@ -36,7 +36,7 @@ minio:
   url: http://localhost:9000
   accessKey: admin
   secretKey: secretsecret
-  bucket:
+  buckets:
     template: templates
     result: results
 
@@ -59,12 +59,16 @@ eureka:
       defaultZone: http://localhost:8761/eureka
     fetch-registry: true
     register-with-eureka: true
-    enabled: true
+    enabled: false
 
 
 scheduling:
-  delete-unsync: "@weekly"
-  days-until-delete: 5
+  delete-unsync-template: "@weekly"
+  days-until-delete-unsync-template: 5
+  delete-unsync-result: "@weekly"
+  days-until-delete-unsync-result: 2
+  delete-result: "@weekly"
+  days-until-delete-result: 3
 
 management:
   endpoints:

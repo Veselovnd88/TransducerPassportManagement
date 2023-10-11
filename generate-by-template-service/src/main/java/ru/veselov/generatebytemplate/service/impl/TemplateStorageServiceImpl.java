@@ -39,9 +39,6 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
     @Value("${template.templates-per-page}")
     private int templatesPerPage;
 
-    @Value("${scheduling.days-until-delete}")
-    private int daysUntilDelete;//TODO delete from tests
-
     private final TemplateRepository templateRepository;
 
 
@@ -135,14 +132,6 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             log.error(TEMPLATE_WITH_ID_NOT_FOUND_LOG, templateId);
             throw new EntityNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
         }
-    }
-
-    @Scheduled(cron = "${scheduling.delete-unsync}")//TODO delete
-    @Transactional
-    @Override
-    public void deleteUnSynchronized() {
-        LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDelete);
-        templateRepository.deleteAllWithUnSyncFalse(deleteDate);
     }
 
     private Pageable createPageable(int page, String sort, String order) {

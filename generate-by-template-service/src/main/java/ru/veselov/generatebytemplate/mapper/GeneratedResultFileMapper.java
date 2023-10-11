@@ -8,8 +8,7 @@ import ru.veselov.generatebytemplate.model.GeneratedResultFile;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface GeneratedResultFileMapper {
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
+
     @Mapping(target = "templateEntity", ignore = true)
     GeneratedResultFileEntity toEntity(GeneratedResultFile generatedResultFile);
 

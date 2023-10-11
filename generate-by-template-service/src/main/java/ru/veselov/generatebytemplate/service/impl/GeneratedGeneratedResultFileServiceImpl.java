@@ -40,4 +40,5 @@ public class GeneratedGeneratedResultFileServiceImpl implements GeneratedResultF
         log.info("Generated file retrieved from storage: [id: {}]", resultFileId);
         return resultFile;
     }
+
 }

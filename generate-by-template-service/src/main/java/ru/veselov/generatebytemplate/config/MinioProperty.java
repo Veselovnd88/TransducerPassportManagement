@@ -4,6 +4,8 @@ import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+
 @Data
 @Component
 @ConfigurationProperties(prefix = "minio")
@@ -15,6 +17,6 @@ public class MinioProperty {
 
     private String secretKey;
 
-    private String bucketName;
+    private Map<String, String> buckets;
 
 }

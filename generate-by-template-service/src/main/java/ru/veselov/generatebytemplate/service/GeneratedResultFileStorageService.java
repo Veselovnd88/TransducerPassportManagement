@@ -13,6 +13,4 @@ public interface GeneratedResultFileStorageService {
 
     GeneratedResultFile findById(String resultFileId);
 
-    void deleteExpired(String resultFileId);
-
 }
