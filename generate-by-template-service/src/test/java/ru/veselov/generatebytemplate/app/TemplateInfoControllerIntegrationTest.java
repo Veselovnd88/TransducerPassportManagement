@@ -12,7 +12,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import ru.veselov.generatebytemplate.TestConstants;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.exception.error.ErrorCode;
@@ -51,11 +51,11 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
     @BeforeEach
     void init() {
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setFilename(TestConstants.SAMPLE_FILENAME);
-        templateEntity.setTemplateName(TestConstants.SAMPLE_TEMPLATE);
+        templateEntity.setFilename(TestUtils.SAMPLE_FILENAME);
+        templateEntity.setTemplateName(TestUtils.SAMPLE_TEMPLATE);
         templateEntity.setBucket(bucketName);
         templateEntity.setSynced(true);
-        templateEntity.setPtArt(TestConstants.ART);
+        templateEntity.setPtArt(TestUtils.ART);
         savedTemplate = templateRepository.save(templateEntity);
         savedTemplateId = savedTemplate.getId();
     }
@@ -70,10 +70,10 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/id/" + savedTemplateId).build())
                 .exchange().expectStatus().isOk().expectBody()
                 .jsonPath("$.id").isEqualTo(savedTemplateId.toString())
-                .jsonPath("$.ptArt").isEqualTo(TestConstants.ART)
+                .jsonPath("$.ptArt").isEqualTo(TestUtils.ART)
                 .jsonPath("$.bucket").isEqualTo(bucketName)
-                .jsonPath("$.templateName").isEqualTo(TestConstants.SAMPLE_TEMPLATE)
-                .jsonPath("$.filename").isEqualTo(TestConstants.SAMPLE_FILENAME)
+                .jsonPath("$.templateName").isEqualTo(TestUtils.SAMPLE_TEMPLATE)
+                .jsonPath("$.filename").isEqualTo(TestUtils.SAMPLE_FILENAME)
                 .jsonPath("$.createdAt").isEqualTo(savedTemplate.getCreatedAt()
                         .format(DateTimeFormatter.ofPattern("yyyy-mm-dd HH:mm:ss")))
                 .jsonPath("$.editedAt").doesNotExist();
@@ -95,13 +95,13 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         //sort by templateName, descending
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
-                        .queryParam(TestConstants.PAGE, 0)
-                        .queryParam(TestConstants.SORT, "templateName")
+                        .queryParam(TestUtils.PAGE, 0)
+                        .queryParam(TestUtils.SORT, "templateName")
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
                 .jsonPath("$.size()").isEqualTo(3)
-                .jsonPath("$[0].templateName").isEqualTo(TestConstants.SAMPLE_TEMPLATE);
+                .jsonPath("$[0].templateName").isEqualTo(TestUtils.SAMPLE_TEMPLATE);
     }
 
     @Test
@@ -109,9 +109,9 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         //sort by createdAt, asc
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
-                        .queryParam(TestConstants.PAGE, 0)
-                        .queryParam(TestConstants.SORT, "templateName")
-                        .queryParam(TestConstants.ORDER, "asc")
+                        .queryParam(TestUtils.PAGE, 0)
+                        .queryParam(TestUtils.SORT, "templateName")
+                        .queryParam(TestUtils.ORDER, "asc")
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
@@ -124,14 +124,14 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         //sort by ptArt, desc
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
-                        .queryParam(TestConstants.PAGE, 0)
-                        .queryParam(TestConstants.SORT, "ptArt")
-                        .queryParam(TestConstants.ORDER, "desc")
+                        .queryParam(TestUtils.PAGE, 0)
+                        .queryParam(TestUtils.SORT, "ptArt")
+                        .queryParam(TestUtils.ORDER, "desc")
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
                 .jsonPath("$.size()").isEqualTo(3)
-                .jsonPath("$[0].templateName").isEqualTo(TestConstants.SAMPLE_TEMPLATE);
+                .jsonPath("$[0].templateName").isEqualTo(TestUtils.SAMPLE_TEMPLATE);
     }
 
     @Test
@@ -139,9 +139,9 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         //sort by ptArt, asc
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
-                        .queryParam(TestConstants.PAGE, 0)
-                        .queryParam(TestConstants.SORT, "ptArt")
-                        .queryParam(TestConstants.ORDER, "asc")
+                        .queryParam(TestUtils.PAGE, 0)
+                        .queryParam(TestUtils.SORT, "ptArt")
+                        .queryParam(TestUtils.ORDER, "asc")
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
@@ -154,19 +154,19 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         saveTwoMoreEntities();
         // try to find with 801
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all/ptArt").path("/801")
-                        .queryParam(TestConstants.PAGE, 0).build())
+                        .queryParam(TestUtils.PAGE, 0).build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
                 .jsonPath("$.size()").isEqualTo(2);
         //try to find full 801877
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all/ptArt").path("/801877")
-                        .queryParam(TestConstants.PAGE, 0).build())
+                        .queryParam(TestUtils.PAGE, 0).build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
                 .jsonPath("$.size()").isEqualTo(1);
         //try to find 01
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all/ptArt").path("/01")
-                        .queryParam(TestConstants.PAGE, 0).build())
+                        .queryParam(TestUtils.PAGE, 0).build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
                 .jsonPath("$.size()").isEqualTo(3);
@@ -174,7 +174,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
 
     @Test
     void shouldReturnPageExceedsMaxError() {
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").queryParam(TestConstants.PAGE, 100).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all").queryParam(TestUtils.PAGE, 100).build())
                 .exchange().expectStatus().isBadRequest()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_MAX_PAGE.toString());
     }

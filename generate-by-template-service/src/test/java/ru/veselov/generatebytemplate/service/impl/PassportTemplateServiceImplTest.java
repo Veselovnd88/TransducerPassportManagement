@@ -19,7 +19,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
-import ru.veselov.generatebytemplate.TestConstants;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.dto.TemplateDto;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.mapper.TemplateMapper;
@@ -63,7 +63,7 @@ class PassportTemplateServiceImplTest {
                 MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
         TemplateDto templateDto = new TemplateDto("name", "801877", "templates");
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setId(TestConstants.TEMPLATE_ID);
+        templateEntity.setId(TestUtils.TEMPLATE_ID);
 
         Mockito.when(templateStorageService.saveTemplateUnSynced(ArgumentMatchers.any()))
                 .thenReturn(templateEntity);
@@ -122,11 +122,11 @@ class PassportTemplateServiceImplTest {
 
     @Test
     void shouldCallServicesToUpdate() {
-        String templateId = TestConstants.TEMPLATE_ID.toString();
+        String templateId = TestUtils.TEMPLATE_ID.toString();
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
                 MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
         Template template = Instancio.of(Template.class)
-                .set(Select.field("id"), TestConstants.TEMPLATE_ID).create();
+                .set(Select.field("id"), TestUtils.TEMPLATE_ID).create();
         Mockito.when(templateStorageService.findTemplateById(templateId)).thenReturn(template);
 
         passportTemplateService.updateTemplate(multipartFile, templateId);

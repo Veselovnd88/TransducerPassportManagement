@@ -15,10 +15,12 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.messaging.Message;
 import org.springframework.test.util.ReflectionTestUtils;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
-import ru.veselov.generatebytemplate.service.PassportGeneratorService;
-import ru.veselov.generatebytemplate.service.PassportTemplateService;
+import ru.veselov.generatebytemplate.model.GeneratedResultFile;
+import ru.veselov.generatebytemplate.service.DocxPassportService;
+import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
 import ru.veselov.generatebytemplate.service.PdfService;
 
 import java.time.LocalDate;
@@ -31,13 +33,14 @@ import java.util.concurrent.CompletableFuture;
 @SuppressWarnings({"rawtypes", "unchecked"})
 class PassportServiceImplTest {
 
-    public static byte[] SOURCE = new byte[]{1, 2, 3, 4};
-
     public static List<SerialNumberDto> SERIALS_DTOS = List.of(
             new SerialNumberDto("1", UUID.randomUUID().toString()),
             new SerialNumberDto("2", UUID.randomUUID().toString()),
             new SerialNumberDto("3", UUID.randomUUID().toString()));
+
     public static List<String> SERIALS = List.of("1", "2", "3");
+
+    public static ByteArrayResource byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
 
     public static final String DATE_FORMAT = "dd-MM-yyyy";
 
@@ -46,13 +49,13 @@ class PassportServiceImplTest {
     public static final LocalDate DATE = LocalDate.now();
 
     @Mock
-    PassportGeneratorService passportGeneratorService;
+    DocxPassportService docxPassportService;
 
     @Mock
     PdfService pdfService;
 
     @Mock
-    PassportTemplateService passportTemplateService;
+    GeneratedResultFileService generatedResultFileService;
 
     @Mock
     KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate;
@@ -61,7 +64,10 @@ class PassportServiceImplTest {
     PassportServiceImpl passportService;
 
     @Captor
-    ArgumentCaptor<Message<GeneratePassportsDto>> argumentCaptor;
+    ArgumentCaptor<Message<GeneratePassportsDto>> messageArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<GeneratedResultFile> generatedResultFileArgumentCaptor;
 
     @BeforeEach
     void init() {
@@ -70,27 +76,27 @@ class PassportServiceImplTest {
 
     @Test
     void shouldCallServicesForReturningByteArray() {
-        GeneratePassportsDto generatePassportsDto = new GeneratePassportsDto(
-                SERIALS_DTOS, UUID.randomUUID().toString(), DATE);
-        ByteArrayResource byteArrayResource = new ByteArrayResource(SOURCE);
-        Mockito.when(passportTemplateService.getTemplate(ArgumentMatchers.anyString()))
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
+        Mockito.when(docxPassportService.createDocxPassports(generatePassportsDto))
                 .thenReturn(byteArrayResource);
-        Mockito.when(passportGeneratorService.generatePassports(
-                SERIALS, byteArrayResource, DTF.format(DATE)
-        )).thenReturn(SOURCE);
-        Mockito.when(pdfService.createPdf(ArgumentMatchers.any())).thenReturn(SOURCE);
+        /*Mockito.when(passportTemplateService.getTemplate(ArgumentMatchers.anyString())).thenReturn(byteArrayResource);
+        Mockito.when(docxGeneratorService.generateDocx(SERIALS, byteArrayResource, DTF.format(DATE)))
+                .thenReturn(TestUtils.SOURCE_BYTES);*/
+        Mockito.when(pdfService.createPdf(ArgumentMatchers.any())).thenReturn(byteArrayResource);
         CompletableFuture mockCF = Mockito.mock(CompletableFuture.class);
         Mockito.when(kafkaTemplate.send(ArgumentMatchers.any(Message.class))).thenReturn(mockCF);
 
         passportService.createPassportsPdf(generatePassportsDto);
+        Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto);
+        /*Mockito.verify(passportTemplateService, Mockito.times(1)).getTemplate(generatePassportsDto.getTemplateId());
+        Mockito.verify(docxGeneratorService, Mockito.times(1))
+                .generateDocx(SERIALS, byteArrayResource, DTF.format(DATE));*/
+        Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource);
+        Mockito.verify(generatedResultFileService, Mockito.times(1))
+                .save(ArgumentMatchers.any(ByteArrayResource.class), generatedResultFileArgumentCaptor.capture());
 
-        Mockito.verify(passportTemplateService, Mockito.times(1)).getTemplate(ArgumentMatchers.anyString());
-        Mockito.verify(passportGeneratorService, Mockito.times(1))
-                .generatePassports(SERIALS, byteArrayResource, DTF.format(DATE));
-        Mockito.verify(pdfService, Mockito.times(1)).createPdf(SOURCE);
-
-        Mockito.verify(kafkaTemplate, Mockito.times(1)).send(argumentCaptor.capture());
-        Message<GeneratePassportsDto> captured = argumentCaptor.getValue();
+        Mockito.verify(kafkaTemplate, Mockito.times(1)).send(messageArgumentCaptor.capture());
+        Message<GeneratePassportsDto> captured = messageArgumentCaptor.getValue();
         Assertions.assertThat(captured.getPayload()).isEqualTo(generatePassportsDto);
     }
 

@@ -4,6 +4,6 @@ import org.springframework.core.io.ByteArrayResource;
 
 public interface PdfService {
 
-    ByteArrayResource createPdf(byte[] source);
+    ByteArrayResource createPdf(ByteArrayResource source);
 
 }

@@ -14,7 +14,7 @@ import org.openxmlformats.schemas.wordprocessingml.x2006.main.CTBody;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
 import ru.veselov.generatebytemplate.exception.DocxProcessingException;
-import ru.veselov.generatebytemplate.service.PassportGeneratorService;
+import ru.veselov.generatebytemplate.service.DocxGeneratorService;
 import ru.veselov.generatebytemplate.service.PlaceholderProperties;
 
 import java.io.ByteArrayOutputStream;
@@ -28,12 +28,12 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PassportGeneratorServiceImpl implements PassportGeneratorService {
+public class DocxGeneratorServiceImpl implements DocxGeneratorService {
 
     private final PlaceholderProperties placeholderProperties;
 
     @Override
-    public byte[] generatePassports(List<String> serials, ByteArrayResource templateByteArrayResource, String date) {
+    public byte[] generateDocx(List<String> serials, ByteArrayResource templateByteArrayResource, String date) {
         log.info("Starting generate .docx for [{} passports] at [date {}]", serials.size(), date);
         try (InputStream templateInputStreamFirst = templateByteArrayResource.getInputStream()) {
             try (XWPFDocument mainDoc = new XWPFDocument(templateInputStreamFirst)) {

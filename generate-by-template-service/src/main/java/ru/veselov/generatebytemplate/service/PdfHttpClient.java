@@ -1,9 +1,10 @@
 package ru.veselov.generatebytemplate.service;
 
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.buffer.DataBuffer;
 
 public interface PdfHttpClient {
 
-    DataBuffer sendRequestForConvertingDocxToPdf(byte[] source);
+    DataBuffer sendRequestForConvertingDocxToPdf(ByteArrayResource source);
 
 }

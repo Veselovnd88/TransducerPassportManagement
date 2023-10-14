@@ -12,19 +12,16 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
-import ru.veselov.generatebytemplate.dto.SerialNumberDto;
 import ru.veselov.generatebytemplate.model.GeneratedResultFile;
+import ru.veselov.generatebytemplate.service.DocxPassportService;
 import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
-import ru.veselov.generatebytemplate.service.PassportGeneratorService;
 import ru.veselov.generatebytemplate.service.PassportService;
-import ru.veselov.generatebytemplate.service.PassportTemplateService;
 import ru.veselov.generatebytemplate.service.PdfService;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -45,30 +42,20 @@ public class PassportServiceImpl implements PassportService {
     @Value("${spring.kafka.passport-topic}")
     private String topic;
 
-    private final PassportGeneratorService passportGeneratorService;
+    private final DocxPassportService docxPassportService;
 
     private final PdfService pdfService;
 
-    private final PassportTemplateService passportTemplateService;
-
     private final KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate;
 
-    private final GeneratedResultFileService generatedResultFileService;
+    private final GeneratedResultFileService generatedResultFileService;//TODO Event Listener
 
     @Async(value = "asyncThreadPoolTaskExecutor")
     @Override
     public void createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
         log.info("Starting process of generating passports");
-        ByteArrayResource templateByteArrayResource = passportTemplateService
-                .getTemplate(generatePassportsDto.getTemplateId());
-        List<String> serials = generatePassportsDto.getSerials()
-                .stream().map(SerialNumberDto::getSerial).toList();
-        byte[] sourceBytes = passportGeneratorService
-                .generatePassports(
-                        serials,
-                        templateByteArrayResource,
-                        getFormattedDate(generatePassportsDto.getPrintDate()));
-        ByteArrayResource pdfBytes = pdfService.createPdf(sourceBytes);
+        ByteArrayResource docxPassports = docxPassportService.createDocxPassports(generatePassportsDto);
+        ByteArrayResource pdfBytes = pdfService.createPdf(docxPassports);
         GeneratedResultFile resultFile = GeneratedResultFile.builder()
                 .filename(createFilenameFromGeneratePassportsDto(generatePassportsDto))
                 .templateId(generatePassportsDto.getTemplateId())

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
@@ -37,9 +38,9 @@ public class PdfHttpClientImpl implements PdfHttpClient {
     }
 
     @Override
-    public DataBuffer sendRequestForConvertingDocxToPdf(byte[] source) {
+    public DataBuffer sendRequestForConvertingDocxToPdf(ByteArrayResource source) {
         MultipartBodyBuilder bodyBuilder = new MultipartBodyBuilder();
-        bodyBuilder.part("file", source)
+        bodyBuilder.part("file", source.getByteArray())
                 .header(CONTENT_DISPOSITION, "form-data; name=" + filename).filename(filename + ".docx");
         Mono<DataBuffer> dataBufferMono = webClient.post().uri(pdfConverterUrl)
                 .contentType(MediaType.MULTIPART_FORM_DATA)

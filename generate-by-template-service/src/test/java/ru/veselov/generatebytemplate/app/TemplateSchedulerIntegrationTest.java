@@ -11,7 +11,7 @@ import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
-import ru.veselov.generatebytemplate.TestConstants;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
@@ -66,11 +66,11 @@ class TemplateSchedulerIntegrationTest extends PostgresContainersConfig {
 
     void saveUnSyncedTemplateToRepo(LocalDateTime createdAt) {
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setFilename(TestConstants.SAMPLE_FILENAME);
+        templateEntity.setFilename(TestUtils.SAMPLE_FILENAME);
         templateEntity.setTemplateName("801877-filename");
         templateEntity.setBucket("bucketName");
         templateEntity.setSynced(false);
-        templateEntity.setPtArt(TestConstants.ART);
+        templateEntity.setPtArt(TestUtils.ART);
         templateEntity.setCreatedAt(createdAt);
         templateRepository.save(templateEntity);
     }

@@ -17,9 +17,9 @@ import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.List;
 
-class PassportGeneratorServiceImplTest {
+class DocxGeneratorServiceImplTest {
 
-    PassportGeneratorServiceImpl passportGeneratorService;
+    DocxGeneratorServiceImpl passportGeneratorService;
 
     private static final List<String> SERIALS = List.of("one", "two", "three", "four", "five", "six");
 
@@ -29,7 +29,7 @@ class PassportGeneratorServiceImplTest {
         placeholderProperties.setUpperSerial("NUMBERUP");
         placeholderProperties.setBottomSerial("NUMBERDOWN");
         placeholderProperties.setDate("DATE");
-        passportGeneratorService = new PassportGeneratorServiceImpl(placeholderProperties);
+        passportGeneratorService = new DocxGeneratorServiceImpl(placeholderProperties);
     }
 
     @Test
@@ -42,7 +42,7 @@ class PassportGeneratorServiceImplTest {
         templateInputStream.close();
 
         //when
-        byte[] bytes = passportGeneratorService.generatePassports(SERIALS, templateByteArrayResource, LocalDate.now().toString());
+        byte[] bytes = passportGeneratorService.generateDocx(SERIALS, templateByteArrayResource, LocalDate.now().toString());
 
         //then
         ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
@@ -65,7 +65,7 @@ class PassportGeneratorServiceImplTest {
     void shouldThrowDocxProcessingException() {
         ByteArrayResource templateByteArrayResource = new ByteArrayResource(new byte[]{1, 2, 3, 4, 5});
         Assertions.assertThatThrownBy(() -> passportGeneratorService
-                .generatePassports(SERIALS, templateByteArrayResource, "15.01.2023")
+                .generateDocx(SERIALS, templateByteArrayResource, "15.01.2023")
         ).isInstanceOf(DocxProcessingException.class);
     }
 

@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
-import ru.veselov.generatebytemplate.TestConstants;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.model.Template;
 import ru.veselov.generatebytemplate.service.TemplateStorageService;
 
@@ -21,7 +21,7 @@ class TemplateInfoControllerTest {
 
     private final static String URL = "/api/v1/template/info";
 
-    private final static String templateId = TestConstants.TEMPLATE_ID.toString();
+    private final static String templateId = TestUtils.TEMPLATE_ID.toString();
 
     @Mock
     TemplateStorageService templateStorageService;

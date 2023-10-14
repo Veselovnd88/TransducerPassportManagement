@@ -11,7 +11,7 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import ru.veselov.generatebytemplate.TestConstants;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.controller.TemplateController;
 import ru.veselov.generatebytemplate.dto.TemplateDto;
 import ru.veselov.generatebytemplate.exception.error.ErrorCode;
@@ -45,11 +45,11 @@ class TemplateControllerValidationIntegrationTest {
         //Checking @Docx annotation for validation
         TemplateDto templateDto = new TemplateDto(
                 "filename",
-                TestConstants.TEMPLATE_ID.toString(),
+                TestUtils.TEMPLATE_ID.toString(),
                 "bucketName");
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES).filename("filename.pox");
-        multipartBodyBuilder.part(TestConstants.MULTIPART_DTO, templateDto);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES).filename("filename.pox");
+        multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
@@ -63,9 +63,9 @@ class TemplateControllerValidationIntegrationTest {
     void shouldReturnValidationErrorForWrongTemplateFieldsForUpload() {
         TemplateDto templateDto = new TemplateDto(null, null, null);
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES)
-                .filename(TestConstants.MULTIPART_FILENAME);
-        multipartBodyBuilder.part(TestConstants.MULTIPART_DTO, templateDto);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
+                .filename(TestUtils.MULTIPART_FILENAME);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
@@ -88,14 +88,14 @@ class TemplateControllerValidationIntegrationTest {
         //Checking @Docx annotation for validation
         TemplateDto templateDto = new TemplateDto(
                 "filename",
-                TestConstants.TEMPLATE_ID.toString(),
+                TestUtils.TEMPLATE_ID.toString(),
                 "bucketName");
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES).filename("filename.pox");
-        multipartBodyBuilder.part(TestConstants.MULTIPART_DTO, templateDto);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES).filename("filename.pox");
+        multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
 
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/upload")
-                        .path("/id/" + TestConstants.TEMPLATE_ID).build())
+                        .path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().is4xxClientError()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -106,8 +106,8 @@ class TemplateControllerValidationIntegrationTest {
     @Test
     void shouldReturnValidationErrorForUUIDFieldForUpdate() {
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES)
-                .filename(TestConstants.MULTIPART_FILENAME);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
+                .filename(TestUtils.MULTIPART_FILENAME);
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/upload")
                         .path("/id/" + "not UUID").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))

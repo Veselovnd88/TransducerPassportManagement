@@ -14,7 +14,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import ru.veselov.generatebytemplate.TestConstants;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.generatebytemplate.dto.TemplateDto;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
@@ -56,7 +56,7 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
     @Test
     void shouldReturnNotFoundError() {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source")
-                        .path("/id/" + TestConstants.TEMPLATE_ID)
+                        .path("/id/" + TestUtils.TEMPLATE_ID)
                         .build())
                 .exchange().expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -66,11 +66,11 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
     @Test
     void shouldReturnNotFoundErrorForUpdate() {
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES)
-                .filename(TestConstants.MULTIPART_FILENAME);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
+                .filename(TestUtils.MULTIPART_FILENAME);
 
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/upload")
-                        .path("/id/" + TestConstants.TEMPLATE_ID).build())
+                        .path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isNotFound()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
@@ -79,7 +79,7 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
     @Test
     void shouldReturnNotFoundErrorForDelete() {
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/delete").path("/id/" + TestConstants.TEMPLATE_ID).build())
+                        .path("/delete").path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .exchange().expectStatus().isNotFound()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }
@@ -92,9 +92,9 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
                 templateEntity.getPtArt(),
                 bucketName);
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part(TestConstants.MULTIPART_FILE, TestConstants.SOURCE_BYTES)
-                .filename(TestConstants.MULTIPART_FILENAME);
-        multipartBodyBuilder.part(TestConstants.MULTIPART_DTO, templateDto);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
+                .filename(TestUtils.MULTIPART_FILENAME);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
@@ -105,7 +105,7 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
 
     private TemplateEntity saveTemplate() {
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setFilename(TestConstants.SAMPLE_FILENAME);
+        templateEntity.setFilename(TestUtils.SAMPLE_FILENAME);
         templateEntity.setTemplateName("801877-filename");
         templateEntity.setBucket(bucketName);
         templateEntity.setSynced(true);

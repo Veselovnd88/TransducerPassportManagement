@@ -24,7 +24,7 @@ public class PdfServiceImpl implements PdfService {
     private final PdfHttpClient pdfHttpClient;
 
     @Override
-    public ByteArrayResource createPdf(byte[] source) {
+    public ByteArrayResource createPdf(ByteArrayResource source) {
         DataBuffer pdfDatabuffer = pdfHttpClient.sendRequestForConvertingDocxToPdf(source);
         log.info("Document successfully converted to pdf");
         return convertToByteArrayResource(pdfDatabuffer);

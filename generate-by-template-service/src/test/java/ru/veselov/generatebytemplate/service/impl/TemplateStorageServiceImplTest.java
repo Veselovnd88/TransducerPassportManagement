@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-import ru.veselov.generatebytemplate.TestConstants;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.dto.SortingParams;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.exception.PageExceedsMaximumValueException;
@@ -26,7 +26,6 @@ import ru.veselov.generatebytemplate.mapper.TemplateMapperImpl;
 import ru.veselov.generatebytemplate.model.Template;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,11 +77,11 @@ class TemplateStorageServiceImplTest {
     @Test
     void shouldSync() {
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setId(TestConstants.TEMPLATE_ID);
-        Mockito.when(templateRepository.findById(TestConstants.TEMPLATE_ID)).thenReturn(
+        templateEntity.setId(TestUtils.TEMPLATE_ID);
+        Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(
                 Optional.of(templateEntity));
 
-        templateStorageService.syncTemplate(TestConstants.TEMPLATE_ID);
+        templateStorageService.syncTemplate(TestUtils.TEMPLATE_ID);
 
         Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
         TemplateEntity captured = templateArgumentCaptor.getValue();
@@ -91,10 +90,10 @@ class TemplateStorageServiceImplTest {
 
     @Test
     void shouldThrowExceptionIfTemplateNotFoundForSync() {
-        Mockito.when(templateRepository.findById(TestConstants.TEMPLATE_ID)).thenReturn(
+        Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(
                 Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> templateStorageService.syncTemplate(TestConstants.TEMPLATE_ID))
+        Assertions.assertThatThrownBy(() -> templateStorageService.syncTemplate(TestUtils.TEMPLATE_ID))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
@@ -185,16 +184,16 @@ class TemplateStorageServiceImplTest {
 
     @Test
     void shouldUpdateTemplate() {
-        String templateIdUUID = TestConstants.TEMPLATE_ID.toString();
+        String templateIdUUID = TestUtils.TEMPLATE_ID.toString();
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setId(TestConstants.TEMPLATE_ID);
+        templateEntity.setId(TestUtils.TEMPLATE_ID);
         templateEntity.setFilename("filename");
-        Mockito.when(templateRepository.findById(TestConstants.TEMPLATE_ID))
+        Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID))
                 .thenReturn(Optional.of(templateEntity));
         Mockito.when(templateRepository.save(ArgumentMatchers.any())).thenReturn(templateEntity);
         templateStorageService.updateTemplate(templateIdUUID);
 
-        Mockito.verify(templateRepository, Mockito.times(1)).findById(TestConstants.TEMPLATE_ID);
+        Mockito.verify(templateRepository, Mockito.times(1)).findById(TestUtils.TEMPLATE_ID);
         Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
         TemplateEntity captured = templateArgumentCaptor.getValue();
         Assertions.assertThat(captured.getId()).isEqualTo(templateEntity.getId());
@@ -230,14 +229,6 @@ class TemplateStorageServiceImplTest {
 
         Assertions.assertThatThrownBy(() -> templateStorageService.deleteTemplate(templateId))
                 .isInstanceOf(EntityNotFoundException.class);
-    }
-
-    @Test
-    void shouldDeleteUnSynchronized() {
-        templateStorageService.deleteUnSynchronized();
-
-        Mockito.verify(templateRepository, Mockito.times(1))
-                .deleteAllWithUnSyncFalse(ArgumentMatchers.any(LocalDateTime.class));
     }
 
 }

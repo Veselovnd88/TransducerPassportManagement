@@ -11,6 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.buffer.DataBuffer;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.exception.PdfProcessingException;
 import ru.veselov.generatebytemplate.service.PdfHttpClient;
 
@@ -21,7 +22,7 @@ import java.io.InputStream;
 @ExtendWith(MockitoExtension.class)
 class PdfServiceImplTest {
 
-    public final static byte[] SOURCE = new byte[]{1, 2, 3, 4};
+    public static ByteArrayResource byteArrayResource;
 
     @Mock
     PdfHttpClient pdfHttpClient;
@@ -35,8 +36,8 @@ class PdfServiceImplTest {
         Mockito.when(mockDataBuffer.asInputStream()).thenReturn(new ByteArrayInputStream(new byte[]{1, 2, 3, 4}));
         Mockito.when(pdfHttpClient.sendRequestForConvertingDocxToPdf(ArgumentMatchers.any()))
                 .thenReturn(mockDataBuffer);
-        ByteArrayResource pdfBytes = pdfService.createPdf(SOURCE);
-
+        byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
+        ByteArrayResource pdfBytes = pdfService.createPdf(byteArrayResource);
         Assertions.assertThat(pdfBytes.getByteArray()).isNotNull();
     }
 
@@ -45,7 +46,7 @@ class PdfServiceImplTest {
         Mockito.when(pdfHttpClient.sendRequestForConvertingDocxToPdf(ArgumentMatchers.any()))
                 .thenReturn(null);
 
-        Assertions.assertThatThrownBy(() -> pdfService.createPdf(SOURCE))
+        Assertions.assertThatThrownBy(() -> pdfService.createPdf(byteArrayResource))
                 .isInstanceOf(PdfProcessingException.class);
     }
 
@@ -59,7 +60,7 @@ class PdfServiceImplTest {
         Mockito.when(pdfHttpClient.sendRequestForConvertingDocxToPdf(ArgumentMatchers.any()))
                 .thenReturn(mockDataBuffer);
 
-        Assertions.assertThatThrownBy(() -> pdfService.createPdf(SOURCE))
+        Assertions.assertThatThrownBy(() -> pdfService.createPdf(byteArrayResource))
                 .isInstanceOf(PdfProcessingException.class);
         inputStream.close();
     }

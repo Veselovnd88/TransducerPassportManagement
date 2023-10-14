@@ -43,7 +43,6 @@ class GeneratePassportControllerTest {
         GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> UUID.randomUUID().toString())
                 .create();
-        Mockito.when(passportService.createPassportsPdf(generatePassportsDto)).thenReturn(BYTES_OUT);
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isOk()
