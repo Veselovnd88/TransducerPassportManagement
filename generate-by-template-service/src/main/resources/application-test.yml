@@ -35,7 +35,7 @@ minio:
   url: http://localhost:9000
   accessKey: admin
   secretKey: secretsecret
-  bucket:
+  buckets:
     template: templates
     result: results
 
@@ -62,8 +62,12 @@ eureka:
 
 scheduling:
   #3 seconds
-  delete-unsync: "*/3 * * * * *"
-  days-until-delete: 5
+  delete-unsync-template: "*/3 * * * * *"
+  days-until-delete-unsync-template: 5
+  delete-unsync-result: "*/3 * * * * *"
+  days-until-delete-unsync-result: 2
+  delete-result: "*/3 * * * * *"
+  days-until-delete-result: 3
 
 management:
   tracing:
@@ -74,3 +78,8 @@ logging:
   level:
     ru.veselov.ru.veselov.miniotemplateservice: debug
     org.apache.kafka: WARN
+
+executor:
+  core-pool-size: 5
+  max-pool-size: 10
+  queue-capacity: 5

@@ -49,10 +49,9 @@ class TemplateStorageServiceImplTest {
 
     @BeforeEach
     void init() {
-        TemplateMapper templateMapper = new TemplateMapperImpl();
+        TemplateMapperImpl templateMapper = new TemplateMapperImpl();
         ReflectionTestUtils.setField(templateStorageService, "templateMapper", templateMapper, TemplateMapper.class);
         ReflectionTestUtils.setField(templateStorageService, "templatesPerPage", 5, int.class);
-        ReflectionTestUtils.setField(templateStorageService, "daysUntilDelete", 5, int.class);
     }
 
     @Test

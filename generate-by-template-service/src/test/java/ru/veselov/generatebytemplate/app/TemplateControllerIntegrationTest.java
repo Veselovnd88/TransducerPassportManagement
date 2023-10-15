@@ -46,8 +46,8 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
 
     public UUID savedTemplateId;
 
-    @Value("${minio.bucket-name}")
-    String bucketName;
+    @Value("${minio.buckets.template}")
+    String templateBucket;
 
     @Autowired
     WebTestClient webTestClient;
@@ -95,13 +95,13 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         Mockito.verify(minioClient, Mockito.times(1)).getObject(getObjectArgsCaptor.capture());
         GetObjectArgs captured = getObjectArgsCaptor.getValue();
         Assertions.assertThat(captured.object()).isEqualTo(TestUtils.SAMPLE_FILENAME);
-        Assertions.assertThat(captured.bucket()).isEqualTo(bucketName);
+        Assertions.assertThat(captured.bucket()).isEqualTo(templateBucket);
     }
 
     @Test
     @SneakyThrows
     void shouldUploadTemplate() {
-        TemplateDto templateDto = new TemplateDto("name", TestUtils.ART, bucketName);
+        TemplateDto templateDto = new TemplateDto("name", TestUtils.ART, templateBucket);
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
                 .filename(TestUtils.MULTIPART_FILENAME);
@@ -116,7 +116,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         Assertions.assertThat(optionalTemplateEntity.get().getSynced()).isTrue();
         Mockito.verify(minioClient, Mockito.times(1)).putObject(putObjectArgsCaptor.capture());
         PutObjectArgs captured = putObjectArgsCaptor.getValue();
-        Assertions.assertThat(captured.bucket()).isEqualTo(bucketName);
+        Assertions.assertThat(captured.bucket()).isEqualTo(templateBucket);
         Assertions.assertThat(captured.object()).isEqualTo("801877-name.docx");
     }
 
@@ -140,7 +140,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         Assertions.assertThat(templateEntity.getEditedAt()).isNotNull();
         Mockito.verify(minioClient, Mockito.times(1)).putObject(putObjectArgsCaptor.capture());
         PutObjectArgs captured = putObjectArgsCaptor.getValue();
-        Assertions.assertThat(captured.bucket()).isEqualTo(bucketName);
+        Assertions.assertThat(captured.bucket()).isEqualTo(templateBucket);
         Assertions.assertThat(captured.object()).isEqualTo(TestUtils.SAMPLE_FILENAME);
     }
 
@@ -158,13 +158,13 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         Mockito.verify(minioClient, Mockito.times(1)).removeObject(removeObjectArgsCaptor.capture());
         RemoveObjectArgs captured = removeObjectArgsCaptor.getValue();
         Assertions.assertThat(captured.object()).isEqualTo(TestUtils.SAMPLE_FILENAME);
-        Assertions.assertThat(captured.bucket()).isEqualTo(bucketName);
+        Assertions.assertThat(captured.bucket()).isEqualTo(templateBucket);
     }
 
     @Test
     @SneakyThrows
     void shouldStayUnSyncedFileWasNotSaved() {
-        TemplateDto templateDto = new TemplateDto("name", TestUtils.ART, bucketName);
+        TemplateDto templateDto = new TemplateDto("name", TestUtils.ART, templateBucket);
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
                 .filename(TestUtils.MULTIPART_FILENAME);
@@ -219,7 +219,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         TemplateEntity templateEntity = new TemplateEntity();
         templateEntity.setFilename(TestUtils.SAMPLE_FILENAME);
         templateEntity.setTemplateName("801877-filename");
-        templateEntity.setBucket(bucketName);
+        templateEntity.setBucket(templateBucket);
         templateEntity.setSynced(true);
         templateEntity.setPtArt(TestUtils.ART);
         TemplateEntity save = templateRepository.save(templateEntity);

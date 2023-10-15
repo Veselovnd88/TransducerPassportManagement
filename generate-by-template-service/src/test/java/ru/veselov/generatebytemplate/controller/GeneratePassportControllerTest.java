@@ -9,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
@@ -45,10 +44,9 @@ class GeneratePassportControllerTest {
                 .create();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
-                .bodyValue(generatePassportsDto).exchange().expectStatus().isOk()
-                .expectHeader().contentType(MediaType.APPLICATION_PDF)
-                .expectHeader().contentLength(BYTES_OUT.length)
-                .expectBody(byte[].class);
+                .bodyValue(generatePassportsDto).exchange().expectStatus().isAccepted();
+
+        Mockito.verify(passportService, Mockito.times(1)).createPassportsPdf(generatePassportsDto);
     }
 
     @Test

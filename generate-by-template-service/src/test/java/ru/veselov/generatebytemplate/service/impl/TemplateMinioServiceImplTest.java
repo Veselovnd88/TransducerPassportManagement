@@ -25,6 +25,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.generatebytemplate.exception.CommonMinioException;
 import ru.veselov.generatebytemplate.model.Template;
+import ru.veselov.generatebytemplate.service.MinioHelper;
 
 import java.io.BufferedInputStream;
 
@@ -52,7 +53,9 @@ class TemplateMinioServiceImplTest {
 
     @BeforeEach
     void init() {
-        ReflectionTestUtils.setField(templateMinioService, "bucketName", BUCKET, String.class);
+        ReflectionTestUtils.setField(templateMinioService, "templateBucket", BUCKET, String.class);
+        MinioHelper minioHelper = new MinioHelperImpl(minioClient);
+        ReflectionTestUtils.setField(templateMinioService, "minioHelper", minioHelper, MinioHelper.class);
     }
 
     @Test

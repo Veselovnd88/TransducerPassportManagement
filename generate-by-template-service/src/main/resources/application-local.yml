@@ -61,7 +61,6 @@ eureka:
     register-with-eureka: true
     enabled: false
 
-
 scheduling:
   delete-unsync-template: "@weekly"
   days-until-delete-unsync-template: 5

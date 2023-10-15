@@ -30,8 +30,8 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
 
     public static final String URL_PREFIX = "/api/v1/template/";
 
-    @Value("${minio.bucket-name}")
-    String bucketName;
+    @Value("${minio.buckets.templates}")
+    String templateBucket;
 
     @Autowired
     WebTestClient webTestClient;
@@ -90,7 +90,7 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
         TemplateDto templateDto = new TemplateDto(
                 "filename",
                 templateEntity.getPtArt(),
-                bucketName);
+                templateBucket);
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
                 .filename(TestUtils.MULTIPART_FILENAME);
@@ -107,7 +107,7 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
         TemplateEntity templateEntity = new TemplateEntity();
         templateEntity.setFilename(TestUtils.SAMPLE_FILENAME);
         templateEntity.setTemplateName("801877-filename");
-        templateEntity.setBucket(bucketName);
+        templateEntity.setBucket(templateBucket);
         templateEntity.setSynced(true);
         templateEntity.setPtArt("801877");
         return templateRepository.save(templateEntity);

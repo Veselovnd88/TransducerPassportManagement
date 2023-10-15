@@ -46,8 +46,8 @@ import java.util.UUID;
 @ActiveProfiles("test")
 public class GeneratePassportControllerIntegrationTest extends PostgresContainersConfig {
 
-    @Value("${minio.bucket-name}")
-    private String bucketName;
+    @Value("${minio.buckets.template}")
+    private String templateBucket;
 
     public static final String URL_PREFIX = "/api/v1/generate";
 
@@ -101,7 +101,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         TemplateEntity templateEntity = saveTemplateToRepo();
         GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(templateEntity.getId().toString());
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
-        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(bucketName)
+        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(templateBucket)
                 .object(templateEntity.getFilename()).build();
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(DOCX_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
@@ -121,7 +121,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         TemplateEntity templateEntity = saveTemplateToRepo();
         GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(templateEntity.getId().toString());
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
-        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(bucketName)
+        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(templateBucket)
                 .object(templateEntity.getFilename()).build();
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(new byte[]{1, 2, 3});
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
@@ -139,7 +139,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         TemplateEntity templateEntity = saveTemplateToRepo();
         GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(templateEntity.getId().toString());
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
-        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(bucketName)
+        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(templateBucket)
                 .object(templateEntity.getFilename()).build();
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(DOCX_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
@@ -157,7 +157,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         TemplateEntity templateEntity = saveTemplateToRepo();
         GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(templateEntity.getId().toString());
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
-        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(bucketName)
+        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(templateBucket)
                 .object(templateEntity.getFilename()).build();
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(DOCX_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
@@ -192,7 +192,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         TemplateEntity templateEntity1 = new TemplateEntity();
         templateEntity1.setFilename("801855-abc.docx");
         templateEntity1.setTemplateName("801855-abc");
-        templateEntity1.setBucket(bucketName);
+        templateEntity1.setBucket(templateBucket);
         templateEntity1.setPtArt("801855");
         templateEntity1.setSynced(true);
         return templateRepository.save(templateEntity1);

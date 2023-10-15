@@ -29,8 +29,8 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
 
     public static final String URL_PREFIX = "/api/v1/template/info";
 
-    @Value("${minio.bucket-name}")
-    String bucketName;
+    @Value("${minio.buckets.template}")
+    String templateBucket;
 
     public UUID savedTemplateId;
 
@@ -53,7 +53,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         TemplateEntity templateEntity = new TemplateEntity();
         templateEntity.setFilename(TestUtils.SAMPLE_FILENAME);
         templateEntity.setTemplateName(TestUtils.SAMPLE_TEMPLATE);
-        templateEntity.setBucket(bucketName);
+        templateEntity.setBucket(templateBucket);
         templateEntity.setSynced(true);
         templateEntity.setPtArt(TestUtils.ART);
         savedTemplate = templateRepository.save(templateEntity);
@@ -71,7 +71,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
                 .exchange().expectStatus().isOk().expectBody()
                 .jsonPath("$.id").isEqualTo(savedTemplateId.toString())
                 .jsonPath("$.ptArt").isEqualTo(TestUtils.ART)
-                .jsonPath("$.bucket").isEqualTo(bucketName)
+                .jsonPath("$.bucket").isEqualTo(templateBucket)
                 .jsonPath("$.templateName").isEqualTo(TestUtils.SAMPLE_TEMPLATE)
                 .jsonPath("$.filename").isEqualTo(TestUtils.SAMPLE_FILENAME)
                 .jsonPath("$.createdAt").isEqualTo(savedTemplate.getCreatedAt()
@@ -183,7 +183,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         TemplateEntity templateEntity1 = new TemplateEntity();
         templateEntity1.setFilename("801855-abc.docx");
         templateEntity1.setTemplateName("801855-abc");
-        templateEntity1.setBucket(bucketName);
+        templateEntity1.setBucket(templateBucket);
         templateEntity1.setPtArt("801855");
         templateEntity1.setSynced(true);
         templateRepository.save(templateEntity1);
@@ -191,7 +191,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         TemplateEntity templateEntity2 = new TemplateEntity();
         templateEntity2.setFilename("101855-zzz.docx");
         templateEntity2.setTemplateName("101855-zzz");
-        templateEntity2.setBucket(bucketName);
+        templateEntity2.setBucket(templateBucket);
         templateEntity2.setSynced(true);
         templateEntity2.setPtArt("101855");
         templateRepository.save(templateEntity2);
