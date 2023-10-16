@@ -15,7 +15,7 @@ import ru.veselov.generatebytemplate.service.GeneratedResultFileStorageService;
 @RequiredArgsConstructor
 @Slf4j
 @Transactional(readOnly = true)
-public class GeneratedGeneratedResultFileServiceImpl implements GeneratedResultFileService {
+public class GeneratedResultFileServiceImpl implements GeneratedResultFileService {
 
     private final GeneratedResultFileStorageService generatedResultFileStorageService;
 

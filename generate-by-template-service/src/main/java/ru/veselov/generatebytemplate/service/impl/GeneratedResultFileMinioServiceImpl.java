@@ -18,7 +18,7 @@ import java.io.IOException;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GeneratedGeneratedResultFileMinioServiceImpl implements GeneratedResultFileMinioService {
+public class GeneratedResultFileMinioServiceImpl implements GeneratedResultFileMinioService {
 
     @Value("${minio.buckets.result}")
     private String resultBucket;
