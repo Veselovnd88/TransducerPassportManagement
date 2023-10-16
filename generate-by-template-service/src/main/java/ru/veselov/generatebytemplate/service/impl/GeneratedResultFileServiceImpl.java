@@ -36,7 +36,7 @@ public class GeneratedResultFileServiceImpl implements GeneratedResultFileServic
     @Override
     public ByteArrayResource getResultFile(String resultFileId) {
         GeneratedResultFile generatedResultFile = generatedResultFileStorageService.findById(resultFileId);
-        ByteArrayResource resultFile = generatedResultFileMinioService.getResultFile(generatedResultFile);
+        ByteArrayResource resultFile = generatedResultFileMinioService.loadResultFile(generatedResultFile);
         log.info("Generated file retrieved from storage: [id: {}]", resultFileId);
         return resultFile;
     }

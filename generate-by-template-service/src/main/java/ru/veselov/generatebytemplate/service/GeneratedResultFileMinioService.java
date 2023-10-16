@@ -8,6 +8,6 @@ public interface GeneratedResultFileMinioService {
 
     String saveResult(Resource resource, GeneratedResultFile resultFile);
 
-    ByteArrayResource getResultFile(GeneratedResultFile resultFile);
+    ByteArrayResource loadResultFile(GeneratedResultFile resultFile);
 
 }

@@ -43,7 +43,7 @@ public class GeneratedResultFileMinioServiceImpl implements GeneratedResultFileM
     }
 
     @Override
-    public ByteArrayResource getResultFile(GeneratedResultFile resultFile) {
+    public ByteArrayResource loadResultFile(GeneratedResultFile resultFile) {
         String filename = resultFile.getFilename();
         GetObjectArgs objectArgs = GetObjectArgs.builder().bucket(resultBucket).object(filename).build();
         return minioHelper.getByteArrayResource(objectArgs);
