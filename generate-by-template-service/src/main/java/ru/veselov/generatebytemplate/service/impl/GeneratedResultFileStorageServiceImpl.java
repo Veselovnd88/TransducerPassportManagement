@@ -23,6 +23,8 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class GeneratedResultFileStorageServiceImpl implements GeneratedResultFileStorageService {
 
+    //TODO TEST ME
+
     private static final String LOG_FILE_NOT_FOUND_MSG = "Generated result file with [id: {}] not found";
 
     private static final String EXCEPTION_FILE_NOT_FOUND_MSG = "Generated result file with [id: %s] not found";

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -18,10 +19,12 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.exception.CommonMinioException;
 import ru.veselov.generatebytemplate.model.GeneratedResultFile;
 import ru.veselov.generatebytemplate.service.MinioHelper;
 
 import java.io.BufferedInputStream;
+import java.security.InvalidKeyException;
 
 @ExtendWith(MockitoExtension.class)
 class GeneratedResultFileMinioServiceImplTest {
@@ -64,6 +67,15 @@ class GeneratedResultFileMinioServiceImplTest {
         }
     }
 
-
+    @Test
+    @SneakyThrows
+    void shouldThrowCommonMinioException() {
+        Resource resource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
+        GeneratedResultFile basicGeneratedResultFile = TestUtils.getBasicGeneratedResultFile();
+        Mockito.when(minioClient.putObject(ArgumentMatchers.any())).thenThrow(InvalidKeyException.class);
+        Assertions.assertThatThrownBy(
+                        () -> generatedResultFileMinioService.saveResult(resource, basicGeneratedResultFile))
+                .isInstanceOf(CommonMinioException.class);
+    }
 
 }

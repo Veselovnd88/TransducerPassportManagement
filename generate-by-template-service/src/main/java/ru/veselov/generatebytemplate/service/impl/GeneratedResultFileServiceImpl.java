@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.generatebytemplate.entity.GeneratedResultFileEntity;
 import ru.veselov.generatebytemplate.model.GeneratedResultFile;
 import ru.veselov.generatebytemplate.service.GeneratedResultFileMinioService;
@@ -14,7 +13,6 @@ import ru.veselov.generatebytemplate.service.GeneratedResultFileStorageService;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional(readOnly = true)
 public class GeneratedResultFileServiceImpl implements GeneratedResultFileService {
 
     private final GeneratedResultFileStorageService generatedResultFileStorageService;
@@ -24,7 +22,6 @@ public class GeneratedResultFileServiceImpl implements GeneratedResultFileServic
  //   private final NotificationService notificationService; TODO
 
     @Override
-    @Transactional
     public void save(ByteArrayResource pdfBytes, GeneratedResultFile generatedResultFile) {
         GeneratedResultFileEntity generatedResultFileEntity = generatedResultFileStorageService
                 .saveUnSynced(generatedResultFile);
