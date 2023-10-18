@@ -74,7 +74,6 @@ class GeneratedResultFileStorageServiceImplTest {
                 .isInstanceOf(EntityNotFoundException.class);
     }
 
-
     @Test
     void shouldFindEntityAndSetSyncToTrue() {
         UUID fileUid = UUID.randomUUID();
@@ -93,13 +92,37 @@ class GeneratedResultFileStorageServiceImplTest {
     }
 
     @Test
-    void shouldThrowExceptionIfResultFileNotFound() {
+    void shouldThrowExceptionIfResultFileNotFoundWhileSyncing() {
         UUID fileUid = UUID.randomUUID();
         Mockito.when(generatedResultFileRepository.findById(ArgumentMatchers.any()))
                 .thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() ->
                         generatedResultFileStorageService.syncResultFile(fileUid))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void shouldFindResultFileById() {
+        UUID fileUid = UUID.randomUUID();
+        GeneratedResultFileEntity generatedResultFileEntity = new GeneratedResultFileEntity();
+        generatedResultFileEntity.setId(fileUid);
+        Mockito.when(generatedResultFileRepository.findById(fileUid))
+                .thenReturn(Optional.of(generatedResultFileEntity));
+
+        GeneratedResultFile foundById = generatedResultFileStorageService.findById(fileUid.toString());
+
+        Assertions.assertThat(foundById.getId()).isEqualTo(fileUid);
+    }
+
+    @Test
+    void shouldThrowNotFoundExceptionIfResultNotFound() {
+        String fileUid = UUID.randomUUID().toString();
+        Mockito.when(generatedResultFileRepository.findById(ArgumentMatchers.any()))
+                .thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() ->
+                        generatedResultFileStorageService.findById(fileUid))
                 .isInstanceOf(EntityNotFoundException.class);
     }
 

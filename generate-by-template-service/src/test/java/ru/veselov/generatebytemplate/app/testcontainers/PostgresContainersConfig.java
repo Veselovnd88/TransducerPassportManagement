@@ -11,7 +11,7 @@ public class PostgresContainersConfig {
 
     @Container
     private static final PostgreSQLContainer<?> postgres = new PostgreSQLContainer<>(
-            "postgres:15.2"
+            "postgres:16"
     ).withDatabaseName("PtManagementDB");
 
     @DynamicPropertySource

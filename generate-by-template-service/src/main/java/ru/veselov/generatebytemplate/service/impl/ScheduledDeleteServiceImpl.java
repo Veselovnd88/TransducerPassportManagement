@@ -17,8 +17,6 @@ import java.time.LocalDateTime;
 @Slf4j
 public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
 
-    //TODO TEST ME
-
     @Value("${scheduling.days-until-delete-unsync-template}")
     private int daysUntilDeleteUnSyncTemplate;
 
@@ -28,9 +26,9 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
     @Value("${scheduling.days-until-delete-result}")
     private int daysUntilDeleteResult;
 
-    private TemplateRepository templateRepository;
+    private final TemplateRepository templateRepository;
 
-    private GeneratedResultFileRepository generatedResultFileRepository;
+    private final GeneratedResultFileRepository generatedResultFileRepository;
 
     @Override
     @Transactional
@@ -47,7 +45,7 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
     public void deleteUnSynchronizedGenerateResultFiles() {
         LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteUnSyncResult);
         generatedResultFileRepository.deleteAllWithUnSyncFalse(deleteDate);
-        log.info("UnSynchronized results deleted");
+        log.info("UnSynchronized result files were deleted");
     }
 
     @Override
@@ -56,7 +54,7 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
     public void deleteExpiredResultFiles() {
         LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteResult);
         generatedResultFileRepository.deleteExpiredResultFiles(deleteDate);
-        log.info("Expired result files deleted");
+        log.info("Expired result files were deleted");
     }
 
 }
