@@ -30,7 +30,7 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
 
     public static final String URL_PREFIX = "/api/v1/template/";
 
-    @Value("${minio.buckets.templates}")
+    @Value("${minio.buckets.template}")
     String templateBucket;
 
     @Autowired

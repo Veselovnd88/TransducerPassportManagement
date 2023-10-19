@@ -36,7 +36,7 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
     public void deleteUnSynchronizedTemplates() {
         LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteUnSyncTemplate);
         templateRepository.deleteAllWithUnSyncFalse(deleteDate);
-        log.info("UnSynchronized template records deleted until");
+        log.info("UnSynchronized template records deleted until {} days", daysUntilDeleteUnSyncTemplate);
     }
 
     @Override
@@ -45,7 +45,7 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
     public void deleteUnSynchronizedGenerateResultFiles() {
         LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteUnSyncResult);
         generatedResultFileRepository.deleteAllWithUnSyncFalse(deleteDate);
-        log.info("UnSynchronized result files were deleted");
+        log.info("UnSynchronized result files were deleted until {} days", daysUntilDeleteUnSyncResult);
     }
 
     @Override
@@ -54,7 +54,7 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
     public void deleteExpiredResultFiles() {
         LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteResult);
         generatedResultFileRepository.deleteExpiredResultFiles(deleteDate);
-        log.info("Expired result files were deleted");
+        log.info("Expired result files were deleted: older than {} days", daysUntilDeleteResult);
     }
 
 }

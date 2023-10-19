@@ -22,8 +22,6 @@ class GeneratePassportControllerTest {
 
     public static final String URL_PREFIX = "/api/v1/generate";
 
-    public static final byte[] BYTES_OUT = new byte[]{1, 2, 4};
-
     static WebTestClient webTestClient;
 
     @Mock
