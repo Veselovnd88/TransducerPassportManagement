@@ -1,6 +1,7 @@
 package ru.veselov.generatebytemplate.service.impl;
 
 import io.minio.GetObjectArgs;
+import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
 import io.minio.RemoveObjectArgs;
@@ -76,6 +77,24 @@ class GeneratedResultFileMinioServiceImplTest {
         Assertions.assertThatThrownBy(
                         () -> generatedResultFileMinioService.saveResult(resource, basicGeneratedResultFile))
                 .isInstanceOf(CommonMinioException.class);
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldLoadResultFileFromMinIO() {
+        GeneratedResultFile basicGeneratedResultFile = TestUtils.getBasicGeneratedResultFile();
+        GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
+        Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
+        Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
+
+        ByteArrayResource byteArrayResource = generatedResultFileMinioService.loadResultFile(basicGeneratedResultFile);
+
+        Mockito.verify(minioClient, Mockito.times(1)).getObject(argumentGetObjCaptor.capture());
+        GetObjectArgs captured = argumentGetObjCaptor.getValue();
+
+        Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES);
+        Assertions.assertThat(captured.object()).isEqualTo(basicGeneratedResultFile.getFilename());
+        Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.RESULT_BUCKET);
     }
 
 }

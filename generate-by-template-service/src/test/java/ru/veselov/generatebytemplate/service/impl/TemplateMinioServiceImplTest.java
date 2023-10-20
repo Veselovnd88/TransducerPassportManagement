@@ -127,6 +127,7 @@ class TemplateMinioServiceImplTest {
 
         Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES);
         Assertions.assertThat(captured.object()).isEqualTo(filename);
+        Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.TEMPLATE_BUCKET);
     }
 
     @Test

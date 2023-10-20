@@ -19,8 +19,6 @@ public class GeneratedResultFileServiceImpl implements GeneratedResultFileServic
 
     private final GeneratedResultFileMinioService generatedResultFileMinioService;
 
- //   private final NotificationService notificationService; TODO
-
     @Override
     public void save(ByteArrayResource pdfBytes, GeneratedResultFile generatedResultFile) {
         GeneratedResultFileEntity generatedResultFileEntity = generatedResultFileStorageService

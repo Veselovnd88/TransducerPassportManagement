@@ -46,4 +46,23 @@ class GeneratedResultFileServiceImplTest {
                 .syncResultFile(generatedResultFileEntity.getId());
     }
 
+    @Test
+    void shouldGetResultFile() {
+        GeneratedResultFile basicGeneratedResultFile = TestUtils.getBasicGeneratedResultFile();
+        String resultFileUid = basicGeneratedResultFile.getId().toString();
+        ByteArrayResource bar = new ByteArrayResource(TestUtils.SOURCE_BYTES);
+        Mockito.when(generatedResultFileMinioService.loadResultFile(basicGeneratedResultFile))
+                .thenReturn(bar);
+
+        Mockito.when(generatedResultFileStorageService.findById(resultFileUid))
+                .thenReturn(basicGeneratedResultFile);
+
+        generatedResultFileService.getResultFile(resultFileUid);
+
+        Mockito.verify(generatedResultFileStorageService, Mockito.times(1))
+                .findById(resultFileUid);
+        Mockito.verify(generatedResultFileMinioService, Mockito.times(1))
+                .loadResultFile(basicGeneratedResultFile);
+    }
+
 }

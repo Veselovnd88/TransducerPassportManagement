@@ -44,6 +44,8 @@ class GeneratedResultFileStorageServiceImplTest {
     void init() {
         ReflectionTestUtils.setField(generatedResultFileStorageService,
                 "generatedResultFileMapper", new GeneratedResultFileMapperImpl(), GeneratedResultFileMapper.class);
+        ReflectionTestUtils
+                .setField(generatedResultFileStorageService, "resultBucket", TestUtils.RESULT_BUCKET, String.class);
     }
 
     @Test
@@ -61,6 +63,7 @@ class GeneratedResultFileStorageServiceImplTest {
         GeneratedResultFileEntity captured = resultFileEntityArgumentCaptor.getValue();
         Assertions.assertThat(captured.getSynced()).isFalse();
         Assertions.assertThat(captured.getTemplateEntity()).isEqualTo(templateEntity);
+        Assertions.assertThat(captured.getBucket()).isEqualTo(TestUtils.RESULT_BUCKET);
     }
 
     @Test

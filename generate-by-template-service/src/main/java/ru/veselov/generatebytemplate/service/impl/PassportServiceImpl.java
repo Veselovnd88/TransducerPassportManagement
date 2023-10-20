@@ -48,7 +48,7 @@ public class PassportServiceImpl implements PassportService {
 
     private final KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate;
 
-    private final GeneratedResultFileService generatedResultFileService;//TODO Event Listener
+    private final GeneratedResultFileService generatedResultFileService;
 
     @Async(value = "asyncThreadPoolTaskExecutor")
     @Override

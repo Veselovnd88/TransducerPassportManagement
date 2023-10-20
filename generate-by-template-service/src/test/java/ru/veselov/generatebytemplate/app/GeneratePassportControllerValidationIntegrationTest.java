@@ -21,6 +21,7 @@ import java.util.UUID;
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 public class GeneratePassportControllerValidationIntegrationTest {
+
     public static final String URL_PREFIX = "/api/v1/generate";
 
     public static final String TEMPLATE_ID = UUID.randomUUID().toString();

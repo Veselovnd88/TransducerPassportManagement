@@ -16,6 +16,8 @@ import java.util.List;
 @AllArgsConstructor
 public class GeneratePassportsDto {
 
+    //TODO task num, username?
+
     @NotEmpty
     private List<SerialNumberDto> serials = new ArrayList<>();
 

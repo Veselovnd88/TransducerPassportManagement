@@ -3,6 +3,7 @@ package ru.veselov.generatebytemplate.service.impl;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +24,8 @@ import java.util.UUID;
 @Transactional(readOnly = true)
 public class GeneratedResultFileStorageServiceImpl implements GeneratedResultFileStorageService {
 
-    //TODO TEST ME
+    @Value("${minio.buckets.result}")
+    private String resultBucket;
 
     private static final String LOG_FILE_NOT_FOUND_MSG = "Generated result file with [id: {}] not found";
 
@@ -47,6 +49,7 @@ public class GeneratedResultFileStorageServiceImpl implements GeneratedResultFil
         GeneratedResultFileEntity resultFileEntity = generatedResultFileMapper.toEntity(resultFile);
         resultFileEntity.setSynced(false);
         resultFileEntity.setTemplateEntity(templateEntity);
+        resultFileEntity.setBucket(resultBucket);
         GeneratedResultFileEntity saved = generatedResultFileRepository.save(resultFileEntity);
         log.info("Saved unsynced generated file result for [template: {}, filename: {}, id: {}]",
                 templateUUID, resultFileEntity.getFilename(), resultFileEntity.getId());

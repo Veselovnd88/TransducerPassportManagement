@@ -51,7 +51,7 @@ public class MinioHelperImpl implements MinioHelper {
     public void putObject(PutObjectArgs putObjectArgs) {
         try {
             minioClient.putObject(putObjectArgs);
-            log.info("Template updated in MinIO storage: [bucket: {}, filename: {}]",
+            log.info("File saved to MinIO storage: [bucket: {}, filename: {}]",
                     putObjectArgs.bucket(), putObjectArgs.object());
         } catch (ErrorResponseException | InsufficientDataException | InvalidResponseException | InternalException |
                  InvalidKeyException | ServerException | NoSuchAlgorithmException | XmlParserException |
@@ -65,7 +65,7 @@ public class MinioHelperImpl implements MinioHelper {
     public void deleteObject(RemoveObjectArgs removeObjectArgs) {
         try {
             minioClient.removeObject(removeObjectArgs);
-            log.info("Template deleted from MinIO storage: [bucket: {}, filename: {}]",
+            log.info("File deleted from MinIO storage: [bucket: {}, filename: {}]",
                     removeObjectArgs.bucket(), removeObjectArgs.object());
         } catch (ErrorResponseException | InsufficientDataException | InternalException | InvalidKeyException |
                  IOException | NoSuchAlgorithmException | ServerException | XmlParserException |
