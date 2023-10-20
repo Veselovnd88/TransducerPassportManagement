@@ -1,7 +1,11 @@
 databaseChangeLog:
   - changeSet:
-      id: createGeneratedResultFileTable
+      id: '02'
       author: Veselov Nikolay
+      labels: '02, result_file'
+      comment: 'create table for result file'
+      created: '2023-10-20'
+      failOnError: true
       changes:
         - sqlFile:
             dbms: postgresql

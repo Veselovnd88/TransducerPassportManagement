@@ -1,7 +1,11 @@
 databaseChangeLog:
   - changeSet:
-      id: createTemplateTable
+      id: '01'
       author: Veselov Nikolay
+      labels: '01, template'
+      comment: 'create table for template'
+      created: '2023-10-20'
+      failOnError: true
       changes:
         - sqlFile:
             dbms: postgresql
