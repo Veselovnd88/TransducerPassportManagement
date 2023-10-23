@@ -65,12 +65,12 @@ public class PassportServiceImpl implements PassportService {
         try {
             ByteArrayResource docxPassports = docxPassportService.createDocxPassports(generatePassportsDto);
             ByteArrayResource pdfBytes = pdfService.createPdf(docxPassports);
-            GeneratedResultFile resultFile = GeneratedResultFile.builder()
+            GeneratedResultFile rawResultFile = GeneratedResultFile.builder()
                     .filename(createFilenameFromGeneratePassportsDto(generatePassportsDto))
                     .templateId(generatePassportsDto.getTemplateId())
                     .build();
             log.debug("Saving generated file to storage");
-            GeneratedResultFile savedResult = generatedResultFileService.save(pdfBytes, resultFile);
+            GeneratedResultFile savedResult = generatedResultFileService.save(pdfBytes, rawResultFile);
             resultEventPublisher.publishSuccessResultEvent(savedResult);
             log.debug("Sending message to broker: [{}]", generatePassportsDto);
             sendToMessageBroker(generatePassportsDto);
