@@ -5,7 +5,7 @@ import ru.veselov.generatebytemplate.model.GeneratedResultFile;
 
 public interface GeneratedResultFileService {
 
-    void save(ByteArrayResource pdfBytes, GeneratedResultFile generatedResultFile);
+    GeneratedResultFile save(ByteArrayResource pdfBytes, GeneratedResultFile generatedResultFile);
 
     ByteArrayResource getResultFile(String resultFileId);
 

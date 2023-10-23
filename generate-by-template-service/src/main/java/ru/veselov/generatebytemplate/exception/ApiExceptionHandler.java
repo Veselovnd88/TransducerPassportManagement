@@ -37,30 +37,6 @@ public class ApiExceptionHandler {
         return new ApiErrorResponse(ErrorCode.ERROR_TEMPLATE_EXISTS, exception.getMessage());
     }
 
-    @ExceptionHandler(DocxProcessingException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//FIXME
-    public ApiErrorResponse handleDocProcessingException(DocxProcessingException e) {
-        return new ApiErrorResponse(ErrorCode.ERROR_DOC_PROCESSING, e.getMessage());
-    }
-
-    @ExceptionHandler(PdfProcessingException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//FIXME
-    public ApiErrorResponse handlePdfProcessingException(PdfProcessingException e) {
-        return new ApiErrorResponse(ErrorCode.ERROR_PDF_PROCESSING, e.getMessage());
-    }
-
-    @ExceptionHandler(ServiceUnavailableException.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)//FIXME
-    public ApiErrorResponse handleServiceUnavailableException(ServiceUnavailableException e) {
-        return new ApiErrorResponse(ErrorCode.ERROR_SERVICE_UNAVAILABLE, e.getMessage());
-    }
-
-    @ExceptionHandler(TemplateStorageException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//FIXME
-    public ApiErrorResponse handleTemplateStorageException(TemplateStorageException e) {
-        return new ApiErrorResponse(ErrorCode.ERROR_DOC_PROCESSING, e.getMessage());
-    }
-
     @ExceptionHandler(TemplateNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
     public ApiErrorResponse handleTemplateNotFoundException(TemplateNotFoundException e) {

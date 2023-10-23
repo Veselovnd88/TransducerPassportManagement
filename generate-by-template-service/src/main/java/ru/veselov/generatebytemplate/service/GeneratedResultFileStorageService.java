@@ -9,7 +9,7 @@ public interface GeneratedResultFileStorageService {
 
     GeneratedResultFileEntity saveUnSynced(GeneratedResultFile resultFile);
 
-    void syncResultFile(UUID resultFileId);
+    GeneratedResultFile syncResultFile(UUID resultFileId);
 
     GeneratedResultFile findById(String resultFileId);
 

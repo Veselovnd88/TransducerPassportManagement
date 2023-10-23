@@ -12,6 +12,12 @@ import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
+import ru.veselov.generatebytemplate.event.ResultEventPublisher;
+import ru.veselov.generatebytemplate.exception.CommonMinioException;
+import ru.veselov.generatebytemplate.exception.DocxProcessingException;
+import ru.veselov.generatebytemplate.exception.PdfProcessingException;
+import ru.veselov.generatebytemplate.exception.ServiceUnavailableException;
+import ru.veselov.generatebytemplate.exception.TemplateNotFoundException;
 import ru.veselov.generatebytemplate.model.GeneratedResultFile;
 import ru.veselov.generatebytemplate.service.DocxPassportService;
 import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
@@ -50,20 +56,31 @@ public class PassportServiceImpl implements PassportService {
 
     private final GeneratedResultFileService generatedResultFileService;
 
+    private final ResultEventPublisher resultEventPublisher;
+
     @Async(value = "asyncThreadPoolTaskExecutor")
     @Override
     public void createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
         log.info("Starting process of generating passports");
-        ByteArrayResource docxPassports = docxPassportService.createDocxPassports(generatePassportsDto);
-        ByteArrayResource pdfBytes = pdfService.createPdf(docxPassports);
-        GeneratedResultFile resultFile = GeneratedResultFile.builder()
-                .filename(createFilenameFromGeneratePassportsDto(generatePassportsDto))
-                .templateId(generatePassportsDto.getTemplateId())
-                .build();
-        log.debug("Saving generated file to storage");
-        generatedResultFileService.save(pdfBytes, resultFile);
-        log.debug("Sending message to broker: [{}]", generatePassportsDto);
-        sendToMessageBroker(generatePassportsDto);
+        try {
+            ByteArrayResource docxPassports = docxPassportService.createDocxPassports(generatePassportsDto);
+            ByteArrayResource pdfBytes = pdfService.createPdf(docxPassports);
+            GeneratedResultFile resultFile = GeneratedResultFile.builder()
+                    .filename(createFilenameFromGeneratePassportsDto(generatePassportsDto))
+                    .templateId(generatePassportsDto.getTemplateId())
+                    .build();
+            log.debug("Saving generated file to storage");
+            GeneratedResultFile savedResult = generatedResultFileService.save(pdfBytes, resultFile);
+            resultEventPublisher.publishSuccessResultEvent(savedResult);
+            log.debug("Sending message to broker: [{}]", generatePassportsDto);
+            sendToMessageBroker(generatePassportsDto);
+        } catch (CommonMinioException |
+                 PdfProcessingException |
+                 DocxProcessingException |
+                 TemplateNotFoundException | ServiceUnavailableException e) {
+            log.error("Error occurred during generating docx and pdf file with passports");
+            resultEventPublisher.publishErrorResultEvent(e);
+        }
     }
 
     private void sendToMessageBroker(GeneratePassportsDto generatePassportsDto) {

@@ -20,12 +20,14 @@ public class GeneratedResultFileServiceImpl implements GeneratedResultFileServic
     private final GeneratedResultFileMinioService generatedResultFileMinioService;
 
     @Override
-    public void save(ByteArrayResource pdfBytes, GeneratedResultFile generatedResultFile) {
+    public GeneratedResultFile save(ByteArrayResource pdfBytes, GeneratedResultFile generatedResultFile) {
         GeneratedResultFileEntity generatedResultFileEntity = generatedResultFileStorageService
                 .saveUnSynced(generatedResultFile);
         generatedResultFileMinioService.saveResult(pdfBytes, generatedResultFile);
-        generatedResultFileStorageService.syncResultFile(generatedResultFileEntity.getId());
+        GeneratedResultFile syncedResultFile = generatedResultFileStorageService
+                .syncResultFile(generatedResultFileEntity.getId());
         log.info("Generated file successfully saved and sync with DB and MinIO");
+        return syncedResultFile;
     }
 
     @Override

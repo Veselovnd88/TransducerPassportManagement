@@ -59,14 +59,15 @@ public class GeneratedResultFileStorageServiceImpl implements GeneratedResultFil
 
     @Override
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void syncResultFile(UUID resultFileId) {
+    public GeneratedResultFile syncResultFile(UUID resultFileId) {
         Optional<GeneratedResultFileEntity> fileEntityOptional = generatedResultFileRepository.findById(resultFileId);
         GeneratedResultFileEntity resultFileEntity = fileEntityOptional.orElseThrow(() -> {
             log.error(LOG_FILE_NOT_FOUND_MSG, resultFileId);
             return new ResultFileNotFoundException(EXCEPTION_FILE_NOT_FOUND_MSG.formatted(resultFileId));
         });
         resultFileEntity.setSynced(true);
-        generatedResultFileRepository.save(resultFileEntity);
+        GeneratedResultFileEntity savedAndSynced = generatedResultFileRepository.save(resultFileEntity);
+        return generatedResultFileMapper.toModel(savedAndSynced);
     }
 
     @Override

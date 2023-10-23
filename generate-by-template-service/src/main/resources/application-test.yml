@@ -77,7 +77,8 @@ management:
 logging:
   level:
     ru.veselov.ru.veselov.miniotemplateservice: debug
-    org.apache.kafka: WARN
+    org.apache.kafka: OFF
+    org.springframework.kafka: OFF
 
 executor:
   core-pool-size: 5
