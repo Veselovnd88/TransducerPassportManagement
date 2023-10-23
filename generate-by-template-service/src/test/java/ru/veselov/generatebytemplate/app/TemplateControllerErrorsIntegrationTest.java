@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
@@ -47,6 +48,9 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
 
     @MockBean
     KafkaTestConsumer kafkaTestConsumer;
+
+    @MockBean
+    KafkaAdmin kafkaAdmin;
 
     @AfterEach
     void clear() {

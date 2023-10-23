@@ -12,6 +12,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import ru.veselov.generatebytemplate.controller.GeneratePassportController;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.exception.error.ErrorCode;
+import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
 import ru.veselov.generatebytemplate.service.PassportService;
 
 import java.util.Collections;
@@ -31,6 +32,9 @@ public class GeneratePassportControllerValidationIntegrationTest {
 
     @MockBean
     PassportService passportService;
+
+    @MockBean
+    GeneratedResultFileService generatedResultFileService;
 
     @Test
     void shouldReturnValidationErrorForEmptyList() {

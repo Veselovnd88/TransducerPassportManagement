@@ -1,6 +1,5 @@
 package ru.veselov.generatebytemplate.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -9,13 +8,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.generatebytemplate.dto.SortingParams;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.exception.PageExceedsMaximumValueException;
+import ru.veselov.generatebytemplate.exception.TemplateNotFoundException;
 import ru.veselov.generatebytemplate.mapper.TemplateMapper;
 import ru.veselov.generatebytemplate.model.Template;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
@@ -65,7 +64,7 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             log.info("Template successfully saved to MinIO and synced with DB");
         } else {
             log.error("Template with [id: {}] for sync not found", templateId);
-            throw new EntityNotFoundException("Template with [id: %s] for sync not found".formatted(templateId));
+            throw new TemplateNotFoundException("Template with [id: %s] for sync not found".formatted(templateId));
         }
 
     }
@@ -79,7 +78,7 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             return templateMapper.toModel(optionalTemplate.get());
         } else {
             log.error(TEMPLATE_WITH_ID_NOT_FOUND_LOG, templateId);
-            throw new EntityNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
+            throw new TemplateNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
         }
     }
 
@@ -115,7 +114,7 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             log.info("Template [id: {}] info updated in DB", templateId);
         } else {
             log.error(TEMPLATE_WITH_ID_NOT_FOUND_LOG, templateId);
-            throw new EntityNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
+            throw new TemplateNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
         }
     }
 
@@ -130,7 +129,7 @@ public class TemplateStorageServiceImpl implements TemplateStorageService {
             log.info("Template with [id: {}] deleted from DB", templateId);
         } else {
             log.error(TEMPLATE_WITH_ID_NOT_FOUND_LOG, templateId);
-            throw new EntityNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
+            throw new TemplateNotFoundException(TEMPLATE_WITH_ID_NOT_FOUND.formatted(templateId));
         }
     }
 

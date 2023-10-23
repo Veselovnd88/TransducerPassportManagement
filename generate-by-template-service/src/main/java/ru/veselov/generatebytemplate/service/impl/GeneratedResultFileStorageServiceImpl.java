@@ -1,6 +1,5 @@
 package ru.veselov.generatebytemplate.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +8,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.generatebytemplate.entity.GeneratedResultFileEntity;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
+import ru.veselov.generatebytemplate.exception.ResultFileNotFoundException;
+import ru.veselov.generatebytemplate.exception.TemplateNotFoundException;
 import ru.veselov.generatebytemplate.mapper.GeneratedResultFileMapper;
 import ru.veselov.generatebytemplate.model.GeneratedResultFile;
 import ru.veselov.generatebytemplate.repository.GeneratedResultFileRepository;
@@ -44,7 +45,7 @@ public class GeneratedResultFileStorageServiceImpl implements GeneratedResultFil
         Optional<TemplateEntity> templateEntityOptional = templateRepository.findById(templateUUID);
         TemplateEntity templateEntity = templateEntityOptional.orElseThrow(() -> {
             log.error("Template with such [id: {}] not found", templateUUID);
-            return new EntityNotFoundException("Template with such [id: %s] not found".formatted(templateUUID));
+            return new TemplateNotFoundException("Template with such [id: %s] not found".formatted(templateUUID));
         });
         GeneratedResultFileEntity resultFileEntity = generatedResultFileMapper.toEntity(resultFile);
         resultFileEntity.setSynced(false);
@@ -62,7 +63,7 @@ public class GeneratedResultFileStorageServiceImpl implements GeneratedResultFil
         Optional<GeneratedResultFileEntity> fileEntityOptional = generatedResultFileRepository.findById(resultFileId);
         GeneratedResultFileEntity resultFileEntity = fileEntityOptional.orElseThrow(() -> {
             log.error(LOG_FILE_NOT_FOUND_MSG, resultFileId);
-            return new EntityNotFoundException(EXCEPTION_FILE_NOT_FOUND_MSG.formatted(resultFileId));
+            return new ResultFileNotFoundException(EXCEPTION_FILE_NOT_FOUND_MSG.formatted(resultFileId));
         });
         resultFileEntity.setSynced(true);
         generatedResultFileRepository.save(resultFileEntity);
@@ -75,7 +76,7 @@ public class GeneratedResultFileStorageServiceImpl implements GeneratedResultFil
                 .findById(resultFileUUID);
         GeneratedResultFileEntity resultFileEntity = resultFileEntityOptional.orElseThrow(() -> {
             log.error(LOG_FILE_NOT_FOUND_MSG, resultFileId);
-            return new EntityNotFoundException(EXCEPTION_FILE_NOT_FOUND_MSG.formatted(resultFileId));
+            return new ResultFileNotFoundException(EXCEPTION_FILE_NOT_FOUND_MSG.formatted(resultFileId));
         });
         log.info("Found result file with [id: {}]", resultFileId);
         return generatedResultFileMapper.toModel(resultFileEntity);

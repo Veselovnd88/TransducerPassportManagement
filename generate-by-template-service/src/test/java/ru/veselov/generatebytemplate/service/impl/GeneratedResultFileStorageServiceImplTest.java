@@ -16,6 +16,8 @@ import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.entity.GeneratedResultFileEntity;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
+import ru.veselov.generatebytemplate.exception.ResultFileNotFoundException;
+import ru.veselov.generatebytemplate.exception.TemplateNotFoundException;
 import ru.veselov.generatebytemplate.mapper.GeneratedResultFileMapper;
 import ru.veselov.generatebytemplate.mapper.GeneratedResultFileMapperImpl;
 import ru.veselov.generatebytemplate.model.GeneratedResultFile;
@@ -74,7 +76,7 @@ class GeneratedResultFileStorageServiceImplTest {
 
         Assertions.assertThatThrownBy(() ->
                         generatedResultFileStorageService.saveUnSynced(generatedResultFile))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(TemplateNotFoundException.class);
     }
 
     @Test
@@ -102,7 +104,7 @@ class GeneratedResultFileStorageServiceImplTest {
 
         Assertions.assertThatThrownBy(() ->
                         generatedResultFileStorageService.syncResultFile(fileUid))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ResultFileNotFoundException.class);
     }
 
     @Test
@@ -126,7 +128,7 @@ class GeneratedResultFileStorageServiceImplTest {
 
         Assertions.assertThatThrownBy(() ->
                         generatedResultFileStorageService.findById(fileUid))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(ResultFileNotFoundException.class);
     }
 
 }

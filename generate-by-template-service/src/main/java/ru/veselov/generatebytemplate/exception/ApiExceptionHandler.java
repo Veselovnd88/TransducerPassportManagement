@@ -1,7 +1,6 @@
 package ru.veselov.generatebytemplate.exception;
 
 import jakarta.persistence.EntityExistsException;
-import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -32,12 +31,6 @@ public class ApiExceptionHandler {
         return new ApiErrorResponse(ErrorCode.ERROR_MAX_PAGE, exception.getMessage());
     }
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiErrorResponse handleEntityNotFoundException(EntityNotFoundException exception) {
-        return new ApiErrorResponse(ErrorCode.ERROR_NOT_FOUND, exception.getMessage());
-    }
-
     @ExceptionHandler(EntityExistsException.class)
     @ResponseStatus(HttpStatus.CONFLICT)
     public ApiErrorResponse handleEntityExistsException(EntityExistsException exception) {
@@ -45,32 +38,38 @@ public class ApiExceptionHandler {
     }
 
     @ExceptionHandler(DocxProcessingException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//FIXME
     public ApiErrorResponse handleDocProcessingException(DocxProcessingException e) {
         return new ApiErrorResponse(ErrorCode.ERROR_DOC_PROCESSING, e.getMessage());
     }
 
     @ExceptionHandler(PdfProcessingException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//FIXME
     public ApiErrorResponse handlePdfProcessingException(PdfProcessingException e) {
         return new ApiErrorResponse(ErrorCode.ERROR_PDF_PROCESSING, e.getMessage());
     }
 
     @ExceptionHandler(ServiceUnavailableException.class)
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)//FIXME
     public ApiErrorResponse handleServiceUnavailableException(ServiceUnavailableException e) {
         return new ApiErrorResponse(ErrorCode.ERROR_SERVICE_UNAVAILABLE, e.getMessage());
     }
 
     @ExceptionHandler(TemplateStorageException.class)
-    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)//FIXME
     public ApiErrorResponse handleTemplateStorageException(TemplateStorageException e) {
         return new ApiErrorResponse(ErrorCode.ERROR_DOC_PROCESSING, e.getMessage());
     }
 
-    @ExceptionHandler(TemplateNotExistsException.class)
+    @ExceptionHandler(TemplateNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public ApiErrorResponse handleTemplateNotExistsException(TemplateNotExistsException e) {
+    public ApiErrorResponse handleTemplateNotFoundException(TemplateNotFoundException e) {
+        return new ApiErrorResponse(ErrorCode.ERROR_NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(ResultFileNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiErrorResponse handleResultFileNotFoundException(ResultFileNotFoundException e) {
         return new ApiErrorResponse(ErrorCode.ERROR_NOT_FOUND, e.getMessage());
     }
 

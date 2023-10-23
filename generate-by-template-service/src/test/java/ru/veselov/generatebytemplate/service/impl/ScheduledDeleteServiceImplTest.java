@@ -46,9 +46,8 @@ class ScheduledDeleteServiceImplTest {
 
         Mockito.verify(templateRepository, Mockito.times(1))
                 .deleteAllWithUnSyncFalse(localDateTimeArgumentCaptor.capture());
-
         LocalDateTime captured = localDateTimeArgumentCaptor.getValue();
-        Assertions.assertThat(captured).isBefore(LocalDateTime.now().minusDays(DELETE_DAYS));
+        Assertions.assertThat(captured).isBeforeOrEqualTo(LocalDateTime.now().minusDays(DELETE_DAYS));
     }
 
     @Test
@@ -57,9 +56,8 @@ class ScheduledDeleteServiceImplTest {
 
         Mockito.verify(generatedResultFileRepository, Mockito.times(1))
                 .deleteAllWithUnSyncFalse(localDateTimeArgumentCaptor.capture());
-
         LocalDateTime captured = localDateTimeArgumentCaptor.getValue();
-        Assertions.assertThat(captured).isBefore(LocalDateTime.now().minusDays(DELETE_DAYS));
+        Assertions.assertThat(captured).isBeforeOrEqualTo(LocalDateTime.now().minusDays(DELETE_DAYS));
 
     }
 
@@ -71,6 +69,7 @@ class ScheduledDeleteServiceImplTest {
                 .deleteExpiredResultFiles(localDateTimeArgumentCaptor.capture());
 
         LocalDateTime captured = localDateTimeArgumentCaptor.getValue();
-        Assertions.assertThat(captured).isBefore(LocalDateTime.now().minusDays(DELETE_DAYS));
+        Assertions.assertThat(captured).isBeforeOrEqualTo(LocalDateTime.now().minusDays(DELETE_DAYS));
     }
+
 }

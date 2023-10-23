@@ -1,6 +1,5 @@
 package ru.veselov.generatebytemplate.service.impl;
 
-import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.instancio.Instancio;
 import org.instancio.Select;
@@ -21,6 +20,7 @@ import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.dto.SortingParams;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.exception.PageExceedsMaximumValueException;
+import ru.veselov.generatebytemplate.exception.TemplateNotFoundException;
 import ru.veselov.generatebytemplate.mapper.TemplateMapper;
 import ru.veselov.generatebytemplate.mapper.TemplateMapperImpl;
 import ru.veselov.generatebytemplate.model.Template;
@@ -93,7 +93,7 @@ class TemplateStorageServiceImplTest {
                 Optional.empty());
 
         Assertions.assertThatThrownBy(() -> templateStorageService.syncTemplate(TestUtils.TEMPLATE_ID))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(TemplateNotFoundException.class);
     }
 
     @Test
@@ -115,7 +115,7 @@ class TemplateStorageServiceImplTest {
         Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
         String idString = ID.toString();
         Assertions.assertThatThrownBy(() -> templateStorageService.findTemplateById(idString))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(TemplateNotFoundException.class);
     }
 
     @Test
@@ -205,7 +205,7 @@ class TemplateStorageServiceImplTest {
         Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> templateStorageService.updateTemplate(templateId))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(TemplateNotFoundException.class);
     }
 
     @Test
@@ -227,7 +227,7 @@ class TemplateStorageServiceImplTest {
         Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() -> templateStorageService.deleteTemplate(templateId))
-                .isInstanceOf(EntityNotFoundException.class);
+                .isInstanceOf(TemplateNotFoundException.class);
     }
 
 }
