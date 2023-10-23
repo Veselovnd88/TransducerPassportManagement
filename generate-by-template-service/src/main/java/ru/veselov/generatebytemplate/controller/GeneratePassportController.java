@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -34,7 +35,7 @@ public class GeneratePassportController {
 
     @PostMapping(produces = MediaType.APPLICATION_PDF_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void getPassportsPdf(@RequestBody @Valid GeneratePassportsDto generatePassportsDto) {
+    public void createPassportsPdf(@RequestBody @Valid GeneratePassportsDto generatePassportsDto) {
         passportService.createPassportsPdf(generatePassportsDto);
     }
 
@@ -51,8 +52,9 @@ public class GeneratePassportController {
         String filename = byteArrayResource.getFilename();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_PDF);
-        headers.setContentDispositionFormData("attachment", "passports-" + filename
-                + "-" + resultId + ".pdf");
+        ContentDisposition attachment = ContentDisposition.formData().name("attachment")
+                .filename("passports-" + filename + "-" + resultId + ".pdf").build();
+        headers.setContentDisposition(attachment);
         headers.setContentLength(contentLength);
         return headers;
     }

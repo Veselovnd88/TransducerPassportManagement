@@ -11,7 +11,6 @@ import org.instancio.Instancio;
 import org.instancio.Select;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +19,7 @@ import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWeb
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.http.MediaType;
 import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -31,8 +31,8 @@ import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
+import ru.veselov.generatebytemplate.entity.GeneratedResultFileEntity;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
-import ru.veselov.generatebytemplate.exception.error.ErrorCode;
 import ru.veselov.generatebytemplate.repository.GeneratedResultFileRepository;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
 
@@ -53,13 +53,14 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
     @Value("${minio.buckets.template}")
     private String templateBucket;
 
+    @Value("${minio.buckets.result}")
+    private String resultBucket;
+
     public static final String URL_PREFIX = "/api/v1/generate";
 
     public static final int SIDE_PORT = 30003;
 
     public static final String sideApi = "http://localhost:%d".formatted(SIDE_PORT);
-
-    public static final String TEMPLATE_ID = UUID.randomUUID().toString();
 
     public byte[] DOCX_BYTES;
 
@@ -121,67 +122,20 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
 
     @Test
     @SneakyThrows
-    @Disabled
-    void shouldReturnDocxProcessingError() {
-        TemplateEntity templateEntity = saveTemplateToRepo();
-        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(templateEntity.getId().toString());
+    void shouldGetResultFile() {
+        GeneratedResultFileEntity generatedResultFileEntity = saveGeneratedResultFileToRepo();
+
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
-        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(templateBucket)
-                .object(templateEntity.getFilename()).build();
-        Mockito.when(getObjectResponse.readAllBytes()).thenReturn(new byte[]{1, 2, 3});
+        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(resultBucket)
+                .object(generatedResultFileEntity.getFilename()).build();
+        Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
-                .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_DOC_PROCESSING.toString());
-    }
-
-    @Test
-    @SneakyThrows
-    @Disabled
-    void shouldReturnPDFProcessingErrorFor400StatusOfPdfService() {
-        //mock pdf service
-        WireMock.stubFor(WireMock.post("/").willReturn(WireMock.aResponse().withStatus(400)));
-        TemplateEntity templateEntity = saveTemplateToRepo();
-        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(templateEntity.getId().toString());
-        GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
-        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(templateBucket)
-                .object(templateEntity.getFilename()).build();
-        Mockito.when(getObjectResponse.readAllBytes()).thenReturn(DOCX_BYTES);
-        Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
-
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
-                .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_PDF_PROCESSING.toString());
-    }
-
-    @Test
-    @SneakyThrows
-    @Disabled
-    void shouldReturnPDFProcessingErrorFor500StatusOfPdfService() {
-        //mock pdf service
-        WireMock.stubFor(WireMock.post("/").willReturn(WireMock.aResponse().withStatus(500)));
-        TemplateEntity templateEntity = saveTemplateToRepo();
-        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(templateEntity.getId().toString());
-        GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
-        GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(templateBucket)
-                .object(templateEntity.getFilename()).build();
-        Mockito.when(getObjectResponse.readAllBytes()).thenReturn(DOCX_BYTES);
-        Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
-
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
-                .bodyValue(generatePassportsDto).exchange().expectStatus().is5xxServerError()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_SERVICE_UNAVAILABLE.toString());
-    }
-
-    @Test
-    @Disabled
-    void shouldReturnTemplateNotFoundError() {
-        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(TEMPLATE_ID);
-
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
-                .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+                        .path("/result/" + generatedResultFileEntity.getId()).build())
+                .exchange().expectStatus().isOk()
+                .expectHeader().contentType(MediaType.APPLICATION_PDF)
+                .expectHeader().contentLength(TestUtils.SOURCE_BYTES.length);
     }
 
     private GeneratePassportsDto getGeneratePassportDto(String templateId) {
@@ -197,12 +151,22 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
     }
 
     private TemplateEntity saveTemplateToRepo() {
-        TemplateEntity templateEntity1 = new TemplateEntity();
-        templateEntity1.setFilename("801855-abc.docx");
-        templateEntity1.setTemplateName("801855-abc");
-        templateEntity1.setBucket(templateBucket);
-        templateEntity1.setPtArt("801855");
-        templateEntity1.setSynced(true);
-        return templateRepository.save(templateEntity1);
+        TemplateEntity templateEntity = new TemplateEntity();
+        templateEntity.setFilename("801855-abc.docx");
+        templateEntity.setTemplateName("801855-abc");
+        templateEntity.setBucket(templateBucket);
+        templateEntity.setPtArt("801855");
+        templateEntity.setSynced(true);
+        return templateRepository.save(templateEntity);
+    }
+
+    private GeneratedResultFileEntity saveGeneratedResultFileToRepo() {
+        TemplateEntity templateEntity = saveTemplateToRepo();
+        GeneratedResultFileEntity generatedResultFileEntity = GeneratedResultFileEntity.builder()
+                .bucket(resultBucket)
+                .filename("filename")
+                .templateEntity(templateEntity)
+                .synced(true).build();
+        return generatedResultFileRepository.save(generatedResultFileEntity);
     }
 }
