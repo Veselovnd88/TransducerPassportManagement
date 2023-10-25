@@ -6,13 +6,13 @@ GO
 CREATE TABLE pass_template
 (
     id            UUID           NOT NULL     DEFAULT gen_random_uuid(),
-    pt_art        varchar(20)    NOT NULL,
-    filename      varchar UNIQUE NOT NULL,
-    template_name varchar UNIQUE NOT NULL,
-    bucket        varchar        NOT NULL,
+    pt_art        VARCHAR(20)    NOT NULL,
+    filename      VARCHAR UNIQUE NOT NULL,
+    template_name VARCHAR UNIQUE NOT NULL,
+    bucket        VARCHAR        NOT NULL,
     synced        BOOLEAN                     DEFAULT FALSE,
-    edited_at     TIMESTAMP with time zone,
-    created_at    TIMESTAMP without time zone DEFAULT CURRENT_TIMESTAMP,
+    edited_at     TIMESTAMP WITHOUT TIME ZONE,
+    created_at    TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT pass_template_pk PRIMARY KEY (id)
 )
     GO

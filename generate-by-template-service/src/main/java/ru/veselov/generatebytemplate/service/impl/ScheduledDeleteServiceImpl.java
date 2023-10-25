@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.veselov.generatebytemplate.repository.GeneratedResultFileRepository;
+import ru.veselov.generatebytemplate.repository.ResultFileRepository;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
 import ru.veselov.generatebytemplate.service.ScheduledDeleteService;
 
@@ -28,7 +28,7 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
 
     private final TemplateRepository templateRepository;
 
-    private final GeneratedResultFileRepository generatedResultFileRepository;
+    private final ResultFileRepository resultFileRepository;
 
     @Override
     @Transactional
@@ -44,7 +44,7 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
     @Scheduled(cron = "${scheduling.delete-unsync-result}")
     public void deleteUnSynchronizedGenerateResultFiles() {
         LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteUnSyncResult);
-        generatedResultFileRepository.deleteAllWithUnSyncFalse(deleteDate);
+        resultFileRepository.deleteAllWithUnSyncFalse(deleteDate);
         log.info("Unsynchronized result files records older than {} days are deleted", daysUntilDeleteUnSyncResult);
     }
 
@@ -53,7 +53,7 @@ public class ScheduledDeleteServiceImpl implements ScheduledDeleteService {
     @Scheduled(cron = "${scheduling.delete-result}")
     public void deleteExpiredResultFiles() {
         LocalDateTime deleteDate = LocalDateTime.now().minusDays(daysUntilDeleteResult);
-        generatedResultFileRepository.deleteExpiredResultFiles(deleteDate);
+        resultFileRepository.deleteExpiredResultFiles(deleteDate);
         log.info("Expired result files older than {} days are deleted: ", daysUntilDeleteResult);
     }
 

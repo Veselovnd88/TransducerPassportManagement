@@ -15,16 +15,18 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
-import ru.veselov.generatebytemplate.entity.GeneratedResultFileEntity;
+import ru.veselov.generatebytemplate.entity.ResultFileEntity;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
-import ru.veselov.generatebytemplate.repository.GeneratedResultFileRepository;
+import ru.veselov.generatebytemplate.repository.ResultFileRepository;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
 import ru.veselov.generatebytemplate.service.TemplateStorageService;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @SpringBootTest
 @DirtiesContext
@@ -44,7 +46,7 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
     TemplateStorageService templateStorageService;
 
     @Autowired
-    GeneratedResultFileRepository generatedResultFileRepository;
+    ResultFileRepository resultFileRepository;
 
     @MockBean
     MinioClient minioClient;
@@ -58,7 +60,7 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
     @AfterEach
     void clear() {
         templateRepository.deleteAll();
-        generatedResultFileRepository.deleteAll();
+        resultFileRepository.deleteAll();
     }
 
     @DynamicPropertySource
@@ -94,7 +96,7 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
     void shouldDeleteUnSyncedResultFiles() {
         saveResultFileToRepo(LocalDateTime.now().minusDays(DAYS_UNTIL_DELETION + 1), false);
         Awaitility.await().pollDelay(Duration.ofSeconds(SCHEDULING_SECONDS)).until(() -> true);
-        List<GeneratedResultFileEntity> allAfterDelete = generatedResultFileRepository.findAll();
+        List<ResultFileEntity> allAfterDelete = resultFileRepository.findAll();
         Assertions.assertThat(allAfterDelete).isEmpty();
     }
 
@@ -103,7 +105,7 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
         saveResultFileToRepo(LocalDateTime.now(), false);
         Awaitility.await().pollDelay(Duration.ofSeconds(SCHEDULING_SECONDS)).until(() -> true);
 
-        List<GeneratedResultFileEntity> allAfterDelete = generatedResultFileRepository.findAll();
+        List<ResultFileEntity> allAfterDelete = resultFileRepository.findAll();
         Assertions.assertThat(allAfterDelete).hasSize(1);
     }
 
@@ -111,7 +113,7 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
     void shouldDeleteExpiredResultFile() {
         saveResultFileToRepo(LocalDateTime.now().minusDays(DAYS_UNTIL_DELETION + 1), true);
         Awaitility.await().pollDelay(Duration.ofSeconds(SCHEDULING_SECONDS)).until(() -> true);
-        List<GeneratedResultFileEntity> allAfterDelete = generatedResultFileRepository.findAll();
+        List<ResultFileEntity> allAfterDelete = resultFileRepository.findAll();
         Assertions.assertThat(allAfterDelete).isEmpty();
     }
 
@@ -125,11 +127,13 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
     void saveResultFileToRepo(LocalDateTime createdAt, Boolean sync) {
         TemplateEntity templateEntity = Instancio.of(TemplateEntity.class).set(Select.field("synced"), true).create();
         TemplateEntity savedTemplate = templateRepository.saveAndFlush(templateEntity);
-        GeneratedResultFileEntity resultFileEntity = Instancio.of(GeneratedResultFileEntity.class)
+        ResultFileEntity resultFileEntity = Instancio.of(ResultFileEntity.class)
                 .set(Select.field("templateEntity"), savedTemplate)
-                .set(Select.field("synced"), sync).create();
+                .set(Select.field("synced"), sync)
+                .set(Select.field("taskId"), UUID.fromString(TestUtils.TASK_ID))
+                .create();
         resultFileEntity.setCreatedAt(createdAt);
-        generatedResultFileRepository.save(resultFileEntity);
+        resultFileRepository.save(resultFileEntity);
     }
 
 }

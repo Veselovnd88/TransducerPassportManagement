@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import ru.veselov.generatebytemplate.repository.GeneratedResultFileRepository;
+import ru.veselov.generatebytemplate.repository.ResultFileRepository;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
 
 import java.time.LocalDateTime;
@@ -25,7 +25,7 @@ class ScheduledDeleteServiceImplTest {
     TemplateRepository templateRepository;
 
     @Mock
-    GeneratedResultFileRepository generatedResultFileRepository;
+    ResultFileRepository resultFileRepository;
 
     @InjectMocks
     ScheduledDeleteServiceImpl scheduledDeleteService;
@@ -54,7 +54,7 @@ class ScheduledDeleteServiceImplTest {
     void shouldDeleteUnSynchronizedGenerateResultFiles() {
         scheduledDeleteService.deleteUnSynchronizedGenerateResultFiles();
 
-        Mockito.verify(generatedResultFileRepository, Mockito.times(1))
+        Mockito.verify(resultFileRepository, Mockito.times(1))
                 .deleteAllWithUnSyncFalse(localDateTimeArgumentCaptor.capture());
         LocalDateTime captured = localDateTimeArgumentCaptor.getValue();
         Assertions.assertThat(captured).isBeforeOrEqualTo(LocalDateTime.now().minusDays(DELETE_DAYS));
@@ -65,7 +65,7 @@ class ScheduledDeleteServiceImplTest {
     void shouldDeleteExpiredResultFiles() {
         scheduledDeleteService.deleteExpiredResultFiles();
 
-        Mockito.verify(generatedResultFileRepository, Mockito.times(1))
+        Mockito.verify(resultFileRepository, Mockito.times(1))
                 .deleteExpiredResultFiles(localDateTimeArgumentCaptor.capture());
 
         LocalDateTime captured = localDateTimeArgumentCaptor.getValue();

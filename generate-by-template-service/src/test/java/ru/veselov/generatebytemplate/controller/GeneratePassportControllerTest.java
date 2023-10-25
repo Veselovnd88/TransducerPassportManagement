@@ -1,7 +1,5 @@
 package ru.veselov.generatebytemplate.controller;
 
-import org.instancio.Instancio;
-import org.instancio.Select;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,8 +13,8 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
-import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
 import ru.veselov.generatebytemplate.service.PassportService;
+import ru.veselov.generatebytemplate.service.ResultFileService;
 
 import java.util.UUID;
 
@@ -31,7 +29,7 @@ class GeneratePassportControllerTest {
     PassportService passportService;
 
     @Mock
-    GeneratedResultFileService generatedResultFileService;
+    ResultFileService resultFileService;
 
     @InjectMocks
     GeneratePassportController generatePassportController;
@@ -43,9 +41,7 @@ class GeneratePassportControllerTest {
 
     @Test
     void shouldCallPassportServiceToCreatePassports() {
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> UUID.randomUUID().toString())
-                .create();
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isAccepted();
@@ -57,14 +53,14 @@ class GeneratePassportControllerTest {
     void shouldGetResultById() {
         String resultUid = UUID.randomUUID().toString();
         ByteArrayResource byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
-        Mockito.when(generatedResultFileService.getResultFile(resultUid))
+        Mockito.when(resultFileService.getResultFile(resultUid))
                 .thenReturn(byteArrayResource);
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/result/" + resultUid).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(byteArrayResource.contentLength());
 
-        Mockito.verify(generatedResultFileService, Mockito.times(1)).getResultFile(resultUid);
+        Mockito.verify(resultFileService, Mockito.times(1)).getResultFile(resultUid);
     }
 
 

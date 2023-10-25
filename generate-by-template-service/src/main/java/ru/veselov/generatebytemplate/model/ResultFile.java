@@ -13,7 +13,7 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class GeneratedResultFile {
+public class ResultFile {
 
     private UUID id;
 
@@ -26,5 +26,9 @@ public class GeneratedResultFile {
 
     @JsonFormat(pattern = "yyyy-mm-dd HH:mm:ss")
     private LocalDateTime createdAt;
+
+    private String username;
+
+    private String taskId;
 
 }

@@ -18,12 +18,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.event.ResultEventPublisher;
+import ru.veselov.generatebytemplate.exception.CommonMinioException;
 import ru.veselov.generatebytemplate.exception.DocxProcessingException;
 import ru.veselov.generatebytemplate.exception.PdfProcessingException;
 import ru.veselov.generatebytemplate.exception.ServiceUnavailableException;
-import ru.veselov.generatebytemplate.model.GeneratedResultFile;
+import ru.veselov.generatebytemplate.exception.TemplateNotFoundException;
+import ru.veselov.generatebytemplate.model.ResultFile;
 import ru.veselov.generatebytemplate.service.DocxPassportService;
-import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
+import ru.veselov.generatebytemplate.service.ResultFileService;
 import ru.veselov.generatebytemplate.service.PdfService;
 
 import java.util.concurrent.CompletableFuture;
@@ -43,7 +45,7 @@ class PassportServiceImplTest {
     PdfService pdfService;
 
     @Mock
-    GeneratedResultFileService generatedResultFileService;
+    ResultFileService resultFileService;
 
     @Mock
     ResultEventPublisher eventPublisher;
@@ -58,7 +60,7 @@ class PassportServiceImplTest {
     ArgumentCaptor<Message<GeneratePassportsDto>> messageArgumentCaptor;
 
     @Captor
-    ArgumentCaptor<GeneratedResultFile> generatedResultFileArgumentCaptor;
+    ArgumentCaptor<ResultFile> generatedResultFileArgumentCaptor;
 
     @BeforeEach
     void init() {
@@ -68,11 +70,11 @@ class PassportServiceImplTest {
     @Test
     void shouldGenerateAndCreatePdfPassportsAndPublishEvent() {
         GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
-        GeneratedResultFile returnedResult = TestUtils.getBasicGeneratedResultFile();
+        ResultFile returnedResult = TestUtils.getBasicGeneratedResultFile();
         Mockito.when(docxPassportService.createDocxPassports(generatePassportsDto))
                 .thenReturn(byteArrayResource);
         Mockito.when(pdfService.createPdf(ArgumentMatchers.any())).thenReturn(byteArrayResource);
-        Mockito.when(generatedResultFileService.save(ArgumentMatchers.any(), ArgumentMatchers.any()))
+        Mockito.when(resultFileService.save(ArgumentMatchers.any(), ArgumentMatchers.any()))
                 .thenReturn(returnedResult);
         CompletableFuture mockCF = Mockito.mock(CompletableFuture.class);
         Mockito.when(kafkaTemplate.send(ArgumentMatchers.any(Message.class))).thenReturn(mockCF);
@@ -81,7 +83,7 @@ class PassportServiceImplTest {
 
         Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto);
         Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource);
-        Mockito.verify(generatedResultFileService, Mockito.times(1))
+        Mockito.verify(resultFileService, Mockito.times(1))
                 .save(ArgumentMatchers.any(ByteArrayResource.class), generatedResultFileArgumentCaptor.capture());
 
         Mockito.verify(eventPublisher, Mockito.times(1)).publishSuccessResultEvent(returnedResult);
@@ -101,7 +103,7 @@ class PassportServiceImplTest {
 
         Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(ArgumentMatchers.any());
         Mockito.verify(pdfService, Mockito.never()).createPdf(ArgumentMatchers.any());
-        Mockito.verify(generatedResultFileService, Mockito.never()).save(ArgumentMatchers.any(),
+        Mockito.verify(resultFileService, Mockito.never()).save(ArgumentMatchers.any(),
                 ArgumentMatchers.any());
         Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
         Mockito.verify(kafkaTemplate, Mockito.never()).send(ArgumentMatchers.any(Message.class));
@@ -119,7 +121,7 @@ class PassportServiceImplTest {
         passportService.createPassportsPdf(generatePassportsDto);
 
         Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(ArgumentMatchers.any());
-        Mockito.verify(generatedResultFileService, Mockito.never()).save(ArgumentMatchers.any(),
+        Mockito.verify(resultFileService, Mockito.never()).save(ArgumentMatchers.any(),
                 ArgumentMatchers.any());
         Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
         Mockito.verify(kafkaTemplate, Mockito.never()).send(ArgumentMatchers.any(Message.class));
@@ -137,11 +139,52 @@ class PassportServiceImplTest {
         passportService.createPassportsPdf(generatePassportsDto);
 
         Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(ArgumentMatchers.any());
-        Mockito.verify(generatedResultFileService, Mockito.never()).save(ArgumentMatchers.any(),
+        Mockito.verify(resultFileService, Mockito.never()).save(ArgumentMatchers.any(),
                 ArgumentMatchers.any());
         Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
         Mockito.verify(kafkaTemplate, Mockito.never()).send(ArgumentMatchers.any(Message.class));
     }
 
+    @Test
+    void shouldPublishErrorEventWhenTemplateNotFoundExceptionHappened() {
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
+        Mockito.when(docxPassportService.createDocxPassports(generatePassportsDto))
+                .thenReturn(byteArrayResource);
+        Mockito.when(pdfService.createPdf(byteArrayResource))
+                .thenReturn(byteArrayResource);
+        Mockito.doThrow(TemplateNotFoundException.class).when(resultFileService)
+                .save(ArgumentMatchers.any(), ArgumentMatchers.any());
+
+        passportService.createPassportsPdf(generatePassportsDto);
+
+        Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto);
+        Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource);
+        Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(ArgumentMatchers.any());
+        Mockito.verify(resultFileService, Mockito.times(1)).save(ArgumentMatchers.any(),
+                ArgumentMatchers.any());
+        Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
+        Mockito.verify(kafkaTemplate, Mockito.never()).send(ArgumentMatchers.any(Message.class));
+    }
+
+    @Test
+    void shouldPublishErrorEventWhenMinioExceptionHappened() {
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
+        Mockito.when(docxPassportService.createDocxPassports(generatePassportsDto))
+                .thenReturn(byteArrayResource);
+        Mockito.when(pdfService.createPdf(byteArrayResource))
+                .thenReturn(byteArrayResource);
+        Mockito.doThrow(CommonMinioException.class).when(resultFileService)
+                .save(ArgumentMatchers.any(), ArgumentMatchers.any());
+
+        passportService.createPassportsPdf(generatePassportsDto);
+
+        Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto);
+        Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource);
+        Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(ArgumentMatchers.any());
+        Mockito.verify(resultFileService, Mockito.times(1)).save(ArgumentMatchers.any(),
+                ArgumentMatchers.any());
+        Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
+        Mockito.verify(kafkaTemplate, Mockito.never()).send(ArgumentMatchers.any(Message.class));
+    }
 
 }

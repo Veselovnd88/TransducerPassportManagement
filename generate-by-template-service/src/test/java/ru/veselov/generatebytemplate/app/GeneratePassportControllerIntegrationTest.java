@@ -31,9 +31,9 @@ import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
-import ru.veselov.generatebytemplate.entity.GeneratedResultFileEntity;
+import ru.veselov.generatebytemplate.entity.ResultFileEntity;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
-import ru.veselov.generatebytemplate.repository.GeneratedResultFileRepository;
+import ru.veselov.generatebytemplate.repository.ResultFileRepository;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
 
 import java.io.InputStream;
@@ -74,7 +74,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
     TemplateRepository templateRepository;
 
     @Autowired
-    GeneratedResultFileRepository generatedResultFileRepository;
+    ResultFileRepository resultFileRepository;
 
     @MockBean
     MinioClient minioClient;
@@ -92,7 +92,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
     @AfterEach
     void clear() {
         templateRepository.deleteAll();
-        generatedResultFileRepository.deleteAll();
+        resultFileRepository.deleteAll();
     }
 
     @DynamicPropertySource
@@ -123,16 +123,16 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
     @Test
     @SneakyThrows
     void shouldGetResultFile() {
-        GeneratedResultFileEntity generatedResultFileEntity = saveGeneratedResultFileToRepo();
+        ResultFileEntity resultFileEntity = saveGeneratedResultFileToRepo();
 
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
         GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(resultBucket)
-                .object(generatedResultFileEntity.getFilename()).build();
+                .object(resultFileEntity.getFilename()).build();
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
-                        .path("/result/" + generatedResultFileEntity.getId()).build())
+                        .path("/result/" + resultFileEntity.getId()).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(TestUtils.SOURCE_BYTES.length);
@@ -143,6 +143,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         SerialNumberDto serialNumberDto2 = new SerialNumberDto("456", UUID.randomUUID().toString());
         GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
                 .ignore(Select.field("serials"))
+                .supply(Select.field(GeneratePassportsDto::getTaskId), () -> TestUtils.TASK_ID)
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> templateId)
                 .create();
 
@@ -160,13 +161,16 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         return templateRepository.save(templateEntity);
     }
 
-    private GeneratedResultFileEntity saveGeneratedResultFileToRepo() {
+    private ResultFileEntity saveGeneratedResultFileToRepo() {
         TemplateEntity templateEntity = saveTemplateToRepo();
-        GeneratedResultFileEntity generatedResultFileEntity = GeneratedResultFileEntity.builder()
+        ResultFileEntity resultFileEntity = ResultFileEntity.builder()
                 .bucket(resultBucket)
                 .filename("filename")
                 .templateEntity(templateEntity)
+                .taskId(UUID.fromString(TestUtils.TASK_ID))
+                .username(TestUtils.USERNAME)
                 .synced(true).build();
-        return generatedResultFileRepository.save(generatedResultFileEntity);
+        return resultFileRepository.save(resultFileEntity);
     }
+
 }

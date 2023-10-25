@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Component;
-import ru.veselov.generatebytemplate.model.GeneratedResultFile;
+import ru.veselov.generatebytemplate.model.ResultFile;
 
 @Component
 @RequiredArgsConstructor
@@ -13,7 +13,7 @@ public class ResultEventPublisher {
 
     private final ApplicationEventPublisher publisher;
 
-    public void publishSuccessResultEvent(GeneratedResultFile resultFile) {
+    public void publishSuccessResultEvent(ResultFile resultFile) {
         SuccessResultEvent successResultEvent = new SuccessResultEvent(resultFile.getId().toString(),
                 "File was successfully generated");
         publisher.publishEvent(successResultEvent);

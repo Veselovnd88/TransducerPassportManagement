@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
-import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
+import ru.veselov.generatebytemplate.service.ResultFileService;
 import ru.veselov.generatebytemplate.service.PassportService;
 
 @RestController
@@ -31,7 +31,7 @@ public class GeneratePassportController {
 
     private final PassportService passportService;
 
-    private final GeneratedResultFileService generatedResultFileService;
+    private final ResultFileService resultFileService;
 
     @PostMapping(produces = MediaType.APPLICATION_PDF_VALUE)
     @ResponseStatus(HttpStatus.ACCEPTED)
@@ -39,10 +39,9 @@ public class GeneratePassportController {
         passportService.createPassportsPdf(generatePassportsDto);
     }
 
-    //TODO Test me
     @GetMapping(value = "/result/{resultId}", produces = MediaType.APPLICATION_PDF_VALUE)
     public ResponseEntity<byte[]> getResult(@PathVariable @UUID String resultId) {
-        ByteArrayResource pdfResult = generatedResultFileService.getResultFile(resultId);
+        ByteArrayResource pdfResult = resultFileService.getResultFile(resultId);
         HttpHeaders headers = createHeaders(pdfResult, resultId);
         return new ResponseEntity<>(pdfResult.getByteArray(), headers, HttpStatus.OK);
     }

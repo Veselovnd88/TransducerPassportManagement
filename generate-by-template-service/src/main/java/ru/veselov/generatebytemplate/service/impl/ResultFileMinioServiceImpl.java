@@ -9,16 +9,16 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
 import ru.veselov.generatebytemplate.exception.CommonMinioException;
-import ru.veselov.generatebytemplate.model.GeneratedResultFile;
+import ru.veselov.generatebytemplate.model.ResultFile;
 import ru.veselov.generatebytemplate.service.MinioHelper;
-import ru.veselov.generatebytemplate.service.GeneratedResultFileMinioService;
+import ru.veselov.generatebytemplate.service.ResultFileMinioService;
 
 import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class GeneratedResultFileMinioServiceImpl implements GeneratedResultFileMinioService {
+public class ResultFileMinioServiceImpl implements ResultFileMinioService {
 
     @Value("${minio.buckets.result}")
     private String resultBucket;
@@ -26,7 +26,7 @@ public class GeneratedResultFileMinioServiceImpl implements GeneratedResultFileM
     private final MinioHelper minioHelper;
 
     @Override
-    public String saveResult(Resource resource, GeneratedResultFile resultFile) {
+    public void saveResult(Resource resource, ResultFile resultFile) {
         try {
             PutObjectArgs saveArgs = PutObjectArgs.builder().bucket(resultBucket)
                     .object(resultFile.getFilename())
@@ -35,7 +35,7 @@ public class GeneratedResultFileMinioServiceImpl implements GeneratedResultFileM
             minioHelper.putObject(saveArgs);
             log.info("Template saved to MinIO storage: [bucket: {}, filename: {}]",
                     saveArgs.bucket(), saveArgs.object());
-            return saveArgs.object();
+            saveArgs.object();
         } catch (IOException e) {
             log.error("Something went wrong with reading object for saving: {}", e.getMessage());
             throw new CommonMinioException(e.getMessage(), e);
@@ -43,7 +43,7 @@ public class GeneratedResultFileMinioServiceImpl implements GeneratedResultFileM
     }
 
     @Override
-    public ByteArrayResource loadResultFile(GeneratedResultFile resultFile) {
+    public ByteArrayResource loadResultFile(ResultFile resultFile) {
         String filename = resultFile.getFilename();
         GetObjectArgs objectArgs = GetObjectArgs.builder().bucket(resultBucket).object(filename).build();
         return minioHelper.getByteArrayResource(objectArgs);

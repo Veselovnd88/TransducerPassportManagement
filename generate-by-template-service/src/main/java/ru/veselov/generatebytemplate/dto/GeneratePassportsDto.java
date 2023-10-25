@@ -1,5 +1,6 @@
 package ru.veselov.generatebytemplate.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,8 +17,6 @@ import java.util.List;
 @AllArgsConstructor
 public class GeneratePassportsDto {
 
-    //TODO task num, username?
-
     @NotEmpty
     private List<SerialNumberDto> serials = new ArrayList<>();
 
@@ -27,5 +26,12 @@ public class GeneratePassportsDto {
 
     @NotNull
     private LocalDate printDate;
+
+    @NotBlank
+    private String username;
+
+    @NotNull
+    @UUID
+    private String taskId;
 
 }

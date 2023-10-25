@@ -21,19 +21,19 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.exception.CommonMinioException;
-import ru.veselov.generatebytemplate.model.GeneratedResultFile;
+import ru.veselov.generatebytemplate.model.ResultFile;
 import ru.veselov.generatebytemplate.service.MinioHelper;
 
 import java.io.BufferedInputStream;
 import java.security.InvalidKeyException;
 
 @ExtendWith(MockitoExtension.class)
-class GeneratedResultFileMinioServiceImplTest {
+class ResultFileMinioServiceImplTest {
 
     @Mock
     MinioClient minioClient;
 
-    GeneratedResultFileMinioServiceImpl generatedResultFileMinioService;
+    ResultFileMinioServiceImpl generatedResultFileMinioService;
 
     @Captor
     ArgumentCaptor<PutObjectArgs> argumentPutObjCaptor;
@@ -47,7 +47,7 @@ class GeneratedResultFileMinioServiceImplTest {
     @BeforeEach
     void init() {
         MinioHelper minioHelper = new MinioHelperImpl(minioClient);
-        generatedResultFileMinioService = new GeneratedResultFileMinioServiceImpl(minioHelper);
+        generatedResultFileMinioService = new ResultFileMinioServiceImpl(minioHelper);
         ReflectionTestUtils
                 .setField(generatedResultFileMinioService, "resultBucket", TestUtils.RESULT_BUCKET, String.class);
     }
@@ -56,13 +56,13 @@ class GeneratedResultFileMinioServiceImplTest {
     @SneakyThrows
     void shouldSaveResultToMinIOStorage() {
         Resource resource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
-        GeneratedResultFile basicGeneratedResultFile = TestUtils.getBasicGeneratedResultFile();
-        generatedResultFileMinioService.saveResult(resource, basicGeneratedResultFile);
+        ResultFile basicResultFile = TestUtils.getBasicGeneratedResultFile();
+        generatedResultFileMinioService.saveResult(resource, basicResultFile);
 
         Mockito.verify(minioClient, Mockito.times(1)).putObject(argumentPutObjCaptor.capture());
         PutObjectArgs captured = argumentPutObjCaptor.getValue();
         Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.RESULT_BUCKET);
-        Assertions.assertThat(captured.object()).isEqualTo(basicGeneratedResultFile.getFilename());
+        Assertions.assertThat(captured.object()).isEqualTo(basicResultFile.getFilename());
         try (BufferedInputStream bis = captured.stream()) {
             Assertions.assertThat(bis.readAllBytes()).isEqualTo(resource.getContentAsByteArray());
         }
@@ -72,28 +72,28 @@ class GeneratedResultFileMinioServiceImplTest {
     @SneakyThrows
     void shouldThrowCommonMinioException() {
         Resource resource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
-        GeneratedResultFile basicGeneratedResultFile = TestUtils.getBasicGeneratedResultFile();
+        ResultFile basicResultFile = TestUtils.getBasicGeneratedResultFile();
         Mockito.when(minioClient.putObject(ArgumentMatchers.any())).thenThrow(InvalidKeyException.class);
         Assertions.assertThatThrownBy(
-                        () -> generatedResultFileMinioService.saveResult(resource, basicGeneratedResultFile))
+                        () -> generatedResultFileMinioService.saveResult(resource, basicResultFile))
                 .isInstanceOf(CommonMinioException.class);
     }
 
     @Test
     @SneakyThrows
     void shouldLoadResultFileFromMinIO() {
-        GeneratedResultFile basicGeneratedResultFile = TestUtils.getBasicGeneratedResultFile();
+        ResultFile basicResultFile = TestUtils.getBasicGeneratedResultFile();
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
         Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
 
-        ByteArrayResource byteArrayResource = generatedResultFileMinioService.loadResultFile(basicGeneratedResultFile);
+        ByteArrayResource byteArrayResource = generatedResultFileMinioService.loadResultFile(basicResultFile);
 
         Mockito.verify(minioClient, Mockito.times(1)).getObject(argumentGetObjCaptor.capture());
         GetObjectArgs captured = argumentGetObjCaptor.getValue();
 
         Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES);
-        Assertions.assertThat(captured.object()).isEqualTo(basicGeneratedResultFile.getFilename());
+        Assertions.assertThat(captured.object()).isEqualTo(basicResultFile.getFilename());
         Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.RESULT_BUCKET);
     }
 

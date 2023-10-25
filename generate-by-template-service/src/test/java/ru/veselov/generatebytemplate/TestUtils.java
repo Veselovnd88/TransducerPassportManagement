@@ -2,7 +2,7 @@ package ru.veselov.generatebytemplate;
 
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
-import ru.veselov.generatebytemplate.model.GeneratedResultFile;
+import ru.veselov.generatebytemplate.model.ResultFile;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -36,6 +36,8 @@ public class TestUtils {
     public static final String TEMPLATE_BUCKET = "templates";
 
     public static final String RESULT_BUCKET = "results";
+    public static final String USERNAME = "username";
+    public static final String TASK_ID = UUID.randomUUID().toString();
 
     public static List<SerialNumberDto> SERIALS_DTOS = List.of(
             new SerialNumberDto("1", UUID.randomUUID().toString()),
@@ -52,11 +54,11 @@ public class TestUtils {
 
     public static GeneratePassportsDto getBasicGeneratePassportsDto() {
         return new GeneratePassportsDto(
-                SERIALS_DTOS, UUID.randomUUID().toString(), DATE);
+                SERIALS_DTOS, UUID.randomUUID().toString(), DATE, TestUtils.USERNAME, TestUtils.TASK_ID);
     }
 
-    public static GeneratedResultFile getBasicGeneratedResultFile() {
-        return GeneratedResultFile.builder()
+    public static ResultFile getBasicGeneratedResultFile() {
+        return ResultFile.builder()
                 .templateId(TEMPLATE_ID.toString())
                 .bucket(RESULT_BUCKET)
                 .filename("my-filename.pdf")

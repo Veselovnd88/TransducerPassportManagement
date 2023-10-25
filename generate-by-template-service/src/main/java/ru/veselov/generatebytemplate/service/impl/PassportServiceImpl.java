@@ -18,9 +18,9 @@ import ru.veselov.generatebytemplate.exception.DocxProcessingException;
 import ru.veselov.generatebytemplate.exception.PdfProcessingException;
 import ru.veselov.generatebytemplate.exception.ServiceUnavailableException;
 import ru.veselov.generatebytemplate.exception.TemplateNotFoundException;
-import ru.veselov.generatebytemplate.model.GeneratedResultFile;
+import ru.veselov.generatebytemplate.model.ResultFile;
 import ru.veselov.generatebytemplate.service.DocxPassportService;
-import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
+import ru.veselov.generatebytemplate.service.ResultFileService;
 import ru.veselov.generatebytemplate.service.PassportService;
 import ru.veselov.generatebytemplate.service.PdfService;
 
@@ -54,7 +54,7 @@ public class PassportServiceImpl implements PassportService {
 
     private final KafkaTemplate<String, GeneratePassportsDto> kafkaTemplate;
 
-    private final GeneratedResultFileService generatedResultFileService;
+    private final ResultFileService resultFileService;
 
     private final ResultEventPublisher resultEventPublisher;
 
@@ -65,12 +65,9 @@ public class PassportServiceImpl implements PassportService {
         try {
             ByteArrayResource docxPassports = docxPassportService.createDocxPassports(generatePassportsDto);
             ByteArrayResource pdfBytes = pdfService.createPdf(docxPassports);
-            GeneratedResultFile rawResultFile = GeneratedResultFile.builder()
-                    .filename(createFilenameFromGeneratePassportsDto(generatePassportsDto))
-                    .templateId(generatePassportsDto.getTemplateId())
-                    .build();
+            ResultFile rawResultFile = createResultFile(generatePassportsDto);
             log.debug("Saving generated file to storage");
-            GeneratedResultFile savedResult = generatedResultFileService.save(pdfBytes, rawResultFile);
+            ResultFile savedResult = resultFileService.save(pdfBytes, rawResultFile);
             resultEventPublisher.publishSuccessResultEvent(savedResult);
             log.debug("Sending message to broker: [{}]", generatePassportsDto);
             sendToMessageBroker(generatePassportsDto);
@@ -93,7 +90,7 @@ public class PassportServiceImpl implements PassportService {
                 log.info("Message successfully sent to Kafka broker, to [topic {}: message: {}]",
                         topic, generatePassportsDto);
             } else {
-                log.error("Message wan not sent to broker with exception: {}", ex.getMessage());
+                log.error("Message was not sent to broker with exception: {}", ex.getMessage());
             }
         });
     }
@@ -101,6 +98,15 @@ public class PassportServiceImpl implements PassportService {
     private String getFormattedDate(LocalDate localDate) {
         DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(dateFormat);
         return dateTimeFormatter.format(localDate);
+    }
+
+    private ResultFile createResultFile(GeneratePassportsDto generatePassportsDto) {
+        return ResultFile.builder()
+                .filename(createFilenameFromGeneratePassportsDto(generatePassportsDto))
+                .templateId(generatePassportsDto.getTemplateId())
+                .taskId(generatePassportsDto.getTaskId())
+                .username(generatePassportsDto.getUsername())
+                .build();
     }
 
     private String createFilenameFromGeneratePassportsDto(GeneratePassportsDto generatePassportsDto) {

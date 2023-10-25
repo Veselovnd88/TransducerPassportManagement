@@ -1,5 +1,7 @@
 databaseChangeLog:
   - include:
-      file: db/changelog/changelogs/01-changelog-create-template-table.yaml
+      relativeToChangelogFile: true
+      file: changelogs/db.changelog-01.00.yaml
   - include:
-      file: db/changelog/changelogs/02-changelog-create-generated-result-file-table.yaml
+      relativeToChangelogFile: true
+      file: changelogs/db.changelog-01.01.yaml

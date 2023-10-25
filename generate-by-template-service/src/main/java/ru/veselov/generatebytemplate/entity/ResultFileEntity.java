@@ -13,15 +13,16 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Objects;
+import java.util.UUID;
 
 @Entity
-@Table(name = "generated_result_file")
+@Table(name = "result_file")
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
 @AllArgsConstructor
-public class GeneratedResultFileEntity extends BaseEntity {
+public class ResultFileEntity extends BaseEntity {
 
     @Column(name = "filename")
     private String filename;
@@ -32,6 +33,12 @@ public class GeneratedResultFileEntity extends BaseEntity {
     @Column(name = "synced")
     private Boolean synced;
 
+    @Column(name = "username")
+    private String username;
+
+    @Column(name = "task_id")
+    private UUID taskId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "template_id", referencedColumnName = "id")
     private TemplateEntity templateEntity;
@@ -41,7 +48,7 @@ public class GeneratedResultFileEntity extends BaseEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         if (!super.equals(o)) return false;
-        GeneratedResultFileEntity that = (GeneratedResultFileEntity) o;
+        ResultFileEntity that = (ResultFileEntity) o;
         return Objects.equals(getFilename(), that.getFilename()) && Objects.equals(getBucket(), that.getBucket())
                 && Objects.equals(getSynced(), that.getSynced())
                 && Objects.equals(getTemplateEntity(), that.getTemplateEntity());

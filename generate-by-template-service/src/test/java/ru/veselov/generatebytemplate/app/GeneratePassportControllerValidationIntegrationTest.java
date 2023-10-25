@@ -1,22 +1,22 @@
 package ru.veselov.generatebytemplate.app;
 
-import org.instancio.Instancio;
-import org.instancio.Select;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.controller.GeneratePassportController;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.exception.error.ErrorCode;
-import ru.veselov.generatebytemplate.service.GeneratedResultFileService;
 import ru.veselov.generatebytemplate.service.PassportService;
+import ru.veselov.generatebytemplate.service.ResultFileService;
 
 import java.util.Collections;
-import java.util.UUID;
 
 @WebMvcTest(controllers = GeneratePassportController.class)
 @AutoConfigureWebTestClient
@@ -25,8 +25,6 @@ public class GeneratePassportControllerValidationIntegrationTest {
 
     public static final String URL_PREFIX = "/api/v1/generate";
 
-    public static final String TEMPLATE_ID = UUID.randomUUID().toString();
-
     @Autowired
     WebTestClient webTestClient;
 
@@ -34,14 +32,12 @@ public class GeneratePassportControllerValidationIntegrationTest {
     PassportService passportService;
 
     @MockBean
-    GeneratedResultFileService generatedResultFileService;
+    ResultFileService resultFileService;
 
     @Test
     void shouldReturnValidationErrorForEmptyList() {
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .set(Select.field(GeneratePassportsDto.class, "serials"), Collections.emptyList())
-                .create();
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
+        generatePassportsDto.setSerials(Collections.emptyList());
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
@@ -51,9 +47,8 @@ public class GeneratePassportControllerValidationIntegrationTest {
 
     @Test
     void shouldReturnValidationErrorForEmptyTemplateId() {
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> null)
-                .create();
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
+        generatePassportsDto.setTemplateId(null);
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
@@ -63,9 +58,8 @@ public class GeneratePassportControllerValidationIntegrationTest {
 
     @Test
     void shouldReturnValidationErrorForNotUUIDTemplateId() {
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> "notUUID")
-                .create();
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
+        generatePassportsDto.setTemplateId("notUUID");
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
@@ -74,16 +68,37 @@ public class GeneratePassportControllerValidationIntegrationTest {
     }
 
     @Test
+    void shouldReturnValidationErrorForNotUUIDTaskId() {
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
+        generatePassportsDto.setTaskId("notUUID");
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
+                .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("taskId");
+    }
+
+    @Test
     void shouldReturnValidationErrorForEmptyDate() {
-        GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
-                .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> TEMPLATE_ID)
-                .set(Select.field(GeneratePassportsDto.class, "printDate"), null)
-                .create();
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
+        generatePassportsDto.setPrintDate(null);
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
                 .jsonPath("$.violations[0].fieldName").isEqualTo("printDate");
+    }
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    void shouldReturnValidationErrorForEmptyOrNullUsername(String username) {
+        GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
+        generatePassportsDto.setUsername(username);
+
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
+                .bodyValue(generatePassportsDto).exchange().expectStatus().is4xxClientError()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("username");
     }
 
 }
