@@ -1,0 +1,72 @@
+package ru.veselov.generatebytemplate.app;
+
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.web.reactive.server.WebTestClient;
+import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.controller.TemplateInfoController;
+import ru.veselov.generatebytemplate.exception.error.ErrorCode;
+import ru.veselov.generatebytemplate.service.TemplateStorageService;
+
+@WebMvcTest(controllers = TemplateInfoController.class)
+@AutoConfigureWebTestClient
+@ActiveProfiles("test")
+public class TemplateInfoControllerValidationTest {
+
+    public static final String URL_PREFIX = "/api/v1/template/info";
+
+    @Autowired
+    WebTestClient webTestClient;
+
+    @MockBean
+    TemplateStorageService templateStorageService;
+
+
+    @Test
+    void shouldReturnErrorWithWrongUUID() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/id/" + "notUUID").build())
+                .exchange().expectStatus().isBadRequest()
+                .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo("templateId");
+    }
+
+    @Test
+    void shouldReturnValidationErrorPassingNotCorrectSortSortByField() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
+                        .queryParam(TestUtils.PAGE, 0)
+                        .queryParam(TestUtils.SORT, "tort")
+                        .queryParam(TestUtils.ORDER, "asc")
+                        .build())
+                .exchange().expectStatus().isBadRequest()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo(TestUtils.SORT);
+    }
+
+    @Test
+    void shouldReturnValidationErrorWhenPassNegativePage() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
+                        .queryParam(TestUtils.PAGE, -1).build())
+                .exchange().expectStatus().isBadRequest()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo(TestUtils.PAGE);
+    }
+
+    @Test
+    void shouldReturnValidationErrorPassingNotCorrectSortOrderField() {
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
+                        .queryParam(TestUtils.PAGE, 0)
+                        .queryParam(TestUtils.SORT, "ptArt")
+                        .queryParam(TestUtils.ORDER, "pasc")
+                        .build())
+                .exchange().expectStatus().isBadRequest()
+                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath("$.violations[0].fieldName").isEqualTo(TestUtils.ORDER);
+    }
+
+}

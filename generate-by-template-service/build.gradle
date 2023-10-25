@@ -28,41 +28,40 @@ ext {
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-cache'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'io.micrometer:micrometer-tracing-bridge-brave'
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
-    implementation 'io.zipkin.brave:brave-instrumentation-http:5.16.0'
+    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.7'
+    implementation 'io.minio:minio:8.5.4'
+    implementation 'org.mapstruct:mapstruct:1.5.5.Final'
+    implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation "org.apache.poi:poi-ooxml:${poi}"
     implementation "org.apache.poi:poi:${poi}"
     implementation 'commons-io:commons-io:2.13.0'
-    implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
-    implementation 'org.springframework.cloud:spring-cloud-starter-config'
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.7'
-    implementation 'org.springframework.boot:spring-boot-starter-cache:3.1.2'
     implementation 'org.springframework.kafka:spring-kafka'
-
-    implementation project(':liquibase-migration')
+    implementation 'org.liquibase:liquibase-core'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
-    annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
     annotationProcessor 'org.projectlombok:lombok'
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.5.5.Final'
+
     testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.projectlombok:lombok:1.18.22'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'io.projectreactor:reactor-test'
-    testImplementation 'org.projectlombok:lombok:1.18.22'
     testImplementation 'org.instancio:instancio-junit:3.0.1'
-    testImplementation 'org.springframework.boot:spring-boot-testcontainers'
-    testImplementation 'io.projectreactor:reactor-test'
-    testImplementation 'org.testcontainers:junit-jupiter'
-    testImplementation 'org.testcontainers:postgresql'
-    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'org.testcontainers:junit-jupiter:1.18.3'
+    testImplementation "org.testcontainers:postgresql:1.18.3"
     testImplementation 'org.awaitility:awaitility:4.2.0'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
+    testImplementation 'com.github.tomakehurst:wiremock:3.0.0-beta-10'
 }
 
 dependencyManagement {

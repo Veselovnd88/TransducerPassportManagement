@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: '01-00'
+      author: 'veselov.nikolay'
+      labels: '01-00, template'
+      comment: 'create table for template'
+      created: '2023-10-25'
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: script/01-00-create-template-table.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - dropTable:
+            tableName: 'pass_template'

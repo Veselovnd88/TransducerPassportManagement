@@ -1,0 +1,5 @@
+rootProject.name = 'generate-by-template-service'
+
+include ':liquibase-migration'
+
+project(':liquibase-migration').projectDir = new File(settingsDir, "../liquibase-migration")

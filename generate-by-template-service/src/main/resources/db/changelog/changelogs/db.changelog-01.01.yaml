@@ -1,0 +1,27 @@
+databaseChangeLog:
+  - changeSet:
+      id: 'tag-01-00'
+      author: 'veselov.nikolay'
+      comment: 'tag before creating result file table'
+      changes:
+        - tagDatabase:
+            tag: 'before-create-result-file-table-01-00'
+
+  - changeSet:
+      id: '01-01'
+      author: 'veselov.nikolay'
+      labels: '01-01, result_file'
+      comment: 'create table for result file'
+      created: '2023-10-25'
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: script/01-01-create-result-file-table.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - dropTable:
+            tableName: 'result_file'
