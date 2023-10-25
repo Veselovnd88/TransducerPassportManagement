@@ -1,28 +1,27 @@
 databaseChangeLog:
   - changeSet:
-      id: '01'
-      author: Veselov Nikolay
-      labels: '01, result_file'
+      id: 'tag-01-00'
+      author: 'veselov.nikolay'
+      comment: 'tag before creating result file table'
+      changes:
+        - tagDatabase:
+            tag: 'before-create-result-file-table-01-00'
+
+  - changeSet:
+      id: '01-01'
+      author: 'veselov.nikolay'
+      labels: '01-01, result_file'
       comment: 'create table for result file'
-      created: '2023-10-20'
-      failOnError: true
+      created: '2023-10-25'
       changes:
         - sqlFile:
             dbms: postgresql
             encoding: utf8
             endDelimiter: GO
-            path: script/03-create-result-file-table.sql
+            path: script/01-01-create-result-file-table.sql
             relativeToChangelogFile: true
             splitStatements: true
             stripComments: true
-        - tagDatabase:
-            tag: 'after-create-result-file-table'
       rollback:
-        - sqlFile:
-            dbms: postgresql
-            encoding: utf8
-            endDelimiter: GO
-            path: scripts/04-drop-result-file-table.sql
-            relativeToChangelogFile: true
-            splitStatements: true
-            stripComments: true
+        - dropTable:
+            tableName: 'result_file'

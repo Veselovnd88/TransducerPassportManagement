@@ -1,28 +1,19 @@
 databaseChangeLog:
   - changeSet:
-      id: '00'
-      author: Veselov Nikolay
-      labels: '00, template'
+      id: '01-00'
+      author: 'veselov.nikolay'
+      labels: '01-00, template'
       comment: 'create table for template'
-      created: '2023-10-20'
-      failOnError: true
+      created: '2023-10-25'
       changes:
         - sqlFile:
             dbms: postgresql
             encoding: utf8
             endDelimiter: GO
-            path: script/01-create-template-table.sql
+            path: script/01-00-create-template-table.sql
             relativeToChangelogFile: true
             splitStatements: true
             stripComments: true
-        - tagDatabase:
-            tag: 'create-template-table'
       rollback:
-        - sqlFile:
-            dbms: postgresql
-            encoding: utf8
-            endDelimiter: GO
-            path: scripts/02-drop-template-table.sql
-            relativeToChangelogFile: true
-            splitStatements: true
-            stripComments: true
+        - dropTable:
+            tableName: 'pass_template'
