@@ -117,8 +117,8 @@ services:
     volumes:
       - /var/docker-volumes/pg-keycloak-ps:/var/lib/postgresql/data/
 
-  postgres-template:
-    container_name: postgres-template
+  postgres-generate-service:
+    container_name: postgres-generate-service
     image: "postgres:16"
     restart: unless-stopped
     environment:
@@ -128,14 +128,14 @@ services:
     ports:
       - "5434:5432"
     networks:
-      - postgres-template
+      - postgres-generate
     volumes:
-      - /var/docker-volumes/pg-pt-management-template:/var/lib/postgresql/data/
+      - /var/docker-volumes/pg-pt-management-generate-service:/var/lib/postgresql/data/
 
 networks:
   postgres-pt:
     driver: bridge
-  postgres-template:
+  postgres-generate:
     driver: bridge
   keycloak-postgres:
     driver: bridge
