@@ -34,8 +34,6 @@ import java.util.UUID;
 @ExtendWith(MockitoExtension.class)
 class TemplateServiceImplTest {
 
-    private static final byte[] BYTES = new byte[]{1, 2, 3};
-
     @Mock
     TemplateMinioService templateMinioService;
 
@@ -53,14 +51,14 @@ class TemplateServiceImplTest {
 
     @BeforeEach
     void init() {
-        TemplateMapper templateMapper = new TemplateMapperImpl();
+        TemplateMapperImpl templateMapper = new TemplateMapperImpl();
         ReflectionTestUtils.setField(passportTemplateService, "templateMapper", templateMapper, TemplateMapper.class);
     }
 
     @Test
     void shouldCallServicesToSave() {
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
-                MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
+                MediaType.MULTIPART_FORM_DATA_VALUE, TestUtils.SOURCE_BYTES);
         TemplateDto templateDto = new TemplateDto("name", "801877", "templates");
         TemplateEntity templateEntity = new TemplateEntity();
         templateEntity.setId(TestUtils.TEMPLATE_ID);
@@ -80,7 +78,7 @@ class TemplateServiceImplTest {
     @Test
     void shouldNotSaveIfNameExists() {
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
-                MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
+                MediaType.MULTIPART_FORM_DATA_VALUE, TestUtils.SOURCE_BYTES);
         TemplateDto templateDto = new TemplateDto("name", "801877", "templates");
         Mockito.doThrow(EntityExistsException.class).when(templateValidator)
                 .validateTemplateName(ArgumentMatchers.anyString());
@@ -98,7 +96,7 @@ class TemplateServiceImplTest {
         Template template = new Template();
         template.setId(id);
         template.setFilename(filename);
-        ByteArrayResource byteArrayResource = new ByteArrayResource(BYTES);
+        ByteArrayResource byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
         Mockito.when(templateStorageService.findTemplateById(id.toString())).thenReturn(template);
         Mockito.when(templateMinioService.getTemplateByName(filename)).thenReturn(byteArrayResource);
 
@@ -106,7 +104,7 @@ class TemplateServiceImplTest {
 
         Mockito.verify(templateStorageService, Mockito.times(1)).findTemplateById(id.toString());
         Mockito.verify(templateMinioService, Mockito.times(1)).getTemplateByName(filename);
-        Assertions.assertThat(sourceBytes.getByteArray()).isEqualTo(BYTES);
+        Assertions.assertThat(sourceBytes.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES);
     }
 
     @Test
@@ -124,7 +122,7 @@ class TemplateServiceImplTest {
     void shouldCallServicesToUpdate() {
         String templateId = TestUtils.TEMPLATE_ID.toString();
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
-                MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
+                MediaType.MULTIPART_FORM_DATA_VALUE, TestUtils.SOURCE_BYTES);
         Template template = Instancio.of(Template.class)
                 .set(Select.field("id"), TestUtils.TEMPLATE_ID).create();
         Mockito.when(templateStorageService.findTemplateById(templateId)).thenReturn(template);
@@ -144,7 +142,7 @@ class TemplateServiceImplTest {
         String templateId = UUID.randomUUID().toString();
         Mockito.doThrow(EntityNotFoundException.class).when(templateStorageService).findTemplateById(templateId);
         MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
-                MediaType.MULTIPART_FORM_DATA_VALUE, new byte[]{1, 2, 3});
+                MediaType.MULTIPART_FORM_DATA_VALUE, TestUtils.SOURCE_BYTES);
 
         Assertions.assertThatThrownBy(() -> passportTemplateService.updateTemplate(multipartFile, templateId))
                 .isInstanceOf(EntityNotFoundException.class);
