@@ -32,7 +32,7 @@ import ru.veselov.generatebytemplate.validator.TemplateValidator;
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
-class PassportTemplateServiceImplTest {
+class TemplateServiceImplTest {
 
     private static final byte[] BYTES = new byte[]{1, 2, 3};
 
@@ -46,7 +46,7 @@ class PassportTemplateServiceImplTest {
     TemplateValidator templateValidator;
 
     @InjectMocks
-    PassportTemplateServiceImpl passportTemplateService;
+    TemplateServiceImpl passportTemplateService;
 
     @Captor
     ArgumentCaptor<Template> templateArgumentCaptor;

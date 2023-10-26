@@ -2,6 +2,8 @@ package ru.veselov.generatebytemplate.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Service;
@@ -22,7 +24,7 @@ import ru.veselov.generatebytemplate.validator.TemplateValidator;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PassportTemplateServiceImpl implements PassportTemplateService {
+public class TemplateServiceImpl implements PassportTemplateService {
 
     private static final String FILE_EXT = ".docx";
 
@@ -51,6 +53,7 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
                 templateInfo.getPtArt(), templateInfo.getTemplateDescription());
     }
 
+    @Cacheable(value = "template")
     @Override
     public ByteArrayResource getTemplate(String templateId) {
         Template templateById = templateStorageService.findTemplateById(templateId);
@@ -59,6 +62,7 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
         return templateBytes;
     }
 
+    @CacheEvict(value = "template", key = "#templateId")
     @Override
     public void updateTemplate(MultipartFile file, String templateId) {
         Template template = templateStorageService.findTemplateById(templateId);
@@ -68,6 +72,7 @@ public class PassportTemplateServiceImpl implements PassportTemplateService {
     }
 
     @Override
+    @CacheEvict(value = "template", key = "#templateId")
     public void deleteTemplate(String templateId) {
         Template template = templateStorageService.findTemplateById(templateId);
         String filename = template.getFilename();

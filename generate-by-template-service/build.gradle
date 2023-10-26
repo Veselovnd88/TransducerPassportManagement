@@ -37,13 +37,13 @@ dependencies {
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
-    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.7'
-    implementation 'io.minio:minio:8.5.4'
+    implementation 'com.github.ben-manes.caffeine:caffeine:3.1.8'
+    implementation 'io.minio:minio:8.5.6'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation "org.apache.poi:poi-ooxml:${poi}"
     implementation "org.apache.poi:poi:${poi}"
-    implementation 'commons-io:commons-io:2.13.0'
+    implementation 'commons-io:commons-io:2.14.0'
     implementation 'org.springframework.kafka:spring-kafka'
     implementation 'org.liquibase:liquibase-core'
 
@@ -61,7 +61,7 @@ dependencies {
     testImplementation "org.testcontainers:postgresql:1.18.3"
     testImplementation 'org.awaitility:awaitility:4.2.0'
     testImplementation 'org.springframework.kafka:spring-kafka-test'
-    testImplementation 'com.github.tomakehurst:wiremock:3.0.0-beta-10'
+    testImplementation 'com.github.tomakehurst:wiremock:3.0.1'
 }
 
 dependencyManagement {

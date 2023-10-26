@@ -55,7 +55,7 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<CustomerEntity> foundEntity = customerRepository.findById(customerUUID);
         CustomerEntity customerEntity = foundEntity.orElseThrow(() -> {
                     log.error("Customer with such [id: {}] not found", customerId);
-                    throw new EntityNotFoundException("Customer with such id: %s not found".formatted(customerId));
+                    return new EntityNotFoundException("Customer with such id: %s not found".formatted(customerId));
                 }
         );
         log.info("Customer with [id: {}] retrieved from DB", customerId);
@@ -67,7 +67,7 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<CustomerEntity> foundEntity = customerRepository.findByInn(inn);
         CustomerEntity customerEntity = foundEntity.orElseThrow(() -> {
             log.error("Customer with such [inn: {}] not found", inn);
-            throw new EntityNotFoundException("Customer with such inn: %s not found".formatted(inn));
+            return new EntityNotFoundException("Customer with such inn: %s not found".formatted(inn));
         });
         log.info("Customer with [inn: {}] retrieved from DB", inn);
         return customerMapper.toModel(customerEntity);
@@ -91,11 +91,12 @@ public class CustomerServiceImpl implements CustomerService {
         Optional<CustomerEntity> optional = customerRepository.findById(customerUUID);
         CustomerEntity customer = optional.orElseThrow(() -> {
             log.error("Customer with such [id: {}] not found", customerId);
-            throw new EntityNotFoundException("Customer with such id: %s not found".formatted(customerId));
+            return new EntityNotFoundException("Customer with such id: %s not found".formatted(customerId));
         });
         customerRepository.delete(customer);
         log.info("Customer with [id {}] deleted", customerId);
     }
+
     @CacheEvict(value = "customer", key = "#customerId")
     @Override
     @Transactional
