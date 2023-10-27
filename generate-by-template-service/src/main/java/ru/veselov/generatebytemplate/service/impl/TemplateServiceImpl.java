@@ -79,7 +79,6 @@ public class TemplateServiceImpl implements PassportTemplateService {
         templateMinioService.deleteTemplate(filename);
         templateStorageService.deleteTemplate(templateId);
         log.info("Template for [id: {}] successfully deleted", templateId);
-
     }
 
     private String generateFileName(TemplateDto templateDto) {
