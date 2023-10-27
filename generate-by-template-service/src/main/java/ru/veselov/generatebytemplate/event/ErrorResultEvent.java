@@ -5,6 +5,8 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 @EqualsAndHashCode(callSuper = true)
 @NoArgsConstructor
 @AllArgsConstructor
@@ -13,8 +15,8 @@ public class ErrorResultEvent extends ResultEvent {
 
     private String errorMessage;
 
-    public ErrorResultEvent(String errorMessage, String message) {
-        super(message, EventType.ERROR);
+    public ErrorResultEvent(UUID taskId, String errorMessage, String message) {
+        super(taskId, message, EventType.ERROR);
         this.errorMessage = errorMessage;
     }
 

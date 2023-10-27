@@ -76,7 +76,7 @@ public class PassportServiceImpl implements PassportService {
                  DocxProcessingException |
                  TemplateNotFoundException | ServiceUnavailableException e) {
             log.error("Error occurred during generating docx and pdf file with passports");
-            resultEventPublisher.publishErrorResultEvent(e);
+            resultEventPublisher.publishErrorResultEvent(generatePassportsDto.getTaskId(), e);
         }
     }
 

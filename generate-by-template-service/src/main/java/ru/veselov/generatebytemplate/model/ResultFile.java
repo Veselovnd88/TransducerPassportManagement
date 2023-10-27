@@ -29,6 +29,7 @@ public class ResultFile {
 
     private String username;
 
+    @org.hibernate.validator.constraints.UUID
     private String taskId;
 
 }
