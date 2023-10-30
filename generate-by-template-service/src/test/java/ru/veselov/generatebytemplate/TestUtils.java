@@ -60,6 +60,8 @@ public class TestUtils {
     public static ResultFile getBasicGeneratedResultFile() {
         return ResultFile.builder()
                 .templateId(TEMPLATE_ID.toString())
+                .taskId(TASK_ID)
+                .username(USERNAME)
                 .bucket(RESULT_BUCKET)
                 .filename("my-filename.pdf")
                 .id(UUID.randomUUID())
