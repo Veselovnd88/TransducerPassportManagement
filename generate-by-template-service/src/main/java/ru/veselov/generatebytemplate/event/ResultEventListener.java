@@ -2,21 +2,17 @@ package ru.veselov.generatebytemplate.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.event.EventListener;
-import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 import ru.veselov.generatebytemplate.dto.TaskResultDto;
+import ru.veselov.generatebytemplate.service.KafkaBrokerSender;
 
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class ResultEventListener {
 
-    @Value("${spring.kafka.task-topic}")
-    private String taskTopic;
-
-    private final KafkaTemplate<String, TaskResultDto> kafkaTemplate;
+    private final KafkaBrokerSender kafkaBrokerSender;
 
     @EventListener
     public void handleSuccessResultEvent(SuccessResultEvent resultEvent) {
@@ -26,7 +22,7 @@ public class ResultEventListener {
                 null,
                 resultEvent.getEventType()
         );
-        kafkaTemplate.send(taskTopic, resultEvent.getTaskId().toString(), taskResultDto);
+        kafkaBrokerSender.sendResultMessage(resultEvent.getTaskId().toString(), taskResultDto);
         log.info("Send result of task to task service: " + resultEvent);
     }
 
@@ -38,7 +34,7 @@ public class ResultEventListener {
                 resultEvent.getErrorMessage(),
                 resultEvent.getEventType()
         );
-        kafkaTemplate.send(taskTopic, resultEvent.getTaskId().toString(), taskResultDto);
+        kafkaBrokerSender.sendResultMessage(resultEvent.getTaskId().toString(), taskResultDto);
         log.info("Send error of task to task service: " + resultEvent);
     }
 

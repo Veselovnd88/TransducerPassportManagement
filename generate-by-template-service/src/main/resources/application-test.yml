@@ -26,6 +26,7 @@ spring:
   kafka:
     bootstrap-servers: localhost:9092
     passport-topic: passports
+    task-topic: task
     consumer:
       bootstrap-servers: localhost:9092
       group-id: passport

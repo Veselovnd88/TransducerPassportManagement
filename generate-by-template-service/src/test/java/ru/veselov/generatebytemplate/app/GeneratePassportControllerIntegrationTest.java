@@ -31,8 +31,10 @@ import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
+import ru.veselov.generatebytemplate.dto.TaskResultDto;
 import ru.veselov.generatebytemplate.entity.ResultFileEntity;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
+import ru.veselov.generatebytemplate.event.EventType;
 import ru.veselov.generatebytemplate.repository.ResultFileRepository;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
 
@@ -102,7 +104,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
 
     @Test
     @SneakyThrows
-    void shouldReturnByteArrayAndSendDataToKafkaTopic() {
+    void shouldPerformTaskSendResultToKafkaTopics() {
         //mock pdf server
         WireMock.stubFor(WireMock.post("/").willReturn(WireMock.aResponse().withStatus(200)
                 .withBody(TestUtils.SOURCE_BYTES)));
@@ -117,7 +119,23 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isAccepted();
         Awaitility.await().pollDelay(Duration.ofSeconds(5)).until(() -> true);
-        Assertions.assertThat(generatePassportsDto).isEqualTo(kafkaTestConsumer.getListenedResult());
+        Assertions.assertThat(generatePassportsDto).isEqualTo(kafkaTestConsumer.getListenedPassportsDto());
+
+        TaskResultDto listenedTaskResultDto = kafkaTestConsumer.getListenedTaskResultDto();
+        Assertions.assertThat(listenedTaskResultDto.eventType()).isEqualTo(EventType.READY);
+    }
+
+    @Test
+    void shouldSendErrorResultToKafka() {
+        //mock pdf server
+        WireMock.stubFor(WireMock.post("/").willReturn(WireMock.aResponse().withStatus(200)
+                .withBody(TestUtils.SOURCE_BYTES)));
+        GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(TestUtils.TEMPLATE_ID.toString());
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
+                .bodyValue(generatePassportsDto).exchange().expectStatus().isAccepted();
+        Awaitility.await().pollDelay(Duration.ofSeconds(5)).until(() -> true);
+        TaskResultDto listenedTaskResultDto = kafkaTestConsumer.getListenedTaskResultDto();
+        Assertions.assertThat(listenedTaskResultDto.eventType()).isEqualTo(EventType.ERROR);
     }
 
     @Test
