@@ -40,6 +40,10 @@ public class TestUtils {
     public static final String TASK_ID = UUID.randomUUID().toString();
     public static final String FILE_ID = UUID.randomUUID().toString();
 
+    public static final String TASK_TOPIC = "task";
+
+    public static final String PASSPORT_TOPIC = "passports";
+
     public static List<SerialNumberDto> SERIALS_DTOS = List.of(
             new SerialNumberDto("1", UUID.randomUUID().toString()),
             new SerialNumberDto("2", UUID.randomUUID().toString()),
