@@ -2,6 +2,7 @@ package ru.veselov.generatebytemplate.controller;
 
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -47,8 +48,11 @@ class TemplateControllerTest {
     @Captor
     ArgumentCaptor<String> templateIdCaptor;
 
+    SoftAssertions softAssertions;
+
     @BeforeEach
     void init() {
+        softAssertions = new SoftAssertions();
         webTestClient = MockMvcWebTestClient.bindToController(templateController).build();
     }
 
@@ -78,9 +82,10 @@ class TemplateControllerTest {
                 .saveTemplate(multipartFileArgumentCaptor.capture(), templateDtoArgumentCaptor.capture());
         MultipartFile capturedMultipart = multipartFileArgumentCaptor.getValue();
         TemplateDto capturedTemplateDto = templateDtoArgumentCaptor.getValue();
-        Assertions.assertThat(capturedMultipart.getBytes()).isEqualTo(BYTES);
-        Assertions.assertThat(capturedMultipart.getOriginalFilename()).isEqualTo("filename.docx");
-        Assertions.assertThat(capturedTemplateDto).isEqualTo(templateDto);
+        softAssertions.assertThat(capturedMultipart.getBytes()).isEqualTo(BYTES).isEqualTo(new Object());
+        softAssertions.assertThat(capturedMultipart.getOriginalFilename()).isEqualTo("filendame.docx");
+        softAssertions.assertThat(capturedTemplateDto).isEqualTo(templateDto).isEqualTo(new Object());
+        softAssertions.assertAll();
     }
 
     @Test
@@ -98,9 +103,10 @@ class TemplateControllerTest {
                 .updateTemplate(multipartFileArgumentCaptor.capture(), templateIdCaptor.capture());
         MultipartFile capturedMultipart = multipartFileArgumentCaptor.getValue();
         String capturedTemplateId = templateIdCaptor.getValue();
-        Assertions.assertThat(capturedMultipart.getBytes()).isEqualTo(BYTES);
-        Assertions.assertThat(capturedMultipart.getOriginalFilename()).isEqualTo("filename.docx");
-        Assertions.assertThat(capturedTemplateId).isEqualTo(templateId);
+        softAssertions.assertThat(capturedMultipart.getBytes()).isEqualTo(BYTES);
+        softAssertions.assertThat(capturedMultipart.getOriginalFilename()).isEqualTo("filename.docx");
+        softAssertions.assertThat(capturedTemplateId).isEqualTo(templateId);
+        softAssertions.assertAll();
     }
 
     @Test

@@ -1,16 +1,14 @@
 package ru.veselov.generatebytemplate.event;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.kafka.core.KafkaTemplate;
-import org.springframework.test.util.ReflectionTestUtils;
 import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.dto.TaskResultDto;
+import ru.veselov.generatebytemplate.service.KafkaBrokerSender;
 
 import java.util.UUID;
 
@@ -18,15 +16,10 @@ import java.util.UUID;
 class ResultEventListenerTest {
 
     @Mock
-    KafkaTemplate<String, TaskResultDto> kafkaTemplate;
+    KafkaBrokerSender kafkaBrokerSender;
 
     @InjectMocks
     ResultEventListener resultEventListener;
-
-    @BeforeEach
-    void init() {
-        ReflectionTestUtils.setField(resultEventListener, "taskTopic", "task", String.class);
-    }
 
     @Test
     void shouldHandleSuccessEvent() {
@@ -38,7 +31,7 @@ class ResultEventListenerTest {
         resultEventListener.handleSuccessResultEvent(successResultEvent);
 
         TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID, "message", null, EventType.READY);
-        Mockito.verify(kafkaTemplate, Mockito.times(1)).send("task", TestUtils.TASK_ID, taskResultDto);
+        Mockito.verify(kafkaBrokerSender, Mockito.times(1)).sendResultMessage(TestUtils.TASK_ID, taskResultDto);
     }
 
     @Test
@@ -49,7 +42,7 @@ class ResultEventListenerTest {
         resultEventListener.handleErrorResultEvent(errorResultEvent);
 
         TaskResultDto taskResultDto = new TaskResultDto(null, "message", "errorMessage", EventType.ERROR);
-        Mockito.verify(kafkaTemplate, Mockito.times(1)).send("task", TestUtils.TASK_ID, taskResultDto);
+        Mockito.verify(kafkaBrokerSender, Mockito.times(1)).sendResultMessage(TestUtils.TASK_ID, taskResultDto);
     }
 
 }
