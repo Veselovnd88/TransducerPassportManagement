@@ -44,6 +44,11 @@ public class TestUtils {
 
     public static final String PASSPORT_TOPIC = "passports";
 
+    public static final String SORT_PT_ART = "ptArt";
+
+    public static final String SORT_ASC = "asc";
+    public static final String TEMPLATE_ID_STRING = TEMPLATE_ID.toString();
+
     public static List<SerialNumberDto> SERIALS_DTOS = List.of(
             new SerialNumberDto("1", UUID.randomUUID().toString()),
             new SerialNumberDto("2", UUID.randomUUID().toString()),

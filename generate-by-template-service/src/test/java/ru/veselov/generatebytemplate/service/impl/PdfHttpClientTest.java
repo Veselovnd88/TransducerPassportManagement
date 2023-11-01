@@ -16,7 +16,7 @@ import ru.veselov.generatebytemplate.exception.ServiceUnavailableException;
 @WireMockTest(httpPort = 30001)
 class PdfHttpClientTest {
 
-    public static ByteArrayResource byteArrayResource;
+    private static ByteArrayResource byteArrayResource;
 
     public static int PORT = 30001;
 

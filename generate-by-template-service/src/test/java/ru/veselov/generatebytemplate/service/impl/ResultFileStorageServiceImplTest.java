@@ -62,9 +62,11 @@ class ResultFileStorageServiceImplTest {
 
         Mockito.verify(resultFileRepository, Mockito.times(1)).save(resultFileEntityArgumentCaptor.capture());
         ResultFileEntity captured = resultFileEntityArgumentCaptor.getValue();
-        Assertions.assertThat(captured.getSynced()).isFalse();
-        Assertions.assertThat(captured.getTemplateEntity()).isEqualTo(templateEntity);
-        Assertions.assertThat(captured.getBucket()).isEqualTo(TestUtils.RESULT_BUCKET);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(captured.getSynced()).isFalse(),
+                () -> Assertions.assertThat(captured.getTemplateEntity()).isEqualTo(templateEntity),
+                () -> Assertions.assertThat(captured.getBucket()).isEqualTo(TestUtils.RESULT_BUCKET)
+        );
     }
 
     @Test
@@ -91,8 +93,10 @@ class ResultFileStorageServiceImplTest {
 
         Mockito.verify(resultFileRepository, Mockito.times(1)).save(resultFileEntityArgumentCaptor.capture());
         ResultFileEntity captured = resultFileEntityArgumentCaptor.getValue();
-        Assertions.assertThat(captured.getId()).isEqualTo(resultFileEntity.getId());
-        Assertions.assertThat(captured.getSynced()).isTrue();
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(captured.getId()).isEqualTo(resultFileEntity.getId()),
+                () -> Assertions.assertThat(captured.getSynced()).isTrue()
+        );
     }
 
     @Test
