@@ -15,6 +15,10 @@ import java.util.UUID;
 @ExtendWith(MockitoExtension.class)
 class ResultEventListenerTest {
 
+    private static final String ERROR_MESSAGE = "errorMessage";
+    
+    private static final String MESSAGE = "message";
+
     @Mock
     KafkaBrokerSender kafkaBrokerSender;
 
@@ -26,22 +30,22 @@ class ResultEventListenerTest {
         SuccessResultEvent successResultEvent = new SuccessResultEvent(
                 UUID.fromString(TestUtils.TASK_ID),
                 TestUtils.FILE_ID,
-                "message");
+                MESSAGE);
 
         resultEventListener.handleSuccessResultEvent(successResultEvent);
 
-        TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID, "message", null, EventType.READY);
+        TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID, MESSAGE, null, EventType.READY);
         Mockito.verify(kafkaBrokerSender, Mockito.times(1)).sendResultMessage(TestUtils.TASK_ID, taskResultDto);
     }
 
     @Test
     void shouldHandleErrorEvent() {
         ErrorResultEvent errorResultEvent = new ErrorResultEvent(
-                UUID.fromString(TestUtils.TASK_ID), "errorMessage", "message");
+                UUID.fromString(TestUtils.TASK_ID), ERROR_MESSAGE, MESSAGE);
 
         resultEventListener.handleErrorResultEvent(errorResultEvent);
 
-        TaskResultDto taskResultDto = new TaskResultDto(null, "message", "errorMessage", EventType.ERROR);
+        TaskResultDto taskResultDto = new TaskResultDto(null, MESSAGE, ERROR_MESSAGE, EventType.ERROR);
         Mockito.verify(kafkaBrokerSender, Mockito.times(1)).sendResultMessage(TestUtils.TASK_ID, taskResultDto);
     }
 

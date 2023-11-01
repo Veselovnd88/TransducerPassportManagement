@@ -19,6 +19,14 @@ import java.util.List;
 
 class DocxGeneratorServiceImplTest {
 
+    private static final String NUMBERUP = "NUMBERUP";
+
+    private static final String NUMBERDOWN = "NUMBERDOWN";
+
+    private static final String DATE = "DATE";
+
+    private static final String RESOURCE_FILE_DOCX = "file.docx";
+
     DocxGeneratorServiceImpl passportGeneratorService;
 
     private static final List<String> SERIALS = List.of("one", "two", "three", "four", "five", "six");
@@ -26,9 +34,9 @@ class DocxGeneratorServiceImplTest {
     @BeforeEach
     void init() {
         PlaceholderProperties placeholderProperties = new PlaceholderProperties();
-        placeholderProperties.setUpperSerial("NUMBERUP");
-        placeholderProperties.setBottomSerial("NUMBERDOWN");
-        placeholderProperties.setDate("DATE");
+        placeholderProperties.setUpperSerial(NUMBERUP);
+        placeholderProperties.setBottomSerial(NUMBERDOWN);
+        placeholderProperties.setDate(DATE);
         passportGeneratorService = new DocxGeneratorServiceImpl(placeholderProperties);
     }
 
@@ -36,7 +44,7 @@ class DocxGeneratorServiceImplTest {
     @SneakyThrows
     void shouldGenerateByteArrayWithReplacingOfPlaceholders() {
         //given
-        InputStream templateInputStream = getClass().getClassLoader().getResourceAsStream("file.docx");
+        InputStream templateInputStream = getClass().getClassLoader().getResourceAsStream(RESOURCE_FILE_DOCX);
         assert templateInputStream != null;
         ByteArrayResource templateByteArrayResource = new ByteArrayResource(templateInputStream.readAllBytes());
         templateInputStream.close();
@@ -50,7 +58,7 @@ class DocxGeneratorServiceImplTest {
         List<XWPFParagraph> generatedParagraphs = getParagraphs(generatedDoc);
         int placeholdersCount = countPlaceholdersInDoc(generatedParagraphs);
         Assertions.assertThat(placeholdersCount).isZero(); //all placeholders replaced
-        InputStream templateIS = getClass().getClassLoader().getResourceAsStream("file.docx");
+        InputStream templateIS = getClass().getClassLoader().getResourceAsStream(RESOURCE_FILE_DOCX);
         assert templateIS != null;
         XWPFDocument sourceDoc = new XWPFDocument(templateIS);
         List<XWPFParagraph> sourceParagraphs = getParagraphs(sourceDoc);
@@ -77,9 +85,9 @@ class DocxGeneratorServiceImplTest {
                 if (run != null) {
                     String text = run.getText(0);
                     if (text != null) {
-                        if (text.contains("NUMBERUP") ||
-                                text.contains("NUMBERDOWN") ||
-                                text.contains("DATE")) {
+                        if (text.contains(NUMBERUP) ||
+                                text.contains(NUMBERDOWN) ||
+                                text.contains(DATE)) {
                             countPlaceholders++;
                         }
                     }

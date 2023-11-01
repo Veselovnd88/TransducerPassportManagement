@@ -1,5 +1,6 @@
 package ru.veselov.generatebytemplate.service.impl;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,9 +30,9 @@ import ru.veselov.generatebytemplate.service.ResultFileService;
 @ExtendWith(MockitoExtension.class)
 class PassportServiceImplTest {
 
-    public static ByteArrayResource byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
+    private static final ByteArrayResource byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
 
-    public static final String DATE_FORMAT = "dd-MM-yyyy";
+    private static final String DATE_FORMAT = "dd-MM-yyyy";
 
     @Mock
     DocxPassportService docxPassportService;
@@ -71,13 +72,17 @@ class PassportServiceImplTest {
 
         passportService.createPassportsPdf(generatePassportsDto);
 
-        Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto);
-        Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource);
-        Mockito.verify(resultFileService, Mockito.times(1))
-                .save(ArgumentMatchers.any(ByteArrayResource.class), generatedResultFileArgumentCaptor.capture());
-        Mockito.verify(kafkaBrokerSender, Mockito.times(1)).sendPassportInfoMessage(generatePassportsDto);
+        Assertions.assertAll(
+                () -> Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto),
+                () -> Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource),
+                () -> Mockito.verify(resultFileService, Mockito.times(1))
+                        .save(
+                                ArgumentMatchers.any(ByteArrayResource.class),
+                                generatedResultFileArgumentCaptor.capture()),
+                () -> Mockito.verify(kafkaBrokerSender, Mockito.times(1)).sendPassportInfoMessage(generatePassportsDto),
+                () -> Mockito.verify(eventPublisher, Mockito.times(1)).publishSuccessResultEvent(returnedResult)
+        );
 
-        Mockito.verify(eventPublisher, Mockito.times(1)).publishSuccessResultEvent(returnedResult);
     }
 
     @Test
@@ -88,13 +93,16 @@ class PassportServiceImplTest {
 
         passportService.createPassportsPdf(generatePassportsDto);
 
-        Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
-                ArgumentMatchers.any(), ArgumentMatchers.any());
-        Mockito.verify(pdfService, Mockito.never()).createPdf(ArgumentMatchers.any());
-        Mockito.verify(resultFileService, Mockito.never()).save(ArgumentMatchers.any(),
-                ArgumentMatchers.any());
-        Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
-        Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any());
+        Assertions.assertAll(
+                () -> Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(pdfService, Mockito.never()).createPdf(ArgumentMatchers.any()),
+                () -> Mockito.verify(resultFileService, Mockito.never()).save(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any()),
+                () -> Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any())
+        );
+
     }
 
     @Test
@@ -107,13 +115,15 @@ class PassportServiceImplTest {
                 .when(pdfService).createPdf(byteArrayResource);
 
         passportService.createPassportsPdf(generatePassportsDto);
+        Assertions.assertAll(
+                () -> Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(resultFileService, Mockito.never()).save(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any()),
+                () -> Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any())
+        );
 
-        Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
-                ArgumentMatchers.any(), ArgumentMatchers.any());
-        Mockito.verify(resultFileService, Mockito.never()).save(ArgumentMatchers.any(),
-                ArgumentMatchers.any());
-        Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
-        Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any());
     }
 
     @Test
@@ -126,13 +136,15 @@ class PassportServiceImplTest {
                 .when(pdfService).createPdf(byteArrayResource);
 
         passportService.createPassportsPdf(generatePassportsDto);
+        Assertions.assertAll(
+                () -> Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(resultFileService, Mockito.never()).save(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any()),
+                () -> Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any())
+        );
 
-        Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
-                ArgumentMatchers.any(), ArgumentMatchers.any());
-        Mockito.verify(resultFileService, Mockito.never()).save(ArgumentMatchers.any(),
-                ArgumentMatchers.any());
-        Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
-        Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any());
     }
 
     @Test
@@ -146,15 +158,16 @@ class PassportServiceImplTest {
                 .save(ArgumentMatchers.any(), ArgumentMatchers.any());
 
         passportService.createPassportsPdf(generatePassportsDto);
-
-        Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto);
-        Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource);
-        Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
-                ArgumentMatchers.any(), ArgumentMatchers.any());
-        Mockito.verify(resultFileService, Mockito.times(1)).save(ArgumentMatchers.any(),
-                ArgumentMatchers.any());
-        Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
-        Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any());
+        Assertions.assertAll(
+                () -> Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto),
+                () -> Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource),
+                () -> Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(resultFileService, Mockito.times(1)).save(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any()),
+                () -> Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any())
+        );
     }
 
     @Test
@@ -169,14 +182,16 @@ class PassportServiceImplTest {
 
         passportService.createPassportsPdf(generatePassportsDto);
 
-        Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto);
-        Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource);
-        Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
-                ArgumentMatchers.any(), ArgumentMatchers.any());
-        Mockito.verify(resultFileService, Mockito.times(1)).save(ArgumentMatchers.any(),
-                ArgumentMatchers.any());
-        Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any());
-        Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any());
+        Assertions.assertAll(
+                () -> Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto),
+                () -> Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource),
+                () -> Mockito.verify(eventPublisher, Mockito.times(1)).publishErrorResultEvent(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(resultFileService, Mockito.times(1)).save(
+                        ArgumentMatchers.any(), ArgumentMatchers.any()),
+                () -> Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(ArgumentMatchers.any()),
+                () -> Mockito.verify(kafkaBrokerSender, Mockito.never()).sendPassportInfoMessage(ArgumentMatchers.any())
+        );
     }
 
 }

@@ -63,5 +63,4 @@ class GeneratePassportControllerTest {
         Mockito.verify(resultFileService, Mockito.times(1)).getResultFile(resultUid);
     }
 
-
 }

@@ -22,7 +22,7 @@ import java.io.InputStream;
 @ExtendWith(MockitoExtension.class)
 class PdfServiceImplTest {
 
-    public static ByteArrayResource byteArrayResource;
+    private static ByteArrayResource byteArrayResource;
 
     @Mock
     PdfHttpClient pdfHttpClient;

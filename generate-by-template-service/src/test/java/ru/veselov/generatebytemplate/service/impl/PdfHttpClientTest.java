@@ -36,7 +36,9 @@ class PdfHttpClientTest {
     void shouldCallPdfService() {
         WireMock.stubFor(WireMock.post("/")
                 .willReturn(WireMock.aResponse().withStatus(200).withBody(TestUtils.SOURCE_BYTES)));
+
         DataBuffer dataBuffer = pdfHttpClient.sendRequestForConvertingDocxToPdf(byteArrayResource);
+
         WireMock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo("/")));
         Assertions.assertThat(dataBuffer).isNotNull();
     }

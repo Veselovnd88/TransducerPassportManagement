@@ -1,5 +1,6 @@
 package ru.veselov.generatebytemplate.service.impl;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +18,7 @@ import ru.veselov.generatebytemplate.service.PassportTemplateService;
 @ExtendWith(MockitoExtension.class)
 class DocxPassportServiceImplTest {
 
-    public static final String DATE_FORMAT = "dd-MM-yyyy";
+    private static final String DATE_FORMAT = "dd-MM-yyyy";
 
     public static ByteArrayResource byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
 
@@ -46,9 +47,13 @@ class DocxPassportServiceImplTest {
 
         docxPassportService.createDocxPassports(generatePassportsDto);
 
-        Mockito.verify(passportTemplateService, Mockito.times(1)).getTemplate(generatePassportsDto.getTemplateId());
-        Mockito.verify(docxGeneratorService, Mockito.times(1)).generateDocx(
-                TestUtils.SERIALS, byteArrayResource, TestUtils.DTF.format(TestUtils.DATE));
+        Assertions.assertAll(
+                () -> Mockito.verify(passportTemplateService, Mockito.times(1))
+                        .getTemplate(generatePassportsDto.getTemplateId()),
+                () -> Mockito.verify(docxGeneratorService, Mockito.times(1))
+                        .generateDocx(TestUtils.SERIALS, byteArrayResource, TestUtils.DTF.format(TestUtils.DATE))
+        );
+
     }
 
 }
