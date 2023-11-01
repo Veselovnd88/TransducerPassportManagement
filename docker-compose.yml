@@ -74,7 +74,7 @@ services:
       #kafka-console-consumer --topic passports --from-beginning --bootstrap-server localhost:9092 --partition 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: false
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_CREATE_TOPICS: "passports"
+      KAFKA_CREATE_TOPICS: "passports:2:1"
     volumes:
       - /var/docker-volumes/kafka:/etc/kafka
     depends_on:
