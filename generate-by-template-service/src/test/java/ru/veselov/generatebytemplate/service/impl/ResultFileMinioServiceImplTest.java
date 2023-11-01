@@ -4,7 +4,6 @@ import io.minio.GetObjectArgs;
 import io.minio.GetObjectResponse;
 import io.minio.MinioClient;
 import io.minio.PutObjectArgs;
-import io.minio.RemoveObjectArgs;
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -41,9 +40,6 @@ class ResultFileMinioServiceImplTest {
     @Captor
     ArgumentCaptor<GetObjectArgs> argumentGetObjCaptor;
 
-    @Captor
-    ArgumentCaptor<RemoveObjectArgs> argumentRemoveObjCaptor;
-
     @BeforeEach
     void init() {
         MinioHelper minioHelper = new MinioHelperImpl(minioClient);
@@ -61,11 +57,15 @@ class ResultFileMinioServiceImplTest {
 
         Mockito.verify(minioClient, Mockito.times(1)).putObject(argumentPutObjCaptor.capture());
         PutObjectArgs captured = argumentPutObjCaptor.getValue();
-        Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.RESULT_BUCKET);
-        Assertions.assertThat(captured.object()).isEqualTo(basicResultFile.getFilename());
-        try (BufferedInputStream bis = captured.stream()) {
-            Assertions.assertThat(bis.readAllBytes()).isEqualTo(resource.getContentAsByteArray());
-        }
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.RESULT_BUCKET),
+                () -> Assertions.assertThat(captured.object()).isEqualTo(basicResultFile.getFilename()),
+                () -> {
+                    try (BufferedInputStream bis = captured.stream()) {
+                        Assertions.assertThat(bis.readAllBytes()).isEqualTo(resource.getContentAsByteArray());
+                    }
+                }
+        );
     }
 
     @Test
@@ -91,10 +91,11 @@ class ResultFileMinioServiceImplTest {
 
         Mockito.verify(minioClient, Mockito.times(1)).getObject(argumentGetObjCaptor.capture());
         GetObjectArgs captured = argumentGetObjCaptor.getValue();
-
-        Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES);
-        Assertions.assertThat(captured.object()).isEqualTo(basicResultFile.getFilename());
-        Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.RESULT_BUCKET);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES),
+                () -> Assertions.assertThat(captured.object()).isEqualTo(basicResultFile.getFilename()),
+                () -> Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.RESULT_BUCKET)
+        );
     }
 
 }

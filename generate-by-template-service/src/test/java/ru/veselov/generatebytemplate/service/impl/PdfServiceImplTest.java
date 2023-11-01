@@ -22,7 +22,7 @@ import java.io.InputStream;
 @ExtendWith(MockitoExtension.class)
 class PdfServiceImplTest {
 
-    public static ByteArrayResource byteArrayResource;
+    private static ByteArrayResource byteArrayResource;
 
     @Mock
     PdfHttpClient pdfHttpClient;
@@ -37,7 +37,9 @@ class PdfServiceImplTest {
         Mockito.when(pdfHttpClient.sendRequestForConvertingDocxToPdf(ArgumentMatchers.any()))
                 .thenReturn(mockDataBuffer);
         byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
+
         ByteArrayResource pdfBytes = pdfService.createPdf(byteArrayResource);
+
         Assertions.assertThat(pdfBytes.getByteArray()).isNotNull();
     }
 

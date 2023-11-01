@@ -2,7 +2,6 @@ package ru.veselov.generatebytemplate.controller;
 
 import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.SoftAssertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,17 +18,19 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.reactive.function.BodyInserters;
+import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.dto.TemplateDto;
 import ru.veselov.generatebytemplate.service.PassportTemplateService;
 
 import java.util.UUID;
+
 
 @ExtendWith(MockitoExtension.class)
 class TemplateControllerTest {
 
     private final static String URL = "/api/v1/template";
 
-    public static final byte[] BYTES = new byte[]{1, 2, 4};
+    public static final String TEMPLATE_DESC = "name";
 
     WebTestClient webTestClient;
 
@@ -48,18 +49,16 @@ class TemplateControllerTest {
     @Captor
     ArgumentCaptor<String> templateIdCaptor;
 
-    SoftAssertions softAssertions;
-
     @BeforeEach
     void init() {
-        softAssertions = new SoftAssertions();
         webTestClient = MockMvcWebTestClient.bindToController(templateController).build();
     }
 
     @Test
     void shouldCallPassportTemplateServiceToGetTemplateSource() {
         String templateId = UUID.randomUUID().toString();
-        Mockito.when(passportTemplateService.getTemplate(templateId)).thenReturn(new ByteArrayResource(BYTES));
+        Mockito.when(passportTemplateService.getTemplate(templateId))
+                .thenReturn(new ByteArrayResource(TestUtils.SOURCE_BYTES));
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/source").path("/id/" + templateId).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -69,10 +68,11 @@ class TemplateControllerTest {
     @Test
     @SneakyThrows
     void shouldCallPassportTemplateServiceToSaveTemplate() {
-        TemplateDto templateDto = new TemplateDto("name", "801877", "templates");
+        TemplateDto templateDto = new TemplateDto(TEMPLATE_DESC, TestUtils.ART, TestUtils.TEMPLATE_BUCKET);
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part("file", BYTES).filename("filename.docx");
-        multipartBodyBuilder.part("template-info", templateDto);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
+                .filename(TestUtils.MULTIPART_FILENAME);
+        multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
@@ -82,10 +82,14 @@ class TemplateControllerTest {
                 .saveTemplate(multipartFileArgumentCaptor.capture(), templateDtoArgumentCaptor.capture());
         MultipartFile capturedMultipart = multipartFileArgumentCaptor.getValue();
         TemplateDto capturedTemplateDto = templateDtoArgumentCaptor.getValue();
-        softAssertions.assertThat(capturedMultipart.getBytes()).isEqualTo(BYTES).isEqualTo(new Object());
-        softAssertions.assertThat(capturedMultipart.getOriginalFilename()).isEqualTo("filendame.docx");
-        softAssertions.assertThat(capturedTemplateDto).isEqualTo(templateDto).isEqualTo(new Object());
-        softAssertions.assertAll();
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(capturedMultipart.getBytes()).isEqualTo(TestUtils.SOURCE_BYTES),
+                () -> Assertions.assertThat(capturedMultipart.getOriginalFilename())
+                        .isEqualTo(TestUtils.MULTIPART_FILENAME),
+                () -> Assertions.assertThat(capturedTemplateDto).isEqualTo(templateDto)
+        );
+
+
     }
 
     @Test
@@ -93,7 +97,7 @@ class TemplateControllerTest {
     void shouldCallPassportTemplateServiceToUpdateTemplate() {
         String templateId = UUID.randomUUID().toString();
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
-        multipartBodyBuilder.part("file", BYTES).filename("filename.docx");
+        multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES).filename(TestUtils.MULTIPART_FILENAME);
 
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL).path("/update/upload").path("/id/" + templateId).build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
@@ -103,10 +107,13 @@ class TemplateControllerTest {
                 .updateTemplate(multipartFileArgumentCaptor.capture(), templateIdCaptor.capture());
         MultipartFile capturedMultipart = multipartFileArgumentCaptor.getValue();
         String capturedTemplateId = templateIdCaptor.getValue();
-        softAssertions.assertThat(capturedMultipart.getBytes()).isEqualTo(BYTES);
-        softAssertions.assertThat(capturedMultipart.getOriginalFilename()).isEqualTo("filename.docx");
-        softAssertions.assertThat(capturedTemplateId).isEqualTo(templateId);
-        softAssertions.assertAll();
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(capturedMultipart.getBytes()).isEqualTo(TestUtils.SOURCE_BYTES),
+                () -> Assertions.assertThat(capturedMultipart.getOriginalFilename())
+                        .isEqualTo(TestUtils.MULTIPART_FILENAME),
+                () -> Assertions.assertThat(capturedTemplateId).isEqualTo(templateId)
+        );
+
     }
 
     @Test

@@ -47,7 +47,7 @@ class TemplateInfoControllerTest {
     void shouldReturnTemplatesWithSortingParams() {
         List<Template> templates = List.of(new Template());
         Mockito.when(templateStorageService.findAll(ArgumentMatchers.any())).thenReturn(templates);
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all").queryParam("page", 1).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all").queryParam(TestUtils.PAGE, 1).build())
                 .exchange().expectStatus().isOk()
                 .expectBody(List.class);
     }
@@ -57,7 +57,8 @@ class TemplateInfoControllerTest {
         List<Template> templates = List.of(new Template());
         Mockito.when(templateStorageService.findAllByPtArt(ArgumentMatchers.anyString(),
                 ArgumentMatchers.any())).thenReturn(templates);
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all/ptArt/801877").queryParam("page", 1).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all/ptArt/801877")
+                        .queryParam(TestUtils.PAGE, 1).build())
                 .exchange().expectStatus().isOk()
                 .expectBody(List.class);
     }

@@ -16,7 +16,7 @@ import java.util.Optional;
 @ExtendWith(MockitoExtension.class)
 class TemplateValidatorImplTest {
 
-    public static final String TEMPLATE_NAME = "templateName";
+    private static final String TEMPLATE_NAME = "templateName";
 
     @Mock
     TemplateRepository templateRepository;
@@ -25,8 +25,7 @@ class TemplateValidatorImplTest {
     TemplateValidatorImpl templateValidator;
 
     @Test
-    void shouldPass() {
-
+    void shouldPassValidation() {
         Mockito.when(templateRepository.findByName(TEMPLATE_NAME))
                 .thenReturn(Optional.empty());
         Assertions.assertThatNoException().isThrownBy(() -> templateValidator.validateTemplateName(TEMPLATE_NAME));

@@ -18,6 +18,8 @@ import java.util.UUID;
 @ExtendWith(MockitoExtension.class)
 class ResultEventPublisherTest {
 
+    private static final String MESSAGE = "message";
+
     @Mock
     ApplicationEventPublisher applicationEventPublisher;
 
@@ -28,7 +30,7 @@ class ResultEventPublisherTest {
     ArgumentCaptor<SuccessResultEvent> successArgumentCaptor;
 
     @Captor
-    ArgumentCaptor<ErrorResultEvent> errorResultEventArgumentCaptor;
+    ArgumentCaptor<ErrorResultEvent> eventArgumentCaptor;
 
     @Test
     void publishSuccessResultEvent() {
@@ -38,21 +40,27 @@ class ResultEventPublisherTest {
 
         Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(successArgumentCaptor.capture());
         SuccessResultEvent captured = successArgumentCaptor.getValue();
-        Assertions.assertThat(captured.getResultFileId()).isEqualTo(resultFile.getId().toString());
-        Assertions.assertThat(captured.getTaskId().toString()).hasToString(resultFile.getTaskId());
-        Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.READY);
-        Assertions.assertThat(captured.getMessage()).isNotBlank();
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(captured.getResultFileId()).isEqualTo(resultFile.getId().toString()),
+                () -> Assertions.assertThat(captured.getTaskId().toString()).hasToString(resultFile.getTaskId()),
+                () -> Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.READY),
+                () -> Assertions.assertThat(captured.getMessage()).isNotBlank()
+        );
+
     }
 
     @Test
     void publishErrorResultEvent() {
-        resultEventPublisher.publishErrorResultEvent(TestUtils.TASK_ID, new Exception("message"));
+        resultEventPublisher.publishErrorResultEvent(TestUtils.TASK_ID, new Exception(MESSAGE));
 
-        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(errorResultEventArgumentCaptor.capture());
-        ErrorResultEvent captured = errorResultEventArgumentCaptor.getValue();
-        Assertions.assertThat(captured.getTaskId()).isEqualTo(UUID.fromString(TestUtils.TASK_ID));
-        Assertions.assertThat(captured.getErrorMessage()).isEqualTo("message");
-        Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.ERROR);
-        Assertions.assertThat(captured.getMessage()).isNotBlank();
+        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(eventArgumentCaptor.capture());
+        ErrorResultEvent captured = eventArgumentCaptor.getValue();
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(captured.getTaskId()).isEqualTo(UUID.fromString(TestUtils.TASK_ID)),
+                () -> Assertions.assertThat(captured.getErrorMessage()).isEqualTo(MESSAGE),
+                () -> Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.ERROR),
+                () -> Assertions.assertThat(captured.getMessage()).isNotBlank()
+        );
+
     }
 }

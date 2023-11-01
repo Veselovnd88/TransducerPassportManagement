@@ -16,7 +16,7 @@ import ru.veselov.generatebytemplate.exception.ServiceUnavailableException;
 @WireMockTest(httpPort = 30001)
 class PdfHttpClientTest {
 
-    public static ByteArrayResource byteArrayResource;
+    private static ByteArrayResource byteArrayResource;
 
     public static int PORT = 30001;
 
@@ -36,7 +36,9 @@ class PdfHttpClientTest {
     void shouldCallPdfService() {
         WireMock.stubFor(WireMock.post("/")
                 .willReturn(WireMock.aResponse().withStatus(200).withBody(TestUtils.SOURCE_BYTES)));
+
         DataBuffer dataBuffer = pdfHttpClient.sendRequestForConvertingDocxToPdf(byteArrayResource);
+
         WireMock.verify(WireMock.postRequestedFor(WireMock.urlEqualTo("/")));
         Assertions.assertThat(dataBuffer).isNotNull();
     }

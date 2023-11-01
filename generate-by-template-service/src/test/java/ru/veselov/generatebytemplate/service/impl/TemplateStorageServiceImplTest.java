@@ -28,15 +28,10 @@ import ru.veselov.generatebytemplate.repository.TemplateRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 @SuppressWarnings({"rawtypes", "unchecked"})
 class TemplateStorageServiceImplTest {
-
-    public static final String BUCKET = "templates";
-
-    public static final UUID ID = UUID.randomUUID();
 
     @Mock
     TemplateRepository templateRepository;
@@ -60,17 +55,19 @@ class TemplateStorageServiceImplTest {
                 .ignore(Select.field(Template::getId))
                 .ignore(Select.field(Template::getCreatedAt))
                 .ignore(Select.field(Template::getEditedAt))
-                .set(Select.field(Template::getBucket), BUCKET).create();
+                .set(Select.field(Template::getBucket), TestUtils.TEMPLATE_BUCKET).create();
 
         templateStorageService.saveTemplateUnSynced(template);
 
         Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
         TemplateEntity captured = templateArgumentCaptor.getValue();
-        Assertions.assertThat(captured.getBucket()).isEqualTo(template.getBucket());
-        Assertions.assertThat(captured.getTemplateName()).isEqualTo(template.getTemplateName());
-        Assertions.assertThat(captured.getPtArt()).isEqualTo(template.getPtArt());
-        Assertions.assertThat(captured.getFilename()).isEqualTo(template.getFilename());
-        Assertions.assertThat(captured.getSynced()).isFalse();
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(captured.getBucket()).isEqualTo(template.getBucket()),
+                () -> Assertions.assertThat(captured.getTemplateName()).isEqualTo(template.getTemplateName()),
+                () -> Assertions.assertThat(captured.getPtArt()).isEqualTo(template.getPtArt()),
+                () -> Assertions.assertThat(captured.getFilename()).isEqualTo(template.getFilename()),
+                () -> Assertions.assertThat(captured.getSynced()).isFalse()
+        );
     }
 
     @Test
@@ -99,21 +96,23 @@ class TemplateStorageServiceImplTest {
     @Test
     void shouldFindTemplateById() {
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setId(ID);
+        templateEntity.setId(TestUtils.TEMPLATE_ID);
         Template template = new Template();
-        template.setId(ID);
-        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.of(templateEntity));
+        template.setId(TestUtils.TEMPLATE_ID);
+        Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.of(templateEntity));
 
-        Template foundTemplate = templateStorageService.findTemplateById(ID.toString());
+        Template foundTemplate = templateStorageService.findTemplateById(TestUtils.TEMPLATE_ID.toString());
 
-        Mockito.verify(templateRepository, Mockito.times(1)).findById(ID);
-        Assertions.assertThat(foundTemplate.getId()).isEqualTo(ID);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Mockito.verify(templateRepository, Mockito.times(1)).findById(TestUtils.TEMPLATE_ID),
+                () -> Assertions.assertThat(foundTemplate.getId()).isEqualTo(TestUtils.TEMPLATE_ID)
+        );
     }
 
     @Test
     void shouldThrowNotFoundException() {
-        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
-        String idString = ID.toString();
+        Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.empty());
+        String idString = TestUtils.TEMPLATE_ID.toString();
         Assertions.assertThatThrownBy(() -> templateStorageService.findTemplateById(idString))
                 .isInstanceOf(TemplateNotFoundException.class);
     }
@@ -121,27 +120,29 @@ class TemplateStorageServiceImplTest {
     @Test
     void shouldReturnListOfTemplatesWithSortingParams() {
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setId(ID);
+        templateEntity.setId(TestUtils.TEMPLATE_ID);
         List<TemplateEntity> templateEntities = List.of(templateEntity);
         Page page = Mockito.mock(Page.class);
         Mockito.when(page.getContent()).thenReturn(templateEntities);
         Mockito.when(templateRepository.countAll()).thenReturn(1L);
         Mockito.when(templateRepository.findAll(ArgumentMatchers.any(Pageable.class))).thenReturn(page);
-        SortingParams sortingParams = new SortingParams(0, "ptArt", "asc");
+        SortingParams sortingParams = new SortingParams(0, TestUtils.SORT_PT_ART, TestUtils.SORT_ASC);
 
         List<Template> all = templateStorageService.findAll(sortingParams);
 
         Template template = new Template();
-        template.setId(ID);
-        Assertions.assertThat(all).contains(template).hasSize(1);
-        Mockito.verify(templateRepository, Mockito.times(1)).countAll();
-        Mockito.verify(templateRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Pageable.class));
+        template.setId(TestUtils.TEMPLATE_ID);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(all).contains(template).hasSize(1),
+                () -> Mockito.verify(templateRepository, Mockito.times(1)).countAll(),
+                () -> Mockito.verify(templateRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Pageable.class))
+        );
     }
 
     @Test
     void shouldThrowPageExceedsMaximumExceptionFindAll() {
         Mockito.when(templateRepository.countAll()).thenReturn(1L);
-        SortingParams sortingParams = new SortingParams(1, "ptArt", "asc");
+        SortingParams sortingParams = new SortingParams(1, TestUtils.SORT_PT_ART, TestUtils.SORT_ASC);
 
         Assertions.assertThatThrownBy(() -> templateStorageService.findAll(sortingParams))
                 .isInstanceOf(PageExceedsMaximumValueException.class);
@@ -150,34 +151,34 @@ class TemplateStorageServiceImplTest {
     @Test
     void shouldReturnListOfTemplatesWithPtArtAndSortingParams() {
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setId(ID);
-        String ptArt = "ptArt";
+        templateEntity.setId(TestUtils.TEMPLATE_ID);
         List<TemplateEntity> templateEntities = List.of(templateEntity);
         Page page = Mockito.mock(Page.class);
         Mockito.when(page.getContent()).thenReturn(templateEntities);
-        Mockito.when(templateRepository.countAllByPtArt(ptArt)).thenReturn(1L);
+        Mockito.when(templateRepository.countAllByPtArt(TestUtils.SORT_PT_ART)).thenReturn(1L);
         Mockito.when(templateRepository
                         .findAllByPtArt(ArgumentMatchers.anyString(), ArgumentMatchers.any(Pageable.class)))
                 .thenReturn(page);
-        SortingParams sortingParams = new SortingParams(0, "ptArt", "asc");
+        SortingParams sortingParams = new SortingParams(0, TestUtils.SORT_PT_ART, TestUtils.SORT_ASC);
 
-        List<Template> all = templateStorageService.findAllByPtArt(ptArt, sortingParams);
+        List<Template> all = templateStorageService.findAllByPtArt(TestUtils.SORT_PT_ART, sortingParams);
 
         Template template = new Template();
-        template.setId(ID);
-        Assertions.assertThat(all).contains(template).hasSize(1);
-        Mockito.verify(templateRepository, Mockito.times(1)).countAllByPtArt(ptArt);
-        Mockito.verify(templateRepository, Mockito.times(1))
-                .findAllByPtArt(ArgumentMatchers.anyString(), ArgumentMatchers.any(Pageable.class));
+        template.setId(TestUtils.TEMPLATE_ID);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(all).contains(template).hasSize(1),
+                () -> Mockito.verify(templateRepository, Mockito.times(1)).countAllByPtArt(TestUtils.SORT_PT_ART),
+                () -> Mockito.verify(templateRepository, Mockito.times(1))
+                        .findAllByPtArt(ArgumentMatchers.anyString(), ArgumentMatchers.any(Pageable.class))
+        );
     }
 
     @Test
     void shouldThrowPageExceedsMaximumExceptionFindAllByPtArt() {
-        String ptArt = "ptArt";
-        Mockito.when(templateRepository.countAllByPtArt(ptArt)).thenReturn(1L);
-        SortingParams sortingParams = new SortingParams(1, "ptArt", "asc");
+        Mockito.when(templateRepository.countAllByPtArt(TestUtils.SORT_PT_ART)).thenReturn(1L);
+        SortingParams sortingParams = new SortingParams(1, TestUtils.SORT_PT_ART, TestUtils.SORT_ASC);
 
-        Assertions.assertThatThrownBy(() -> templateStorageService.findAllByPtArt(ptArt, sortingParams))
+        Assertions.assertThatThrownBy(() -> templateStorageService.findAllByPtArt(TestUtils.SORT_PT_ART, sortingParams))
                 .isInstanceOf(PageExceedsMaximumValueException.class);
     }
 
@@ -201,32 +202,29 @@ class TemplateStorageServiceImplTest {
 
     @Test
     void shouldThrowExceptionIfNotFoundDuringUpdate() {
-        String templateId = ID.toString();
-        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
+        Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> templateStorageService.updateTemplate(templateId))
+        Assertions.assertThatThrownBy(() -> templateStorageService.updateTemplate(TestUtils.TEMPLATE_ID_STRING))
                 .isInstanceOf(TemplateNotFoundException.class);
     }
 
     @Test
     void shouldDeleteTemplate() {
-        String templateId = ID.toString();
         TemplateEntity templateEntity = new TemplateEntity();
-        templateEntity.setId(ID);
+        templateEntity.setId(TestUtils.TEMPLATE_ID);
         templateEntity.setFilename("filename");
-        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.of(templateEntity));
+        Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.of(templateEntity));
 
-        templateStorageService.deleteTemplate(templateId);
+        templateStorageService.deleteTemplate(TestUtils.TEMPLATE_ID_STRING);
 
         Mockito.verify(templateRepository, Mockito.times(1)).delete(templateEntity);
     }
 
     @Test
     void shouldThrowExceptionIfNotTemplateForDelete() {
-        String templateId = ID.toString();
-        Mockito.when(templateRepository.findById(ID)).thenReturn(Optional.empty());
+        Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.empty());
 
-        Assertions.assertThatThrownBy(() -> templateStorageService.deleteTemplate(templateId))
+        Assertions.assertThatThrownBy(() -> templateStorageService.deleteTemplate(TestUtils.TEMPLATE_ID_STRING))
                 .isInstanceOf(TemplateNotFoundException.class);
     }
 

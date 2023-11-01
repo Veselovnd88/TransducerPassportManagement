@@ -69,11 +69,15 @@ class TemplateMinioServiceImplTest {
 
         Mockito.verify(minioClient, Mockito.times(1)).putObject(argumentPutObjCaptor.capture());
         PutObjectArgs captured = argumentPutObjCaptor.getValue();
-        Assertions.assertThat(captured.object()).isEqualTo(template.getFilename());
-        Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.TEMPLATE_BUCKET);
-        try (BufferedInputStream stream = captured.stream()) {
-            Assertions.assertThat(stream.readAllBytes()).isEqualTo(resource.getContentAsByteArray());
-        }
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(captured.object()).isEqualTo(template.getFilename()),
+                () -> Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.TEMPLATE_BUCKET),
+                () -> {
+                    try (BufferedInputStream stream = captured.stream()) {
+                        Assertions.assertThat(stream.readAllBytes()).isEqualTo(resource.getContentAsByteArray());
+                    }
+                }
+        );
     }
 
     @Test
@@ -105,11 +109,15 @@ class TemplateMinioServiceImplTest {
 
         Mockito.verify(minioClient, Mockito.times(1)).putObject(argumentPutObjCaptor.capture());
         PutObjectArgs captured = argumentPutObjCaptor.getValue();
-        Assertions.assertThat(captured.object()).isEqualTo(template.getFilename());
-        Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.TEMPLATE_BUCKET);
-        try (BufferedInputStream stream = captured.stream()) {
-            Assertions.assertThat(stream.readAllBytes()).isEqualTo(resource.getContentAsByteArray());
-        }
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(captured.object()).isEqualTo(template.getFilename()),
+                () -> Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.TEMPLATE_BUCKET),
+                () -> {
+                    try (BufferedInputStream stream = captured.stream()) {
+                        Assertions.assertThat(stream.readAllBytes()).isEqualTo(resource.getContentAsByteArray());
+                    }
+                }
+        );
     }
 
     @Test
@@ -124,10 +132,11 @@ class TemplateMinioServiceImplTest {
 
         Mockito.verify(minioClient, Mockito.times(1)).getObject(argumentGetObjCaptor.capture());
         GetObjectArgs captured = argumentGetObjCaptor.getValue();
-
-        Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES);
-        Assertions.assertThat(captured.object()).isEqualTo(filename);
-        Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.TEMPLATE_BUCKET);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES),
+                () -> Assertions.assertThat(captured.object()).isEqualTo(filename),
+                () -> Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.TEMPLATE_BUCKET)
+        );
     }
 
     @Test
