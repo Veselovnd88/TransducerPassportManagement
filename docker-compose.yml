@@ -132,10 +132,29 @@ services:
     volumes:
       - /var/docker-volumes/pg-pt-management-generate-service:/var/lib/postgresql/data/
 
+  postgres-task-service:
+    container_name: postgres-task-service
+    image: "postgres:16"
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=TaskDB
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=admin
+    command:
+      - "-p 5440"
+    ports:
+      - "5440:5440"
+    networks:
+      - postgres-task
+    volumes:
+      - /var/docker-volumes/pg-pt-management-task-service:/var/lib/postgresql/data/
+
 networks:
   postgres-pt:
     driver: bridge
   postgres-generate:
+    driver: bridge
+  postgres-task:
     driver: bridge
   keycloak-postgres:
     driver: bridge
