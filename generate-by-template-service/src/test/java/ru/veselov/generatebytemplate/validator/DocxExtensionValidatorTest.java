@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import ru.veselov.generatebytemplate.TestUtils;
-import ru.veselov.generatebytemplate.paramresolver.DocxExtensionValidatorParamResolver;
+import ru.veselov.generatebytemplate.extension.DocxExtensionValidatorParamResolver;
 
 import java.util.stream.Stream;
 

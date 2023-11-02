@@ -80,7 +80,6 @@ class PassportServiceImplTest {
                 .thenReturn(returnedResult);
 
         passportService.createPassportsPdf(generatePassportsDto);
-
         Assertions.assertAll(
                 () -> Mockito.verify(docxPassportService, Mockito.times(1)).createDocxPassports(generatePassportsDto),
                 () -> Mockito.verify(pdfService, Mockito.times(1)).createPdf(byteArrayResource),

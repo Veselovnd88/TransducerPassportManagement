@@ -1,4 +1,4 @@
-package ru.veselov.generatebytemplate.paramresolver;
+package ru.veselov.generatebytemplate.extension;
 
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.extension.ParameterContext;
