@@ -29,8 +29,9 @@ public class TaskController {
 
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public Task createTask(@RequestBody @Valid GeneratePassportsDto generatePassportsDto) {
-        return taskService.createTask(generatePassportsDto);
+    public Task createTask(@RequestBody @Valid GeneratePassportsDto generatePassportsDto,
+                           @RequestHeader("username") String username) {
+        return taskService.createTask(generatePassportsDto, username);
     }
 
     @GetMapping("/{taskId}")

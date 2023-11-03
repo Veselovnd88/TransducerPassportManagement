@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface TaskService {
 
-    Task createTask(GeneratePassportsDto generatePassportsDto);
+    Task createTask(GeneratePassportsDto generatePassportsDto, String username);
 
     Task getTask(String taskId);
 

@@ -1,6 +1,5 @@
 package ru.veselov.taskservice.dto;
 
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -26,12 +25,5 @@ public class GeneratePassportsDto {
 
     @NotNull
     private LocalDate printDate;
-
-    @NotBlank
-    private String username;
-
-    @NotNull
-    @UUID
-    private String taskId;
 
 }
