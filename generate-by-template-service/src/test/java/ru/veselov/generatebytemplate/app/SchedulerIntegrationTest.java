@@ -38,6 +38,9 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
     private static final String CRON_TIME = "*/%s * * * * *".formatted(SCHEDULING_SECONDS);
 
     public static final int DAYS_UNTIL_DELETION = 3;
+    private static final String TASK_ID_FIELD = "taskId";
+    private static final String SYNCED_FIELD = "synced";
+    private static final String TEMPLATE_ENTITY_FIELD = "templateEntity";
 
     @Autowired
     TemplateRepository templateRepository;
@@ -118,19 +121,19 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
     }
 
     void saveUnSyncedTemplateToRepo(LocalDateTime createdAt) {
-        TemplateEntity templateEntity = Instancio.of(TemplateEntity.class).set(Select.field("synced"), false)
+        TemplateEntity templateEntity = Instancio.of(TemplateEntity.class).set(Select.field(SYNCED_FIELD), false)
                 .create();
         templateEntity.setCreatedAt(createdAt);
         templateRepository.save(templateEntity);
     }
 
     void saveResultFileToRepo(LocalDateTime createdAt, Boolean sync) {
-        TemplateEntity templateEntity = Instancio.of(TemplateEntity.class).set(Select.field("synced"), true).create();
+        TemplateEntity templateEntity = Instancio.of(TemplateEntity.class).set(Select.field(SYNCED_FIELD), true).create();
         TemplateEntity savedTemplate = templateRepository.saveAndFlush(templateEntity);
         ResultFileEntity resultFileEntity = Instancio.of(ResultFileEntity.class)
-                .set(Select.field("templateEntity"), savedTemplate)
-                .set(Select.field("synced"), sync)
-                .set(Select.field("taskId"), UUID.fromString(TestUtils.TASK_ID))
+                .set(Select.field(TEMPLATE_ENTITY_FIELD), savedTemplate)
+                .set(Select.field(SYNCED_FIELD), sync)
+                .set(Select.field(TASK_ID_FIELD), UUID.fromString(TestUtils.TASK_ID))
                 .create();
         resultFileEntity.setCreatedAt(createdAt);
         resultFileRepository.save(resultFileEntity);

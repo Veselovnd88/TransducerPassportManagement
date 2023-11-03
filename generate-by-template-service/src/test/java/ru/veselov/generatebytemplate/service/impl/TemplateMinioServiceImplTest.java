@@ -14,7 +14,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -67,7 +66,7 @@ class TemplateMinioServiceImplTest {
 
         templateMinioService.saveTemplate(resource, template);
 
-        Mockito.verify(minioClient, Mockito.times(1)).putObject(argumentPutObjCaptor.capture());
+        Mockito.verify(minioClient).putObject(argumentPutObjCaptor.capture());
         PutObjectArgs captured = argumentPutObjCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.object()).isEqualTo(template.getFilename()),
@@ -89,7 +88,7 @@ class TemplateMinioServiceImplTest {
                 .ignore(Select.field(Template::getCreatedAt))
                 .ignore(Select.field(Template::getEditedAt))
                 .set(Select.field(Template::getBucket), TestUtils.TEMPLATE_BUCKET).create();
-        Mockito.when(minioClient.putObject(ArgumentMatchers.any())).thenThrow(ErrorResponseException.class);
+        Mockito.when(minioClient.putObject(Mockito.any())).thenThrow(ErrorResponseException.class);
 
         Assertions.assertThatThrownBy(() -> templateMinioService.saveTemplate(resource, template))
                 .isInstanceOf(CommonMinioException.class);
@@ -126,11 +125,11 @@ class TemplateMinioServiceImplTest {
         String filename = "filename";
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
-        Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
+        Mockito.when(minioClient.getObject(Mockito.any())).thenReturn(getObjectResponse);
 
         ByteArrayResource byteArrayResource = templateMinioService.getTemplateByName(filename);
 
-        Mockito.verify(minioClient, Mockito.times(1)).getObject(argumentGetObjCaptor.capture());
+        Mockito.verify(minioClient).getObject(argumentGetObjCaptor.capture());
         GetObjectArgs captured = argumentGetObjCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES),
@@ -146,7 +145,7 @@ class TemplateMinioServiceImplTest {
 
         templateMinioService.deleteTemplate(filename);
 
-        Mockito.verify(minioClient, Mockito.times(1)).removeObject(argumentRemoveObjCaptor.capture());
+        Mockito.verify(minioClient).removeObject(argumentRemoveObjCaptor.capture());
         RemoveObjectArgs captured = argumentRemoveObjCaptor.getValue();
         Assertions.assertThat(captured.object()).isEqualTo(filename);
     }

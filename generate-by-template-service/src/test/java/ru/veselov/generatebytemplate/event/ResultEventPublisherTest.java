@@ -38,7 +38,7 @@ class ResultEventPublisherTest {
 
         resultEventPublisher.publishSuccessResultEvent(resultFile);
 
-        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(successArgumentCaptor.capture());
+        Mockito.verify(applicationEventPublisher).publishEvent(successArgumentCaptor.capture());
         SuccessResultEvent captured = successArgumentCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.getResultFileId()).isEqualTo(resultFile.getId().toString()),
@@ -53,7 +53,7 @@ class ResultEventPublisherTest {
     void publishErrorResultEvent() {
         resultEventPublisher.publishErrorResultEvent(TestUtils.TASK_ID, new Exception(MESSAGE));
 
-        Mockito.verify(applicationEventPublisher, Mockito.times(1)).publishEvent(eventArgumentCaptor.capture());
+        Mockito.verify(applicationEventPublisher).publishEvent(eventArgumentCaptor.capture());
         ErrorResultEvent captured = eventArgumentCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.getTaskId()).isEqualTo(UUID.fromString(TestUtils.TASK_ID)),

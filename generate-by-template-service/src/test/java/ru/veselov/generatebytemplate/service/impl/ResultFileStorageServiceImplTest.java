@@ -5,7 +5,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -60,7 +59,7 @@ class ResultFileStorageServiceImplTest {
 
         resultFileStorageService.saveUnSynced(resultFile);
 
-        Mockito.verify(resultFileRepository, Mockito.times(1)).save(resultFileEntityArgumentCaptor.capture());
+        Mockito.verify(resultFileRepository).save(resultFileEntityArgumentCaptor.capture());
         ResultFileEntity captured = resultFileEntityArgumentCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.getSynced()).isFalse(),
@@ -72,8 +71,7 @@ class ResultFileStorageServiceImplTest {
     @Test
     void shouldThrowNotFoundExceptionIfTemplateNotExists() {
         ResultFile resultFile = TestUtils.getBasicGeneratedResultFile();
-        Mockito.when(templateRepository.findById(ArgumentMatchers.any()))
-                .thenReturn(Optional.empty());
+        Mockito.when(templateRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() ->
                         resultFileStorageService.saveUnSynced(resultFile))
@@ -91,7 +89,7 @@ class ResultFileStorageServiceImplTest {
 
         resultFileStorageService.syncResultFile(fileUid);
 
-        Mockito.verify(resultFileRepository, Mockito.times(1)).save(resultFileEntityArgumentCaptor.capture());
+        Mockito.verify(resultFileRepository).save(resultFileEntityArgumentCaptor.capture());
         ResultFileEntity captured = resultFileEntityArgumentCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.getId()).isEqualTo(resultFileEntity.getId()),
@@ -102,8 +100,7 @@ class ResultFileStorageServiceImplTest {
     @Test
     void shouldThrowExceptionIfResultFileNotFoundWhileSyncing() {
         UUID fileUid = UUID.randomUUID();
-        Mockito.when(resultFileRepository.findById(ArgumentMatchers.any()))
-                .thenReturn(Optional.empty());
+        Mockito.when(resultFileRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() ->
                         resultFileStorageService.syncResultFile(fileUid))
@@ -126,8 +123,7 @@ class ResultFileStorageServiceImplTest {
     @Test
     void shouldThrowNotFoundExceptionIfResultNotFound() {
         String fileUid = UUID.randomUUID().toString();
-        Mockito.when(resultFileRepository.findById(ArgumentMatchers.any()))
-                .thenReturn(Optional.empty());
+        Mockito.when(resultFileRepository.findById(Mockito.any())).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(() ->
                         resultFileStorageService.findById(fileUid))

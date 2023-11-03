@@ -10,7 +10,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -53,9 +52,10 @@ class ResultFileMinioServiceImplTest {
     void shouldSaveResultToMinIOStorage() {
         Resource resource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
         ResultFile basicResultFile = TestUtils.getBasicGeneratedResultFile();
+
         generatedResultFileMinioService.saveResult(resource, basicResultFile);
 
-        Mockito.verify(minioClient, Mockito.times(1)).putObject(argumentPutObjCaptor.capture());
+        Mockito.verify(minioClient).putObject(argumentPutObjCaptor.capture());
         PutObjectArgs captured = argumentPutObjCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.bucket()).isEqualTo(TestUtils.RESULT_BUCKET),
@@ -73,7 +73,8 @@ class ResultFileMinioServiceImplTest {
     void shouldThrowCommonMinioException() {
         Resource resource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
         ResultFile basicResultFile = TestUtils.getBasicGeneratedResultFile();
-        Mockito.when(minioClient.putObject(ArgumentMatchers.any())).thenThrow(InvalidKeyException.class);
+        Mockito.when(minioClient.putObject(Mockito.any())).thenThrow(InvalidKeyException.class);
+
         Assertions.assertThatThrownBy(
                         () -> generatedResultFileMinioService.saveResult(resource, basicResultFile))
                 .isInstanceOf(CommonMinioException.class);
@@ -85,11 +86,11 @@ class ResultFileMinioServiceImplTest {
         ResultFile basicResultFile = TestUtils.getBasicGeneratedResultFile();
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
-        Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
+        Mockito.when(minioClient.getObject(Mockito.any())).thenReturn(getObjectResponse);
 
         ByteArrayResource byteArrayResource = generatedResultFileMinioService.loadResultFile(basicResultFile);
 
-        Mockito.verify(minioClient, Mockito.times(1)).getObject(argumentGetObjCaptor.capture());
+        Mockito.verify(minioClient).getObject(argumentGetObjCaptor.capture());
         GetObjectArgs captured = argumentGetObjCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(byteArrayResource.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES),

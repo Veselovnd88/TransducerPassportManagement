@@ -9,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -57,25 +56,24 @@ class TemplateServiceImplTest {
 
     @Test
     void shouldCallServicesToSave() {
-        MockMultipartFile multipartFile = new MockMultipartFile("file", "filename.docx",
+        MockMultipartFile multipartFile = new MockMultipartFile(TestUtils.MULTIPART_FILE,
+                TestUtils.MULTIPART_FILENAME,
                 MediaType.MULTIPART_FORM_DATA_VALUE, TestUtils.SOURCE_BYTES);
-        TemplateDto templateDto = new TemplateDto("name", "801877", "templates");
+        TemplateDto templateDto = new TemplateDto("name", TestUtils.ART, TestUtils.TEMPLATE_BUCKET);
         TemplateEntity templateEntity = new TemplateEntity();
         templateEntity.setId(TestUtils.TEMPLATE_ID);
 
-        Mockito.when(templateStorageService.saveTemplateUnSynced(ArgumentMatchers.any()))
-                .thenReturn(templateEntity);
+        Mockito.when(templateStorageService.saveTemplateUnSynced(Mockito.any())).thenReturn(templateEntity);
         passportTemplateService.saveTemplate(multipartFile, templateDto);
         org.junit.jupiter.api.Assertions.assertAll(
-                () -> Mockito.verify(templateStorageService, Mockito.times(1))
-                        .saveTemplateUnSynced(templateArgumentCaptor.capture()),
-                () -> Mockito.verify(templateMinioService, Mockito.times(1))
-                        .saveTemplate(ArgumentMatchers.any(), templateArgumentCaptor.capture())
+                () -> Mockito.verify(templateStorageService).saveTemplateUnSynced(templateArgumentCaptor.capture()),
+                () -> Mockito.verify(templateMinioService)
+                        .saveTemplate(Mockito.any(), templateArgumentCaptor.capture())
         );
         Template captured = templateArgumentCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.getFilename()).isEqualTo("801877-name.docx"),
-                () -> Mockito.verify(templateStorageService, Mockito.times(1)).syncTemplate(templateEntity.getId())
+                () -> Mockito.verify(templateStorageService).syncTemplate(templateEntity.getId())
         );
     }
 
@@ -86,12 +84,12 @@ class TemplateServiceImplTest {
                 MediaType.MULTIPART_FORM_DATA_VALUE, TestUtils.SOURCE_BYTES);
         TemplateDto templateDto = new TemplateDto("name", TestUtils.ART, TestUtils.TEMPLATE_BUCKET);
         Mockito.doThrow(EntityExistsException.class).when(templateValidator)
-                .validateTemplateName(ArgumentMatchers.anyString());
+                .validateTemplateName(Mockito.anyString());
 
         Assertions.assertThatThrownBy(() -> passportTemplateService.saveTemplate(multipartFile, templateDto))
                 .isInstanceOf(EntityExistsException.class);
 
-        Mockito.verify(templateStorageService, Mockito.never()).saveTemplateUnSynced(ArgumentMatchers.any());
+        Mockito.verifyNoInteractions(templateStorageService);
     }
 
     @Test
@@ -108,8 +106,8 @@ class TemplateServiceImplTest {
         ByteArrayResource sourceBytes = passportTemplateService.getTemplate(id.toString());
 
         org.junit.jupiter.api.Assertions.assertAll(
-                () -> Mockito.verify(templateStorageService, Mockito.times(1)).findTemplateById(id.toString()),
-                () -> Mockito.verify(templateMinioService, Mockito.times(1)).getTemplateByName(filename),
+                () -> Mockito.verify(templateStorageService).findTemplateById(id.toString()),
+                () -> Mockito.verify(templateMinioService).getTemplateByName(filename),
                 () -> Assertions.assertThat(sourceBytes.getByteArray()).isEqualTo(TestUtils.SOURCE_BYTES)
         );
     }
@@ -122,7 +120,7 @@ class TemplateServiceImplTest {
         Assertions.assertThatThrownBy(() -> passportTemplateService.getTemplate(idString))
                 .isInstanceOf(EntityNotFoundException.class);
 
-        Mockito.verify(templateMinioService, Mockito.never()).getTemplateByName(ArgumentMatchers.anyString());
+        Mockito.verifyNoInteractions(templateMinioService);
     }
 
     @Test
@@ -138,10 +136,10 @@ class TemplateServiceImplTest {
         passportTemplateService.updateTemplate(multipartFile, templateId);
 
         org.junit.jupiter.api.Assertions.assertAll(
-                () -> Mockito.verify(templateStorageService, Mockito.times(1)).findTemplateById(templateId),
-                () -> Mockito.verify(templateStorageService, Mockito.times(1)).updateTemplate(templateId),
-                () -> Mockito.verify(templateMinioService, Mockito.times(1))
-                        .updateTemplate(ArgumentMatchers.any(), templateArgumentCaptor.capture())
+                () -> Mockito.verify(templateStorageService).findTemplateById(templateId),
+                () -> Mockito.verify(templateStorageService).updateTemplate(templateId),
+                () -> Mockito.verify(templateMinioService)
+                        .updateTemplate(Mockito.any(), templateArgumentCaptor.capture())
         );
         Template captured = templateArgumentCaptor.getValue();
         Assertions.assertThat(captured.getFilename()).isEqualTo(template.getFilename());
@@ -158,8 +156,7 @@ class TemplateServiceImplTest {
         Assertions.assertThatThrownBy(() -> passportTemplateService.updateTemplate(multipartFile, templateId))
                 .isInstanceOf(EntityNotFoundException.class);
 
-        Mockito.verify(templateMinioService, Mockito.never())
-                .updateTemplate(ArgumentMatchers.any(), ArgumentMatchers.any());
+        Mockito.verifyNoInteractions(templateMinioService);
     }
 
     @Test
@@ -173,8 +170,8 @@ class TemplateServiceImplTest {
         passportTemplateService.deleteTemplate(templateId);
 
         org.junit.jupiter.api.Assertions.assertAll(
-                () -> Mockito.verify(templateStorageService, Mockito.times(1)).deleteTemplate(templateId),
-                () -> Mockito.verify(templateMinioService, Mockito.times(1)).deleteTemplate(template.getFilename())
+                () -> Mockito.verify(templateStorageService).deleteTemplate(templateId),
+                () -> Mockito.verify(templateMinioService).deleteTemplate(template.getFilename())
         );
     }
 

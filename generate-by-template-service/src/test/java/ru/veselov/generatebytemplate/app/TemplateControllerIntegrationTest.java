@@ -10,7 +10,6 @@ import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,9 @@ import java.util.UUID;
 @DirtiesContext
 class TemplateControllerIntegrationTest extends PostgresContainersConfig {
 
-    public static final String URL_PREFIX = "/api/v1/template/";
+    private static final String URL_PREFIX = "/api/v1/template/";
+    private static final String TEMPLATE_NAME = "801877-filename";
+    private static final String SAVED_TEMPLATE_NAME = "801877-name";
 
     public UUID savedTemplateId;
 
@@ -84,7 +85,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         saveTemplateEntity();
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
-        Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
+        Mockito.when(minioClient.getObject(Mockito.any())).thenReturn(getObjectResponse);
 
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
                         path("/id/" + savedTemplateId).build())
@@ -92,7 +93,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .expectBody(byte[].class);
 
-        Mockito.verify(minioClient, Mockito.times(1)).getObject(getObjectArgsCaptor.capture());
+        Mockito.verify(minioClient).getObject(getObjectArgsCaptor.capture());
         GetObjectArgs captured = getObjectArgsCaptor.getValue();
         Assertions.assertThat(captured.object()).isEqualTo(TestUtils.SAMPLE_FILENAME);
         Assertions.assertThat(captured.bucket()).isEqualTo(templateBucket);
@@ -111,10 +112,10 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isAccepted();
 
-        Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findByName("801877-name");
+        Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findByName(SAVED_TEMPLATE_NAME);
         Assertions.assertThat(optionalTemplateEntity).isPresent();
         Assertions.assertThat(optionalTemplateEntity.get().getSynced()).isTrue();
-        Mockito.verify(minioClient, Mockito.times(1)).putObject(putObjectArgsCaptor.capture());
+        Mockito.verify(minioClient).putObject(putObjectArgsCaptor.capture());
         PutObjectArgs captured = putObjectArgsCaptor.getValue();
         Assertions.assertThat(captured.bucket()).isEqualTo(templateBucket);
         Assertions.assertThat(captured.object()).isEqualTo("801877-name.docx");
@@ -138,7 +139,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         Assertions.assertThat(templateEntityOptional).isPresent();
         TemplateEntity templateEntity = templateEntityOptional.get();
         Assertions.assertThat(templateEntity.getEditedAt()).isNotNull();
-        Mockito.verify(minioClient, Mockito.times(1)).putObject(putObjectArgsCaptor.capture());
+        Mockito.verify(minioClient).putObject(putObjectArgsCaptor.capture());
         PutObjectArgs captured = putObjectArgsCaptor.getValue();
         Assertions.assertThat(captured.bucket()).isEqualTo(templateBucket);
         Assertions.assertThat(captured.object()).isEqualTo(TestUtils.SAMPLE_FILENAME);
@@ -155,7 +156,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findById(savedTemplateId);
 
         Assertions.assertThat(optionalTemplateEntity).isNotPresent();
-        Mockito.verify(minioClient, Mockito.times(1)).removeObject(removeObjectArgsCaptor.capture());
+        Mockito.verify(minioClient).removeObject(removeObjectArgsCaptor.capture());
         RemoveObjectArgs captured = removeObjectArgsCaptor.getValue();
         Assertions.assertThat(captured.object()).isEqualTo(TestUtils.SAMPLE_FILENAME);
         Assertions.assertThat(captured.bucket()).isEqualTo(templateBucket);
@@ -169,14 +170,14 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
                 .filename(TestUtils.MULTIPART_FILENAME);
         multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
-        Mockito.doThrow(CommonMinioException.class).when(minioClient).putObject(ArgumentMatchers.any());
+        Mockito.doThrow(CommonMinioException.class).when(minioClient).putObject(Mockito.any());
 
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_FILE_STORAGE.toString());
 
-        Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findByName("801877-name");
+        Optional<TemplateEntity> optionalTemplateEntity = templateRepository.findByName(SAVED_TEMPLATE_NAME);
         Assertions.assertThat(optionalTemplateEntity).isPresent();
         Assertions.assertThat(optionalTemplateEntity.get().getSynced()).isFalse();
     }
@@ -187,7 +188,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         saveTemplateEntity();
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES).filename(TestUtils.MULTIPART_FILENAME);
-        Mockito.doThrow(CommonMinioException.class).when(minioClient).putObject(ArgumentMatchers.any());
+        Mockito.doThrow(CommonMinioException.class).when(minioClient).putObject(Mockito.any());
 
         webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/upload")
                         .path("/id/" + savedTemplateId).build())
@@ -204,7 +205,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     @SneakyThrows
     void shouldNotDeleteIfException() {
         saveTemplateEntity();
-        Mockito.doThrow(CommonMinioException.class).when(minioClient).removeObject(ArgumentMatchers.any());
+        Mockito.doThrow(CommonMinioException.class).when(minioClient).removeObject(Mockito.any());
 
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
                         .path("/delete").path("/id/" + savedTemplateId).build())
@@ -218,7 +219,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     private void saveTemplateEntity() {
         TemplateEntity templateEntity = new TemplateEntity();
         templateEntity.setFilename(TestUtils.SAMPLE_FILENAME);
-        templateEntity.setTemplateName("801877-filename");
+        templateEntity.setTemplateName(TEMPLATE_NAME);
         templateEntity.setBucket(templateBucket);
         templateEntity.setSynced(true);
         templateEntity.setPtArt(TestUtils.ART);

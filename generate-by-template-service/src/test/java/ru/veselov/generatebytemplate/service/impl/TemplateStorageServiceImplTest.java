@@ -7,7 +7,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.mockito.ArgumentMatchers;
 import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -59,7 +58,7 @@ class TemplateStorageServiceImplTest {
 
         templateStorageService.saveTemplateUnSynced(template);
 
-        Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
+        Mockito.verify(templateRepository).save(templateArgumentCaptor.capture());
         TemplateEntity captured = templateArgumentCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.getBucket()).isEqualTo(template.getBucket()),
@@ -79,7 +78,7 @@ class TemplateStorageServiceImplTest {
 
         templateStorageService.syncTemplate(TestUtils.TEMPLATE_ID);
 
-        Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
+        Mockito.verify(templateRepository).save(templateArgumentCaptor.capture());
         TemplateEntity captured = templateArgumentCaptor.getValue();
         Assertions.assertThat(captured.getSynced()).isTrue();
     }
@@ -104,7 +103,7 @@ class TemplateStorageServiceImplTest {
         Template foundTemplate = templateStorageService.findTemplateById(TestUtils.TEMPLATE_ID.toString());
 
         org.junit.jupiter.api.Assertions.assertAll(
-                () -> Mockito.verify(templateRepository, Mockito.times(1)).findById(TestUtils.TEMPLATE_ID),
+                () -> Mockito.verify(templateRepository).findById(TestUtils.TEMPLATE_ID),
                 () -> Assertions.assertThat(foundTemplate.getId()).isEqualTo(TestUtils.TEMPLATE_ID)
         );
     }
@@ -125,7 +124,7 @@ class TemplateStorageServiceImplTest {
         Page page = Mockito.mock(Page.class);
         Mockito.when(page.getContent()).thenReturn(templateEntities);
         Mockito.when(templateRepository.countAll()).thenReturn(1L);
-        Mockito.when(templateRepository.findAll(ArgumentMatchers.any(Pageable.class))).thenReturn(page);
+        Mockito.when(templateRepository.findAll(Mockito.any(Pageable.class))).thenReturn(page);
         SortingParams sortingParams = new SortingParams(0, TestUtils.SORT_PT_ART, TestUtils.SORT_ASC);
 
         List<Template> all = templateStorageService.findAll(sortingParams);
@@ -134,8 +133,8 @@ class TemplateStorageServiceImplTest {
         template.setId(TestUtils.TEMPLATE_ID);
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(all).contains(template).hasSize(1),
-                () -> Mockito.verify(templateRepository, Mockito.times(1)).countAll(),
-                () -> Mockito.verify(templateRepository, Mockito.times(1)).findAll(ArgumentMatchers.any(Pageable.class))
+                () -> Mockito.verify(templateRepository).countAll(),
+                () -> Mockito.verify(templateRepository).findAll(Mockito.any(Pageable.class))
         );
     }
 
@@ -156,8 +155,7 @@ class TemplateStorageServiceImplTest {
         Page page = Mockito.mock(Page.class);
         Mockito.when(page.getContent()).thenReturn(templateEntities);
         Mockito.when(templateRepository.countAllByPtArt(TestUtils.SORT_PT_ART)).thenReturn(1L);
-        Mockito.when(templateRepository
-                        .findAllByPtArt(ArgumentMatchers.anyString(), ArgumentMatchers.any(Pageable.class)))
+        Mockito.when(templateRepository.findAllByPtArt(Mockito.anyString(), Mockito.any(Pageable.class)))
                 .thenReturn(page);
         SortingParams sortingParams = new SortingParams(0, TestUtils.SORT_PT_ART, TestUtils.SORT_ASC);
 
@@ -167,9 +165,9 @@ class TemplateStorageServiceImplTest {
         template.setId(TestUtils.TEMPLATE_ID);
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(all).contains(template).hasSize(1),
-                () -> Mockito.verify(templateRepository, Mockito.times(1)).countAllByPtArt(TestUtils.SORT_PT_ART),
-                () -> Mockito.verify(templateRepository, Mockito.times(1))
-                        .findAllByPtArt(ArgumentMatchers.anyString(), ArgumentMatchers.any(Pageable.class))
+                () -> Mockito.verify(templateRepository).countAllByPtArt(TestUtils.SORT_PT_ART),
+                () -> Mockito.verify(templateRepository)
+                        .findAllByPtArt(Mockito.anyString(), Mockito.any(Pageable.class))
         );
     }
 
@@ -190,11 +188,11 @@ class TemplateStorageServiceImplTest {
         templateEntity.setFilename("filename");
         Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID))
                 .thenReturn(Optional.of(templateEntity));
-        Mockito.when(templateRepository.save(ArgumentMatchers.any())).thenReturn(templateEntity);
+        Mockito.when(templateRepository.save(Mockito.any())).thenReturn(templateEntity);
         templateStorageService.updateTemplate(templateIdUUID);
 
-        Mockito.verify(templateRepository, Mockito.times(1)).findById(TestUtils.TEMPLATE_ID);
-        Mockito.verify(templateRepository, Mockito.times(1)).save(templateArgumentCaptor.capture());
+        Mockito.verify(templateRepository).findById(TestUtils.TEMPLATE_ID);
+        Mockito.verify(templateRepository).save(templateArgumentCaptor.capture());
         TemplateEntity captured = templateArgumentCaptor.getValue();
         Assertions.assertThat(captured.getId()).isEqualTo(templateEntity.getId());
         Assertions.assertThat(captured.getEditedAt()).isNotNull();
@@ -217,7 +215,7 @@ class TemplateStorageServiceImplTest {
 
         templateStorageService.deleteTemplate(TestUtils.TEMPLATE_ID_STRING);
 
-        Mockito.verify(templateRepository, Mockito.times(1)).delete(templateEntity);
+        Mockito.verify(templateRepository).delete(templateEntity);
     }
 
     @Test

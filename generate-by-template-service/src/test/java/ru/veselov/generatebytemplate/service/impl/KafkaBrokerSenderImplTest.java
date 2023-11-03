@@ -1,9 +1,11 @@
 package ru.veselov.generatebytemplate.service.impl;
 
+import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -18,7 +20,7 @@ import ru.veselov.generatebytemplate.event.EventType;
 import java.util.concurrent.CompletableFuture;
 
 @ExtendWith(MockitoExtension.class)
-@SuppressWarnings("unchecked")
+@SuppressWarnings({"unchecked", "rawtypes"})
 class KafkaBrokerSenderImplTest {
 
     @Mock(name = "passportsDtoKafkaTemplate")
@@ -27,11 +29,11 @@ class KafkaBrokerSenderImplTest {
     @Mock(name = "taskResultDtoKafkaTemplate")
     KafkaTemplate<String, TaskResultDto> taskResultDtoKafkaTemplate;
 
-    @InjectMocks
     KafkaBrokerSenderImpl kafkaBrokerSender;
 
     @BeforeEach
     void init() {
+        kafkaBrokerSender = new KafkaBrokerSenderImpl(passportsDtoKafkaTemplate, taskResultDtoKafkaTemplate);
         ReflectionTestUtils.setField(kafkaBrokerSender, "taskTopic", TestUtils.TASK_TOPIC, String.class);
         ReflectionTestUtils.setField(kafkaBrokerSender, "passportTopic", TestUtils.PASSPORT_TOPIC, String.class);
     }
@@ -45,21 +47,22 @@ class KafkaBrokerSenderImplTest {
 
         kafkaBrokerSender.sendPassportInfoMessage(generatePassportsDto);
 
-        Mockito.verify(passportsDtoKafkaTemplate, Mockito.times(1))
-                .send(TestUtils.PASSPORT_TOPIC, generatePassportsDto);
+        Mockito.verify(passportsDtoKafkaTemplate).send(TestUtils.PASSPORT_TOPIC, generatePassportsDto);
     }
 
-    @Test
+    @RepeatedTest(3)
+        //flaky test
     void shouldSendTaskResultToKafka() {
-        CompletableFuture<SendResult<String, TaskResultDto>> mockCF = Mockito.mock(CompletableFuture.class);
+        CompletableFuture<SendResult<String, TaskResultDto>> mockCF = CompletableFuture.completedFuture(
+                new SendResult<>(Mockito.mock(ProducerRecord.class), Mockito.mock(RecordMetadata.class)
+                ));
         TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID, "message", null, EventType.READY);
-        Mockito.when(taskResultDtoKafkaTemplate.send(TestUtils.TASK_TOPIC,
-                TestUtils.TASK_ID, taskResultDto)).thenReturn(mockCF);
+        Mockito.doReturn(mockCF).when(taskResultDtoKafkaTemplate)
+                .send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID, taskResultDto);
 
         kafkaBrokerSender.sendResultMessage(TestUtils.TASK_ID, taskResultDto);
 
-        Mockito.verify(taskResultDtoKafkaTemplate, Mockito.times(1))
-                .send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID, taskResultDto);
+        Mockito.verify(taskResultDtoKafkaTemplate).send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID, taskResultDto);
     }
 
 }

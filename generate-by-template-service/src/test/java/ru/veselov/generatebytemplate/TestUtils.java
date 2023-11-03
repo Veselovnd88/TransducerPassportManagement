@@ -64,12 +64,12 @@ public class TestUtils {
 
     public static GeneratePassportsDto getBasicGeneratePassportsDto() {
         return new GeneratePassportsDto(
-                SERIALS_DTOS, UUID.randomUUID().toString(), DATE, TestUtils.USERNAME, TestUtils.TASK_ID);
+                SERIALS_DTOS, TEMPLATE_ID_STRING, DATE, TestUtils.USERNAME, TestUtils.TASK_ID);
     }
 
     public static ResultFile getBasicGeneratedResultFile() {
         return ResultFile.builder()
-                .templateId(TEMPLATE_ID.toString())
+                .templateId(TEMPLATE_ID_STRING)
                 .taskId(TASK_ID)
                 .username(USERNAME)
                 .bucket(RESULT_BUCKET)

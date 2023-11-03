@@ -3,7 +3,6 @@ package ru.veselov.generatebytemplate.controller;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -46,7 +45,7 @@ class TemplateInfoControllerTest {
     @Test
     void shouldReturnTemplatesWithSortingParams() {
         List<Template> templates = List.of(new Template());
-        Mockito.when(templateStorageService.findAll(ArgumentMatchers.any())).thenReturn(templates);
+        Mockito.when(templateStorageService.findAll(Mockito.any())).thenReturn(templates);
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all").queryParam(TestUtils.PAGE, 1).build())
                 .exchange().expectStatus().isOk()
                 .expectBody(List.class);
@@ -55,8 +54,7 @@ class TemplateInfoControllerTest {
     @Test
     void shouldReturnTemplatesByPtArtWithSortingParams() {
         List<Template> templates = List.of(new Template());
-        Mockito.when(templateStorageService.findAllByPtArt(ArgumentMatchers.anyString(),
-                ArgumentMatchers.any())).thenReturn(templates);
+        Mockito.when(templateStorageService.findAllByPtArt(Mockito.anyString(), Mockito.any())).thenReturn(templates);
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL).path("/all/ptArt/801877")
                         .queryParam(TestUtils.PAGE, 1).build())
                 .exchange().expectStatus().isOk()
