@@ -16,7 +16,7 @@ import java.util.UUID;
 class ResultEventListenerTest {
 
     private static final String ERROR_MESSAGE = "errorMessage";
-    
+
     private static final String MESSAGE = "message";
 
     @Mock
@@ -46,7 +46,7 @@ class ResultEventListenerTest {
         resultEventListener.handleErrorResultEvent(errorResultEvent);
 
         TaskResultDto taskResultDto = new TaskResultDto(null, MESSAGE, ERROR_MESSAGE, EventType.ERROR);
-        Mockito.verify(kafkaBrokerSender, Mockito.times(1)).sendResultMessage(TestUtils.TASK_ID, taskResultDto);
+        Mockito.verify(kafkaBrokerSender).sendResultMessage(TestUtils.TASK_ID, taskResultDto);
     }
 
 }

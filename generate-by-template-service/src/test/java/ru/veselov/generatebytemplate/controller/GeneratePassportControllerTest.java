@@ -46,7 +46,7 @@ class GeneratePassportControllerTest {
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isAccepted();
 
-        Mockito.verify(passportService, Mockito.times(1)).createPassportsPdf(generatePassportsDto);
+        Mockito.verify(passportService).createPassportsPdf(generatePassportsDto);
     }
 
     @Test
@@ -60,7 +60,7 @@ class GeneratePassportControllerTest {
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(byteArrayResource.contentLength());
 
-        Mockito.verify(resultFileService, Mockito.times(1)).getResultFile(resultUid);
+        Mockito.verify(resultFileService).getResultFile(resultUid);
     }
 
 }

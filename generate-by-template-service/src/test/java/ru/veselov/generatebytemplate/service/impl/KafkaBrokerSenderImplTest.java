@@ -45,8 +45,7 @@ class KafkaBrokerSenderImplTest {
 
         kafkaBrokerSender.sendPassportInfoMessage(generatePassportsDto);
 
-        Mockito.verify(passportsDtoKafkaTemplate, Mockito.times(1))
-                .send(TestUtils.PASSPORT_TOPIC, generatePassportsDto);
+        Mockito.verify(passportsDtoKafkaTemplate).send(TestUtils.PASSPORT_TOPIC, generatePassportsDto);
     }
 
     @Test
@@ -58,8 +57,7 @@ class KafkaBrokerSenderImplTest {
 
         kafkaBrokerSender.sendResultMessage(TestUtils.TASK_ID, taskResultDto);
 
-        Mockito.verify(taskResultDtoKafkaTemplate, Mockito.times(1))
-                .send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID, taskResultDto);
+        Mockito.verify(taskResultDtoKafkaTemplate).send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID, taskResultDto);
     }
 
 }

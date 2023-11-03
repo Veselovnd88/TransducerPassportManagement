@@ -48,12 +48,10 @@ class DocxPassportServiceImplTest {
         docxPassportService.createDocxPassports(generatePassportsDto);
 
         Assertions.assertAll(
-                () -> Mockito.verify(passportTemplateService, Mockito.times(1))
-                        .getTemplate(generatePassportsDto.getTemplateId()),
-                () -> Mockito.verify(docxGeneratorService, Mockito.times(1))
+                () -> Mockito.verify(passportTemplateService).getTemplate(generatePassportsDto.getTemplateId()),
+                () -> Mockito.verify(docxGeneratorService)
                         .generateDocx(TestUtils.SERIALS, byteArrayResource, TestUtils.DTF.format(TestUtils.DATE))
         );
-
     }
 
 }

@@ -25,9 +25,21 @@ import java.util.UUID;
 @AutoConfigureWebTestClient
 @ActiveProfiles("test")
 @DirtiesContext
-public class TemplateInfoControllerIntegrationTest extends PostgresContainersConfig {
+class TemplateInfoControllerIntegrationTest extends PostgresContainersConfig {
 
-    public static final String URL_PREFIX = "/api/v1/template/info";
+    private static final String URL_PREFIX = "/api/v1/template/info";
+
+    private static final String TEMPLATE_NAME = "templateName";
+
+    private static final String ASC = "asc";
+
+    private static final String PT_ART = "ptArt";
+
+    private static final String DESC = "desc";
+
+    private static final String TEMPLATE_NAME2 = "101855-zzz";
+
+    private static final String TEMPLATE_NAME1 = "801855-abc";
 
     @Value("${minio.buckets.template}")
     String templateBucket;
@@ -87,7 +99,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
                 .jsonPath("$.size()").isEqualTo(3)
-                .jsonPath("$[0].templateName").isEqualTo("101855-zzz");
+                .jsonPath("$[0].templateName").isEqualTo(TEMPLATE_NAME2);
     }
 
     @Test
@@ -96,7 +108,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
                         .queryParam(TestUtils.PAGE, 0)
-                        .queryParam(TestUtils.SORT, "templateName")
+                        .queryParam(TestUtils.SORT, TEMPLATE_NAME)
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
@@ -110,13 +122,13 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
                         .queryParam(TestUtils.PAGE, 0)
-                        .queryParam(TestUtils.SORT, "templateName")
-                        .queryParam(TestUtils.ORDER, "asc")
+                        .queryParam(TestUtils.SORT, TEMPLATE_NAME)
+                        .queryParam(TestUtils.ORDER, ASC)
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
                 .jsonPath("$.size()").isEqualTo(3)
-                .jsonPath("$[0].templateName").isEqualTo("101855-zzz");
+                .jsonPath("$[0].templateName").isEqualTo(TEMPLATE_NAME2);
     }
 
     @Test
@@ -125,8 +137,8 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
                         .queryParam(TestUtils.PAGE, 0)
-                        .queryParam(TestUtils.SORT, "ptArt")
-                        .queryParam(TestUtils.ORDER, "desc")
+                        .queryParam(TestUtils.SORT, PT_ART)
+                        .queryParam(TestUtils.ORDER, DESC)
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
@@ -140,13 +152,13 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
         saveTwoMoreEntities();
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
                         .queryParam(TestUtils.PAGE, 0)
-                        .queryParam(TestUtils.SORT, "ptArt")
-                        .queryParam(TestUtils.ORDER, "asc")
+                        .queryParam(TestUtils.SORT, PT_ART)
+                        .queryParam(TestUtils.ORDER, ASC)
                         .build())
                 .exchange().expectStatus().isOk()
                 .expectBody().jsonPath("$").isArray()
                 .jsonPath("$.size()").isEqualTo(3)
-                .jsonPath("$[0].templateName").isEqualTo("101855-zzz");
+                .jsonPath("$[0].templateName").isEqualTo(TEMPLATE_NAME2);
     }
 
     @Test
@@ -182,7 +194,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
     private void saveTwoMoreEntities() {
         TemplateEntity templateEntity1 = new TemplateEntity();
         templateEntity1.setFilename("801855-abc.docx");
-        templateEntity1.setTemplateName("801855-abc");
+        templateEntity1.setTemplateName(TEMPLATE_NAME1);
         templateEntity1.setBucket(templateBucket);
         templateEntity1.setPtArt("801855");
         templateEntity1.setSynced(true);
@@ -190,7 +202,7 @@ public class TemplateInfoControllerIntegrationTest extends PostgresContainersCon
 
         TemplateEntity templateEntity2 = new TemplateEntity();
         templateEntity2.setFilename("101855-zzz.docx");
-        templateEntity2.setTemplateName("101855-zzz");
+        templateEntity2.setTemplateName(TEMPLATE_NAME2);
         templateEntity2.setBucket(templateBucket);
         templateEntity2.setSynced(true);
         templateEntity2.setPtArt("101855");

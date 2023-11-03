@@ -22,7 +22,12 @@ import ru.veselov.generatebytemplate.service.PassportTemplateService;
 @ActiveProfiles("test")
 class TemplateControllerValidationIntegrationTest {
 
-    public static final String URL_PREFIX = "/api/v1/template/";
+    private static final String URL_PREFIX = "/api/v1/template/";
+    private static final String PT_ART_FIELD = "ptArt";
+    private static final String TEMPLATE_DESCRIPTION_FIELD = "templateDescription";
+    private static final String BUCKET_FIELD = "bucket";
+    private static final String FILE_FIELD = "file";
+    private static final String TEMPLATE_ID_FIELD = "templateId";
 
     @Autowired
     WebTestClient webTestClient;
@@ -37,7 +42,7 @@ class TemplateControllerValidationIntegrationTest {
                 .exchange().expectStatus().is4xxClientError()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("templateId");
+                .jsonPath("$.violations[0].fieldName").isEqualTo(TEMPLATE_ID_FIELD);
     }
 
     @Test
@@ -45,8 +50,8 @@ class TemplateControllerValidationIntegrationTest {
         //Checking @Docx annotation for validation
         TemplateDto templateDto = new TemplateDto(
                 "filename",
-                TestUtils.TEMPLATE_ID.toString(),
-                "bucketName");
+                TestUtils.TEMPLATE_ID_STRING,
+                TestUtils.TEMPLATE_BUCKET);
         MultipartBodyBuilder multipartBodyBuilder = new MultipartBodyBuilder();
         multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES).filename("filename.pox");
         multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
@@ -56,7 +61,7 @@ class TemplateControllerValidationIntegrationTest {
                 .exchange().expectStatus().is4xxClientError()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("file");
+                .jsonPath("$.violations[0].fieldName").isEqualTo(FILE_FIELD);
     }
 
     @Test
@@ -73,14 +78,14 @@ class TemplateControllerValidationIntegrationTest {
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
                 .jsonPath("$.violations[0].fieldName")
-                .value(Matchers.anyOf(Matchers.containsString("templateDescription"),
-                        Matchers.containsString("ptArt"), Matchers.containsString("bucket")))
+                .value(Matchers.anyOf(Matchers.containsString(TEMPLATE_DESCRIPTION_FIELD),
+                        Matchers.containsString(PT_ART_FIELD), Matchers.containsString(BUCKET_FIELD)))
                 .jsonPath("$.violations[1].fieldName")
-                .value(Matchers.anyOf(Matchers.containsString("templateDescription"),
-                        Matchers.containsString("ptArt"), Matchers.containsString("bucket")))
+                .value(Matchers.anyOf(Matchers.containsString(TEMPLATE_DESCRIPTION_FIELD),
+                        Matchers.containsString(PT_ART_FIELD), Matchers.containsString(BUCKET_FIELD)))
                 .jsonPath("$.violations[2].fieldName")
-                .value(Matchers.anyOf(Matchers.containsString("templateDescription"),
-                        Matchers.containsString("ptArt"), Matchers.containsString("bucket")));
+                .value(Matchers.anyOf(Matchers.containsString(TEMPLATE_DESCRIPTION_FIELD),
+                        Matchers.containsString(PT_ART_FIELD), Matchers.containsString(BUCKET_FIELD)));
     }
 
     @Test
@@ -100,7 +105,7 @@ class TemplateControllerValidationIntegrationTest {
                 .exchange().expectStatus().is4xxClientError()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("file");
+                .jsonPath("$.violations[0].fieldName").isEqualTo(FILE_FIELD);
     }
 
     @Test
@@ -114,7 +119,7 @@ class TemplateControllerValidationIntegrationTest {
                 .exchange().expectStatus().is4xxClientError()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("templateId");
+                .jsonPath("$.violations[0].fieldName").isEqualTo(TEMPLATE_ID_FIELD);
     }
 
     @Test
@@ -124,7 +129,7 @@ class TemplateControllerValidationIntegrationTest {
                 .exchange().expectStatus().is4xxClientError()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("templateId");
+                .jsonPath("$.violations[0].fieldName").isEqualTo(TEMPLATE_ID_FIELD);
     }
 
 }

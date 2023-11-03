@@ -86,8 +86,8 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .expectBody(byte[].class);
-        Mockito.verify(templateRepository, Mockito.times(1)).findById(TestUtils.TEMPLATE_ID);
-        Mockito.verify(minioClient, Mockito.times(1)).getObject(ArgumentMatchers.any());
+        Mockito.verify(templateRepository).findById(TestUtils.TEMPLATE_ID);
+        Mockito.verify(minioClient).getObject(ArgumentMatchers.any());
         //second time should get from cache
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
                         path("/id/" + TestUtils.TEMPLATE_ID).build())
@@ -95,8 +95,8 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .expectBody(byte[].class);
 
-        Mockito.verify(templateRepository, Mockito.times(1)).findById(TestUtils.TEMPLATE_ID);
-        Mockito.verify(minioClient, Mockito.times(1)).getObject(ArgumentMatchers.any());
+        Mockito.verify(templateRepository).findById(TestUtils.TEMPLATE_ID);
+        Mockito.verify(minioClient).getObject(ArgumentMatchers.any());
     }
 
     @Test
@@ -108,7 +108,7 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
                 .filename(TestUtils.MULTIPART_FILENAME);
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
-        Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
+        Mockito.when(minioClient.getObject(Mockito.any())).thenReturn(getObjectResponse);
         Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.of(templateEntity));
         //after this request template should be in cache #1 invocation of template repository
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
@@ -128,7 +128,7 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .expectBody(byte[].class);
         Mockito.verify(templateRepository, Mockito.times(4)).findById(TestUtils.TEMPLATE_ID);
-        Mockito.verify(minioClient, Mockito.times(2)).getObject(ArgumentMatchers.any());
+        Mockito.verify(minioClient, Mockito.times(2)).getObject(Mockito.any());
     }
 
     @Test
@@ -137,7 +137,7 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
         TemplateEntity templateEntity = getTemplateEntity();
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
-        Mockito.when(minioClient.getObject(ArgumentMatchers.any())).thenReturn(getObjectResponse);
+        Mockito.when(minioClient.getObject(Mockito.any())).thenReturn(getObjectResponse);
         Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.of(templateEntity));
         //after this request template should be in cache, #1 invocation of template repository
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
@@ -157,7 +157,7 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .expectBody(byte[].class);
         Mockito.verify(templateRepository, Mockito.times(4)).findById(TestUtils.TEMPLATE_ID);
-        Mockito.verify(minioClient, Mockito.times(2)).getObject(ArgumentMatchers.any());
+        Mockito.verify(minioClient, Mockito.times(2)).getObject(Mockito.any());
     }
 
     private TemplateEntity getTemplateEntity() {

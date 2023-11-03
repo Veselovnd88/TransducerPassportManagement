@@ -19,6 +19,9 @@ import ru.veselov.generatebytemplate.service.TemplateStorageService;
 public class TemplateInfoControllerValidationTest {
 
     public static final String URL_PREFIX = "/api/v1/template/info";
+    public static final String TEMPLATE_ID_FIELD = "templateId";
+    public static final String ASC = "asc";
+    public static final String PT_ART = "ptArt";
 
     @Autowired
     WebTestClient webTestClient;
@@ -33,7 +36,7 @@ public class TemplateInfoControllerValidationTest {
                 .exchange().expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo("templateId");
+                .jsonPath("$.violations[0].fieldName").isEqualTo(TEMPLATE_ID_FIELD);
     }
 
     @Test
@@ -41,7 +44,7 @@ public class TemplateInfoControllerValidationTest {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
                         .queryParam(TestUtils.PAGE, 0)
                         .queryParam(TestUtils.SORT, "tort")
-                        .queryParam(TestUtils.ORDER, "asc")
+                        .queryParam(TestUtils.ORDER, ASC)
                         .build())
                 .exchange().expectStatus().isBadRequest()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
@@ -61,7 +64,7 @@ public class TemplateInfoControllerValidationTest {
     void shouldReturnValidationErrorPassingNotCorrectSortOrderField() {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
                         .queryParam(TestUtils.PAGE, 0)
-                        .queryParam(TestUtils.SORT, "ptArt")
+                        .queryParam(TestUtils.SORT, PT_ART)
                         .queryParam(TestUtils.ORDER, "pasc")
                         .build())
                 .exchange().expectStatus().isBadRequest()

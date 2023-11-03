@@ -42,11 +42,9 @@ class ResultFileServiceImplTest {
         ResultFile saved = generatedResultFileService.save(byteArrayResource, resultFile);
 
         org.junit.jupiter.api.Assertions.assertAll(
-                () -> Mockito.verify(resultFileStorageService, Mockito.times(1)).saveUnSynced(resultFile),
-                () -> Mockito.verify(resultFileMinioService, Mockito.times(1))
-                        .saveResult(byteArrayResource, resultFile),
-                () -> Mockito.verify(resultFileStorageService, Mockito.times(1))
-                        .syncResultFile(resultFileEntity.getId()),
+                () -> Mockito.verify(resultFileStorageService).saveUnSynced(resultFile),
+                () -> Mockito.verify(resultFileMinioService).saveResult(byteArrayResource, resultFile),
+                () -> Mockito.verify(resultFileStorageService).syncResultFile(resultFileEntity.getId()),
                 () -> Assertions.assertThat(saved).isEqualTo(resultFile)
         );
 
@@ -57,16 +55,14 @@ class ResultFileServiceImplTest {
         ResultFile resultFile = TestUtils.getBasicGeneratedResultFile();
         String resultFileUid = resultFile.getId().toString();
         ByteArrayResource byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
-        Mockito.when(resultFileMinioService.loadResultFile(resultFile))
-                .thenReturn(byteArrayResource);
-        Mockito.when(resultFileStorageService.findById(resultFileUid))
-                .thenReturn(resultFile);
+        Mockito.when(resultFileMinioService.loadResultFile(resultFile)).thenReturn(byteArrayResource);
+        Mockito.when(resultFileStorageService.findById(resultFileUid)).thenReturn(resultFile);
 
         ByteArrayResource receivedResultFile = generatedResultFileService.getResultFile(resultFileUid);
 
         org.junit.jupiter.api.Assertions.assertAll(
-                () -> Mockito.verify(resultFileStorageService, Mockito.times(1)).findById(resultFileUid),
-                () -> Mockito.verify(resultFileMinioService, Mockito.times(1)).loadResultFile(resultFile),
+                () -> Mockito.verify(resultFileStorageService).findById(resultFileUid),
+                () -> Mockito.verify(resultFileMinioService).loadResultFile(resultFile),
                 () -> Assertions.assertThat(receivedResultFile).isEqualTo(byteArrayResource)
         );
     }

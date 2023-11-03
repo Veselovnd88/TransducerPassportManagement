@@ -57,9 +57,9 @@ class PdfServiceImplTest {
     void shouldThrowExceptionIfCantConvertToPdfBytes() {
         DataBuffer mockDataBuffer = Mockito.mock(DataBuffer.class);
         InputStream inputStream = Mockito.mock(InputStream.class);
-        Mockito.when(inputStream.transferTo(ArgumentMatchers.any())).thenThrow(IOException.class);
+        Mockito.when(inputStream.transferTo(Mockito.any())).thenThrow(IOException.class);
         Mockito.when(mockDataBuffer.asInputStream()).thenReturn(inputStream);
-        Mockito.when(pdfHttpClient.sendRequestForConvertingDocxToPdf(ArgumentMatchers.any()))
+        Mockito.when(pdfHttpClient.sendRequestForConvertingDocxToPdf(Mockito.any()))
                 .thenReturn(mockDataBuffer);
 
         Assertions.assertThatThrownBy(() -> pdfService.createPdf(byteArrayResource))

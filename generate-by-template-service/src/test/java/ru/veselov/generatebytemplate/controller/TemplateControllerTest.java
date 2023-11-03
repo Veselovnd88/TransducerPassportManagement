@@ -78,7 +78,7 @@ class TemplateControllerTest {
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isAccepted();
 
-        Mockito.verify(passportTemplateService, Mockito.times(1))
+        Mockito.verify(passportTemplateService)
                 .saveTemplate(multipartFileArgumentCaptor.capture(), templateDtoArgumentCaptor.capture());
         MultipartFile capturedMultipart = multipartFileArgumentCaptor.getValue();
         TemplateDto capturedTemplateDto = templateDtoArgumentCaptor.getValue();
@@ -103,7 +103,7 @@ class TemplateControllerTest {
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isAccepted();
 
-        Mockito.verify(passportTemplateService, Mockito.times(1))
+        Mockito.verify(passportTemplateService)
                 .updateTemplate(multipartFileArgumentCaptor.capture(), templateIdCaptor.capture());
         MultipartFile capturedMultipart = multipartFileArgumentCaptor.getValue();
         String capturedTemplateId = templateIdCaptor.getValue();
@@ -123,7 +123,7 @@ class TemplateControllerTest {
         webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL).path("/delete").path("/id/" + templateId).build())
                 .exchange().expectStatus().isOk();
 
-        Mockito.verify(passportTemplateService, Mockito.times(1)).deleteTemplate(templateIdCaptor.capture());
+        Mockito.verify(passportTemplateService).deleteTemplate(templateIdCaptor.capture());
         String captured = templateIdCaptor.getValue();
         Assertions.assertThat(captured).isEqualTo(templateId);
     }
