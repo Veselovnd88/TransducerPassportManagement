@@ -163,7 +163,7 @@ class PassportServiceImplTest {
                     () -> Mockito.verify(eventPublisher).publishErrorResultEvent(Mockito.any(), Mockito.any()),
                     () -> Mockito.verify(resultFileService).save(Mockito.any(), Mockito.any()),
                     () -> Mockito.verify(eventPublisher, Mockito.never()).publishSuccessResultEvent(Mockito.any()),
-                    () -> Mockito.verifyNoInteractions(kafkaBrokerSender, Mockito.never())
+                    () -> Mockito.verifyNoInteractions(kafkaBrokerSender)
             );
         }
 
