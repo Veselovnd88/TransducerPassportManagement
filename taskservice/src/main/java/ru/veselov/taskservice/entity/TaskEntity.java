@@ -1,19 +1,12 @@
 package ru.veselov.taskservice.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
-import jakarta.persistence.PrePersist;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 
 @Entity
@@ -38,6 +31,20 @@ public class TaskEntity {
 
     @Column(name = "performed_at")
     private LocalDateTime performedAt;
+
+    @Column(name = "template_id")
+    private UUID templateId;
+
+    @Column(name = "printDate")
+    private LocalDate printDate;
+
+    @ManyToMany
+    @JoinTable(
+            name = "task_serial",
+            joinColumns = @JoinColumn(name = "id"),
+            inverseJoinColumns = @JoinColumn(name = "serial_id")
+    )
+    Set<SerialNumberEntity> serials;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

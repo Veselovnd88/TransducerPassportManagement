@@ -30,7 +30,7 @@ public class TaskController {
     @PostMapping("/create")
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Task createTask(@RequestBody @Valid GeneratePassportsDto generatePassportsDto,
-                           @RequestHeader("username") String username) {
+                           @RequestHeader(value = "username") String username) {
         return taskService.createTask(generatePassportsDto, username);
     }
 
