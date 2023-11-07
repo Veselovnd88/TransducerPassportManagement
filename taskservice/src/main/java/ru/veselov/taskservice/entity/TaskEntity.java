@@ -38,11 +38,13 @@ public class TaskEntity {
     @Column(name = "printDate")
     private LocalDate printDate;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "task_serial",
-            joinColumns = @JoinColumn(name = "id"),
-            inverseJoinColumns = @JoinColumn(name = "serial_id")
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "serial_id"),
+            foreignKey = @ForeignKey(name = "id"),
+            inverseForeignKey = @ForeignKey(name = "serial_id")
     )
     Set<SerialNumberEntity> serials;
 
@@ -61,14 +63,16 @@ public class TaskEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TaskEntity that = (TaskEntity) o;
-        return Objects.equals(getUsername(), that.getUsername()) &&
-                Objects.equals(getIsPerformed(), that.getIsPerformed()) &&
-                Objects.equals(getPerformedAt(), that.getPerformedAt()) &&
-                Objects.equals(getCreatedAt(), that.getCreatedAt());
+        return Objects.equals(taskId, that.taskId) && Objects.equals(username, that.username)
+                && Objects.equals(isPerformed, that.isPerformed)
+                && Objects.equals(performedAt, that.performedAt)
+                && Objects.equals(templateId, that.templateId)
+                && Objects.equals(printDate, that.printDate)
+                && Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getUsername(), getIsPerformed(), getPerformedAt(), getCreatedAt());
+        return Objects.hash(taskId, username, isPerformed, performedAt, templateId, printDate, createdAt);
     }
 }

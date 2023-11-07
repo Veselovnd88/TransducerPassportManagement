@@ -6,3 +6,11 @@ databaseChangeLog:
   - include:
       relativeToChangelogFile: true
       file: changelogs/db.changelog-01.00.yaml
+
+  - include:
+      relativeToChangelogFile: true
+      file: changelogs/db.changelog-01.01.yaml
+
+  - include:
+      relativeToChangelogFile: true
+      file: changelogs/db.changelog-01.02.yaml
