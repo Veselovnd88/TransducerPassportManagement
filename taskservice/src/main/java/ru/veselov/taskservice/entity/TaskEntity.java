@@ -5,6 +5,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
@@ -20,7 +21,7 @@ public class TaskEntity {
 
     @Id
     @GeneratedValue
-    @Column(name = "id", columnDefinition = "uuid")
+    @Column(name = "task_id", columnDefinition = "uuid")
     private UUID taskId;
 
     @Column(name = "username")
@@ -38,18 +39,23 @@ public class TaskEntity {
     @Column(name = "printDate")
     private LocalDate printDate;
 
+    @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinTable(
             name = "task_serial",
             joinColumns = @JoinColumn(name = "task_id"),
             inverseJoinColumns = @JoinColumn(name = "serial_id"),
-            foreignKey = @ForeignKey(name = "id"),
+            foreignKey = @ForeignKey(name = "task_id"),
             inverseForeignKey = @ForeignKey(name = "serial_id")
     )
-    Set<SerialNumberEntity> serials;
+    private Set<SerialNumberEntity> serials = new HashSet<>();
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
+
+    public void addSerialNumber(SerialNumberEntity serialNumberEntity) {
+        this.serials.add(serialNumberEntity);
+    }
 
     @PrePersist
     public void prePersist() {
@@ -75,4 +81,5 @@ public class TaskEntity {
     public int hashCode() {
         return Objects.hash(taskId, username, isPerformed, performedAt, templateId, printDate, createdAt);
     }
+
 }

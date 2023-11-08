@@ -42,6 +42,8 @@ dependencies {
     testAnnotationProcessor("org.projectlombok:lombok")
     testImplementation("org.projectlombok:lombok:1.18.22")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
+    testImplementation("org.testcontainers:junit-jupiter:1.18.3")
+    testImplementation("org.testcontainers:postgresql:1.18.3")
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
 }

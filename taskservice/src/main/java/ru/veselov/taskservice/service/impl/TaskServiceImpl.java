@@ -6,9 +6,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
+import ru.veselov.taskservice.dto.SerialNumberDto;
+import ru.veselov.taskservice.entity.SerialNumberEntity;
 import ru.veselov.taskservice.entity.TaskEntity;
 import ru.veselov.taskservice.mapper.TaskMapper;
 import ru.veselov.taskservice.model.Task;
+import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
 import ru.veselov.taskservice.service.GenerateServiceHttpClient;
 import ru.veselov.taskservice.service.TaskService;
@@ -25,6 +28,8 @@ public class TaskServiceImpl implements TaskService {
 
     private final TaskRepository taskRepository;
 
+    private final SerialNumberRepository serialNumberRepository;
+
     private final GenerateServiceHttpClient generateServiceHttpClient;
 
     private final TaskMapper taskMapper;
@@ -36,6 +41,17 @@ public class TaskServiceImpl implements TaskService {
                 .isPerformed(false)
                 .username(username)
                 .build();
+        List<SerialNumberDto> serials = generatePassportsDto.getSerials();
+        serials.forEach(s -> {
+            UUID serialUid = UUID.fromString(s.getSerialId());
+            Optional<SerialNumberEntity> optionalSerialNumber = serialNumberRepository
+                    .findSerialNumberById(serialUid);
+            if (optionalSerialNumber.isPresent()) {
+                taskEntity.addSerialNumber(optionalSerialNumber.get());
+            } else {
+                taskEntity.addSerialNumber(new SerialNumberEntity(serialUid, s.getSerial()));
+            }
+        });
         TaskEntity savedTask = taskRepository.save(taskEntity);
         log.info("Task saved with [id: {}]", savedTask.getTaskId());
         generateServiceHttpClient.sendTaskToPerform(generatePassportsDto, savedTask.getTaskId().toString(), username);
