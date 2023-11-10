@@ -64,7 +64,7 @@ public class TestUtils {
 
     public static GeneratePassportsDto getBasicGeneratePassportsDto() {
         return new GeneratePassportsDto(
-                SERIALS_DTOS, TEMPLATE_ID_STRING, DATE, TestUtils.USERNAME, TestUtils.TASK_ID);
+                SERIALS_DTOS, TEMPLATE_ID_STRING, DATE, USERNAME, TASK_ID);
     }
 
     public static ResultFile getBasicGeneratedResultFile() {

@@ -13,7 +13,6 @@ import ru.veselov.taskservice.mapper.TaskMapper;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
-import ru.veselov.taskservice.service.GenerateServiceHttpClient;
 import ru.veselov.taskservice.service.TaskService;
 
 import java.util.List;
@@ -26,11 +25,13 @@ import java.util.UUID;
 @Slf4j
 public class TaskServiceImpl implements TaskService {
 
+    public static final String TASK_NOT_FOUND_LOG_MSG = "Task with such [id: {}] doesn't exists";
+
+    public static final String TASK_NOT_FOUND_EXCEPTION_MSK = "Task with such [id: %s] doesn't exists";
+
     private final TaskRepository taskRepository;
 
     private final SerialNumberRepository serialNumberRepository;
-
-    private final GenerateServiceHttpClient generateServiceHttpClient;
 
     private final TaskMapper taskMapper;
 
@@ -39,6 +40,7 @@ public class TaskServiceImpl implements TaskService {
     public Task createTask(GeneratePassportsDto generatePassportsDto, String username) {
         TaskEntity taskEntity = TaskEntity.builder()
                 .username(username)
+                .printDate(generatePassportsDto.getPrintDate())
                 .build();
         List<SerialNumberDto> serials = generatePassportsDto.getSerials();
         serials.forEach(s -> {
@@ -52,17 +54,30 @@ public class TaskServiceImpl implements TaskService {
             }
         });
         TaskEntity savedTask = taskRepository.save(taskEntity);
-        log.info("Task saved with [id: {}]", savedTask.getTaskId());
-        generateServiceHttpClient.sendTaskToPerform(generatePassportsDto, savedTask.getTaskId().toString(), username);
+        log.info("Task saved with [id: {}] with started=false status", savedTask.getTaskId());
         return taskMapper.toModel(savedTask);
+    }
+
+    @Override
+    @Transactional
+    public Task updateStatusToStart(UUID taskId) {
+        Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
+        TaskEntity taskEntity = optionalTask.orElseThrow(() -> {
+            log.error(TASK_NOT_FOUND_LOG_MSG, taskId);
+            return new EntityNotFoundException(TASK_NOT_FOUND_EXCEPTION_MSK.formatted(taskId));
+        });
+        taskEntity.setStarted(true);
+        TaskEntity updated = taskRepository.save(taskEntity);
+        log.info("Task with [id: {}] updated with started=true status", taskId);
+        return taskMapper.toModel(updated);
     }
 
     @Override
     public Task getTask(String taskId) {
         Optional<TaskEntity> optionalTask = taskRepository.findById(UUID.fromString(taskId));
         TaskEntity taskEntity = optionalTask.orElseThrow(() -> { //example of supplier btw
-            log.info("Task with such [id: {}] doesn't exists", taskId);
-            return new EntityNotFoundException("Task with such [id: %s] doesn't exists".formatted(taskId));
+            log.info(TASK_NOT_FOUND_LOG_MSG, taskId);
+            return new EntityNotFoundException(TASK_NOT_FOUND_EXCEPTION_MSK.formatted(taskId));
         }); //if value!=null -> return value, else - throw supplier.get()-> supplier is lambda
         return taskMapper.toModel(taskEntity);
     }

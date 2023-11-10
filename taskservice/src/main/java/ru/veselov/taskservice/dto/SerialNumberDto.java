@@ -11,10 +11,10 @@ import org.hibernate.validator.constraints.UUID;
 @NoArgsConstructor
 public class SerialNumberDto {
 
-    @NotBlank
-    private String serial;
-
     @UUID
     private String serialId;
+
+    @NotBlank
+    private String serial;
 
 }

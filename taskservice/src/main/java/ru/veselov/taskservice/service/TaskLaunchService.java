@@ -3,8 +3,8 @@ package ru.veselov.taskservice.service;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.model.Task;
 
-public interface GenerateServiceHttpClient {
+public interface TaskLaunchService {
 
-    void sendTaskToPerform(GeneratePassportsDto generatePassportsDto, Task task);
+    Task startTask(GeneratePassportsDto generatePassportsDto, String username);
 
 }
