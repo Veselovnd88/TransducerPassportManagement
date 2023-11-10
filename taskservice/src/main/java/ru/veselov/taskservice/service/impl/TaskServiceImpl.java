@@ -92,4 +92,10 @@ public class TaskServiceImpl implements TaskService {
         return taskMapper.toModels(taskRepository.findAllNotPerformedTasksByUsername(username));
     }
 
+    @Override
+    @Transactional
+    public void deleteTaskById(UUID taskId) {
+        taskRepository.deleteById(taskId);
+    }
+
 }

@@ -181,6 +181,13 @@ class TaskServiceImplTest {
         );
     }
 
+    @Test
+    void shouldDeleteTaskById() {
+        taskService.deleteTaskById(TestUtils.TASK_ID);
+
+        Mockito.verify(taskRepository).deleteById(TestUtils.TASK_ID);
+    }
+
     private TaskEntity createTaskEntityWithUid() {
         return TaskEntity.builder()
                 .taskId(TestUtils.TASK_ID)
@@ -188,4 +195,5 @@ class TaskServiceImplTest {
                 .printDate(TestUtils.PRINT_DATE)
                 .build();
     }
+
 }

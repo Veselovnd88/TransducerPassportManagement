@@ -5,6 +5,6 @@ import ru.veselov.taskservice.model.Task;
 
 public interface GenerateServiceHttpClient {
 
-    void sendTaskToPerform(GeneratePassportsDto generatePassportsDto, Task task);
+    boolean sendTaskToPerform(GeneratePassportsDto generatePassportsDto, Task task);
 
 }

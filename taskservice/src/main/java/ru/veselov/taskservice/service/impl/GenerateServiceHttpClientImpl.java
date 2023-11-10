@@ -10,7 +10,8 @@ import ru.veselov.taskservice.service.GenerateServiceHttpClient;
 @Slf4j
 public class GenerateServiceHttpClientImpl implements GenerateServiceHttpClient {
     @Override
-    public void sendTaskToPerform(GeneratePassportsDto generatePassportsDto, Task task) {
+    public boolean sendTaskToPerform(GeneratePassportsDto generatePassportsDto, Task task) {
         log.info("Send [task : {}] for perform", task.getTaskId());//TODO implement
+        return true;
     }
 }

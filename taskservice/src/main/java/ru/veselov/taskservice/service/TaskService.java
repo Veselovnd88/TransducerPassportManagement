@@ -18,4 +18,5 @@ public interface TaskService {
 
     List<Task> getNotPerformedTasks(String username);
 
+    void deleteTaskById(UUID taskId);
 }
