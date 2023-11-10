@@ -38,7 +38,6 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public Task createTask(GeneratePassportsDto generatePassportsDto, String username) {
         TaskEntity taskEntity = TaskEntity.builder()
-                .isPerformed(false)
                 .username(username)
                 .build();
         List<SerialNumberDto> serials = generatePassportsDto.getSerials();
@@ -70,12 +69,12 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> getPerformedTasks(String username) {
-        return taskMapper.toModels(taskRepository.findAllByUsername(username));
+        return taskMapper.toModels(taskRepository.findlAllPerformedTasksByUsername(username));
     }
 
     @Override
     public List<Task> getCurrentTasks(String username) {
-        return taskMapper.toModels(taskRepository.findAllByUsernameCurrent(username));
+        return taskMapper.toModels(taskRepository.findAllNotPerformedTasksByUsername(username));
     }
 
 }

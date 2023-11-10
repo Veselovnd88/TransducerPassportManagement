@@ -1,7 +1,22 @@
 package ru.veselov.taskservice.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,11 +42,15 @@ public class TaskEntity {
     @Column(name = "username")
     private String username;
 
-    @Column(name = "is_performed")
-    private Boolean isPerformed;
+    @Builder.Default
+    @Column(name = "performed")
+    private Boolean performed = false;
 
     @Column(name = "performed_at")
     private LocalDateTime performedAt;
+
+    @Column(name = "started")
+    private Boolean started = false;
 
     @Column(name = "template_id")
     private UUID templateId;
@@ -69,17 +88,14 @@ public class TaskEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TaskEntity that = (TaskEntity) o;
-        return Objects.equals(taskId, that.taskId) && Objects.equals(username, that.username)
-                && Objects.equals(isPerformed, that.isPerformed)
-                && Objects.equals(performedAt, that.performedAt)
-                && Objects.equals(templateId, that.templateId)
-                && Objects.equals(printDate, that.printDate)
-                && Objects.equals(createdAt, that.createdAt);
+        return Objects.equals(username, that.username) && Objects.equals(performed, that.performed)
+                && Objects.equals(performedAt, that.performedAt) && Objects.equals(started, that.started)
+                && Objects.equals(templateId, that.templateId) && Objects.equals(printDate, that.printDate)
+                && Objects.equals(serials, that.serials);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(taskId, username, isPerformed, performedAt, templateId, printDate, createdAt);
+        return Objects.hash(username, performed, performedAt, started, templateId, printDate, serials);
     }
-
 }

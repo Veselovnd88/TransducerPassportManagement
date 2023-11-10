@@ -7,7 +7,8 @@ CREATE TABLE task
 (
     task_id      UUID    NOT NULL            DEFAULT gen_random_uuid(),
     username     VARCHAR NOT NULL,
-    is_performed BOOLEAN                     DEFAULT FALSE,
+    performed    BOOLEAN                     DEFAULT FALSE,
+    started      BOOLEAN                     DEFAULT FALSE,
     template_id  uuid    NOT NULL,
     print_date   DATE    NOT NULL,
     created_at   TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,

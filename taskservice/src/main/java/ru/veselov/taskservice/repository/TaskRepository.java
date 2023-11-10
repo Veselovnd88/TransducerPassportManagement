@@ -10,12 +10,15 @@ import java.util.UUID;
 
 public interface TaskRepository extends JpaRepository<TaskEntity, UUID> {
 
-    @Query("SELECT t FROM TaskEntity t LEFT JOIN FETCH  t.serials where  t.isPerformed=true AND t.username= :username" +
-            "  ORDER BY t.performedAt LIMIT 20")
-    List<TaskEntity> findAllByUsername(@Param("username") String username);
 
-    @Query("SELECT t FROM TaskEntity t LEFT JOIN FETCH  t.serials where  t.isPerformed=false AND t.username= :username" +
+    String USERNAME = "username";
+
+    @Query("SELECT t FROM TaskEntity t LEFT JOIN FETCH  t.serials where  t.performed=true AND t.username= :username" +
+            "  ORDER BY t.performedAt LIMIT 20")
+    List<TaskEntity> findlAllPerformedTasksByUsername(@Param(USERNAME) String username);
+
+    @Query("SELECT t FROM TaskEntity t LEFT JOIN FETCH  t.serials where  t.performed=false AND t.username= :username" +
             " ORDER BY t.createdAt LIMIT 20")
-    List<TaskEntity> findAllByUsernameCurrent(@Param("username") String username);
+    List<TaskEntity> findAllNotPerformedTasksByUsername(@Param(USERNAME) String username);
 
 }
