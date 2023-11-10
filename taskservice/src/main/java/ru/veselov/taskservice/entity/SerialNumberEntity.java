@@ -17,10 +17,10 @@ import java.util.UUID;
 public class SerialNumberEntity {
 
     @Id
-    @GeneratedValue
     @Column(name = "serial_id")
     private UUID serialId;
 
+    @Column(name = "serial")
     private String serial;
 
 }
