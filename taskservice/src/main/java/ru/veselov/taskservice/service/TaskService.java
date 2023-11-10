@@ -16,6 +16,6 @@ public interface TaskService {
 
     List<Task> getPerformedTasks(String username);
 
-    List<Task> getCurrentTasks(String username);
+    List<Task> getNotPerformedTasks(String username);
 
 }

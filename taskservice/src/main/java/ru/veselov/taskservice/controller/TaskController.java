@@ -46,7 +46,7 @@ public class TaskController {
 
     @GetMapping("/current")
     public List<Task> getCurrentTasks(@RequestHeader(name = "username") String username) {
-        return taskService.getCurrentTasks(username);
+        return taskService.getNotPerformedTasks(username);
     }
 
 }

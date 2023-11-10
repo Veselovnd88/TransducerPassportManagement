@@ -12,7 +12,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Task {
 
-    private UUID uid;
+    private UUID taskId;
 
     private Boolean isPerformed;
 

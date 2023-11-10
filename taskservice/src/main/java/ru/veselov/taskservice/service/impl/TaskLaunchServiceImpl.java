@@ -22,7 +22,7 @@ public class TaskLaunchServiceImpl implements TaskLaunchService {
     public Task startTask(GeneratePassportsDto generatePassportsDto, String username) {
         Task task = taskService.createTask(generatePassportsDto, username);
         generateServiceHttpClient.sendTaskToPerform(generatePassportsDto, task);
-        taskService.updateStatusToStart(task.getUid());
+        taskService.updateStatusToStart(task.getTaskId());
         return task;
     }
 }

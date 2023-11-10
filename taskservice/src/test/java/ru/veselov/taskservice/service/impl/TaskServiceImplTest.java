@@ -1,5 +1,6 @@
 package ru.veselov.taskservice.service.impl;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,7 @@ import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -99,12 +101,12 @@ class TaskServiceImplTest {
                 () -> Assertions.assertThat(captured.getPrintDate()).isEqualTo(generatePassportsDto.getPrintDate()),
                 () -> Assertions.assertThat(captured.getPerformed()).isFalse(),
                 () -> Assertions.assertThat(captured.getStarted()).isFalse(),
-                () -> Assertions.assertThat(task.getUid()).isEqualTo(taskEntityWithUid.getTaskId())
+                () -> Assertions.assertThat(task.getTaskId()).isEqualTo(taskEntityWithUid.getTaskId())
         );
     }
 
     @Test
-    void updateStatusToStart() {
+    void shouldUpdateStatusToStart() {
         TaskEntity notStartedTask = createTaskEntityWithUid();
         Mockito.when(taskRepository.findById(TestUtils.TASK_ID))
                 .thenReturn(Optional.of(notStartedTask));
@@ -121,15 +123,62 @@ class TaskServiceImplTest {
     }
 
     @Test
-    void getTask() {
+    void shouldThrowExceptionIfTaskForUpdateNotFound() {
+        Mockito.when(taskRepository.findById(TestUtils.TASK_ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(
+                () -> taskService.updateStatusToStart(TestUtils.TASK_ID)
+        ).isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void getPerformedTasks() {
+    void shouldGetTask() {
+        TaskEntity savedTask = createTaskEntityWithUid();
+        Mockito.when(taskRepository.findById(TestUtils.TASK_ID)).thenReturn(Optional.of(savedTask));
+        Task task = taskService.getTask(TestUtils.TASK_ID_STR);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Mockito.verify(taskRepository).findById(TestUtils.TASK_ID),
+                () -> Assertions.assertThat(task).isNotNull(),
+                () -> {
+                    assert task != null;
+                    Assertions.assertThat(task.getTaskId()).isEqualTo(savedTask.getTaskId());
+                }
+        );
     }
 
     @Test
-    void getCurrentTasks() {
+    void shouldThrowExceptionIfTaskNotFoundById() {
+        Mockito.when(taskRepository.findById(TestUtils.TASK_ID)).thenReturn(Optional.empty());
+
+        Assertions.assertThatThrownBy(() -> taskService.getTask(TestUtils.TASK_ID_STR))
+                .isInstanceOf(EntityNotFoundException.class);
+    }
+
+    @Test
+    void shouldGetPerformedTasks() {
+        TaskEntity taskEntity = createTaskEntityWithUid();
+        taskEntity.setPerformed(true);
+        Mockito.when(taskRepository.findlAllPerformedTasksByUsername(TestUtils.USERNAME))
+                .thenReturn(List.of(taskEntity));
+
+        List<Task> performedTasks = taskService.getPerformedTasks(TestUtils.USERNAME);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(performedTasks).isNotNull().hasSize(1),
+                () -> Mockito.verify(taskRepository).findlAllPerformedTasksByUsername(TestUtils.USERNAME)
+        );
+    }
+
+    @Test
+    void shouldGetNotPerformedTasks() {
+        TaskEntity taskEntity = createTaskEntityWithUid();
+        Mockito.when(taskRepository.findAllNotPerformedTasksByUsername(TestUtils.USERNAME))
+                .thenReturn(List.of(taskEntity));
+
+        List<Task> notPerformedTasks = taskService.getNotPerformedTasks(TestUtils.USERNAME);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Assertions.assertThat(notPerformedTasks).isNotNull().hasSize(1),
+                () -> Mockito.verify(taskRepository).findAllNotPerformedTasksByUsername(TestUtils.USERNAME)
+        );
     }
 
     private TaskEntity createTaskEntityWithUid() {

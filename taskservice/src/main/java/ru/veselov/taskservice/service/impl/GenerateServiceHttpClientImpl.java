@@ -11,6 +11,6 @@ import ru.veselov.taskservice.service.GenerateServiceHttpClient;
 public class GenerateServiceHttpClientImpl implements GenerateServiceHttpClient {
     @Override
     public void sendTaskToPerform(GeneratePassportsDto generatePassportsDto, Task task) {
-        log.info("Send [task : {}] for perform", task.getUid());//TODO implement
+        log.info("Send [task : {}] for perform", task.getTaskId());//TODO implement
     }
 }

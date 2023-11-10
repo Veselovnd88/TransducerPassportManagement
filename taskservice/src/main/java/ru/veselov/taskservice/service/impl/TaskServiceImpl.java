@@ -88,7 +88,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getCurrentTasks(String username) {
+    public List<Task> getNotPerformedTasks(String username) {
         return taskMapper.toModels(taskRepository.findAllNotPerformedTasksByUsername(username));
     }
 
