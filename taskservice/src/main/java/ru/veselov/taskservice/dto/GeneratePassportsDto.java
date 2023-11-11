@@ -1,5 +1,6 @@
 package ru.veselov.taskservice.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -16,6 +17,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GeneratePassportsDto {
 
+    @Valid
     @NotEmpty
     private List<SerialNumberDto> serials = new ArrayList<>();
 

@@ -1,5 +1,9 @@
 package ru.veselov.taskservice;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.dto.SerialNumberDto;
 
@@ -35,6 +39,12 @@ public class TestUtils {
     public static GeneratePassportsDto getGeneratePassportsDto() {
         return new GeneratePassportsDto(SERIALS_DTOS, TEMPLATE_ID_STR, PRINT_DATE);
     }
+
+    public static String jsonStringFromGeneratePassportsDto(GeneratePassportsDto generatePassportsDto) throws JsonProcessingException {
+        ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
+        return objectMapper.writeValueAsString(generatePassportsDto);
+    }
+
 
     private TestUtils() {
     }
