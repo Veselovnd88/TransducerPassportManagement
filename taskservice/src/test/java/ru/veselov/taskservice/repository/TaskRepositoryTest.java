@@ -1,4 +1,4 @@
-package ru.veselov.taskservice.it;
+package ru.veselov.taskservice.repository;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.AfterEach;
@@ -9,8 +9,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.veselov.taskservice.TestUtils;
 import ru.veselov.taskservice.entity.SerialNumberEntity;
 import ru.veselov.taskservice.entity.TaskEntity;
-import ru.veselov.taskservice.repository.SerialNumberRepository;
-import ru.veselov.taskservice.repository.TaskRepository;
 import ru.veselov.taskservice.testcontainers.PostgresContainersConfig;
 
 import java.util.List;

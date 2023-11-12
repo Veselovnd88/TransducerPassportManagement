@@ -33,6 +33,10 @@ public class TestUtils {
     public static final SerialNumberDto SERIAL_DTO_3 = new SerialNumberDto(UUID.randomUUID().toString(), "3");
     public static final String TASK_ID_STR = TASK_ID.toString();
 
+    public static final String JSON_ERROR_CODE = "$.errorCode";
+
+    public static final String JSON_VIOLATIONS_FIELD = "$.violations[0].fieldName";
+
     public static List<SerialNumberDto> SERIALS_DTOS = List.of(SERIAL_DTO_1, SERIAL_DTO_2, SERIAL_DTO_3);
 
 

@@ -1,5 +1,6 @@
 package ru.veselov.taskservice.controller;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.validation.annotation.Validated;
@@ -23,12 +24,12 @@ public class TaskController {
     }
 
     @GetMapping("/performed")
-    public List<Task> getPerformedTasks(@RequestHeader(name = "username") String username) {
+    public List<Task> getPerformedTasks(@RequestHeader(name = "username") @NotBlank String username) {
         return taskService.getPerformedTasks(username);
     }
 
     @GetMapping("/current")
-    public List<Task> getCurrentTasks(@RequestHeader(name = "username") String username) {
+    public List<Task> getCurrentTasks(@RequestHeader(name = "username") @NotBlank String username) {
         return taskService.getNotPerformedTasks(username);
     }
 
