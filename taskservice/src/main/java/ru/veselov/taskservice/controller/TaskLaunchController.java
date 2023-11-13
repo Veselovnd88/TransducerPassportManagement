@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.TaskLaunchService;
+import ru.veselov.taskservice.utils.AppConstants;
 
 @RestController
 @RequestMapping("/api/v1/task/launch")
@@ -21,7 +22,7 @@ public class TaskLaunchController {
     @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Task createTask(@RequestBody @Valid GeneratePassportsDto generatePassportsDto,
-                           @RequestHeader(value = "username") @NotEmpty String username) {
+                           @RequestHeader(value = AppConstants.SERVICE_USERNAME_HEADER) @NotEmpty String username) {
         return taskLaunchService.startTask(generatePassportsDto, username);
     }
 

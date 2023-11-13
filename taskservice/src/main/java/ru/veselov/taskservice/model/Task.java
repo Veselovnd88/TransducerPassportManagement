@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -14,7 +15,11 @@ public class Task {
 
     private UUID taskId;
 
-    private Boolean isPerformed;
+    private Boolean performed;
+
+    private Boolean started;
+
+    private LocalDate printDate;
 
     private LocalDateTime createdAt;
 

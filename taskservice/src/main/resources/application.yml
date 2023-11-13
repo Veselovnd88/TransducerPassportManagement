@@ -9,6 +9,9 @@ spring:
 
   config:
     import: "optional:configserver:http://localhost:8071"
+  cloud:
+    config:
+      enabled: false
 
   liquibase:
     enabled: true

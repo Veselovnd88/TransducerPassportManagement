@@ -20,7 +20,7 @@ spring:
         hbm2ddl:
           auto: validate
   liquibase:
-    enabled: false
+    enabled: true
     change-log: db/changelog/db.changelog-master.yaml
 
   kafka:

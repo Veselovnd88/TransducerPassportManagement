@@ -8,6 +8,7 @@ public enum ErrorCode {
 
     ERROR_WRONG_DATE,
 
-    ERROR_CONFLICT
+    ERROR_CONFLICT,
 
+    SERVICE_ERROR;
 }

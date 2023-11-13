@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import ru.veselov.taskservice.exception.error.ApiErrorResponse;
+import ru.veselov.taskservice.exception.error.ErrorCode;
 import ru.veselov.taskservice.exception.error.ValidationErrorResponse;
 import ru.veselov.taskservice.exception.error.ViolationError;
 
@@ -18,14 +19,32 @@ import java.util.List;
 @Slf4j
 public class ApiExceptionHandler {
 
+    @ExceptionHandler(GenerateServiceException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiErrorResponse handleGenerateServiceException(GenerateServiceException exception) {
+        return new ApiErrorResponse(ErrorCode.SERVICE_ERROR, exception.getMessage());
+    }
+
+    @ExceptionHandler(ErrorHandlingException.class)
+    @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+    public ApiErrorResponse handleErrorHandlingException(ErrorHandlingException exception) {
+        return new ApiErrorResponse(ErrorCode.SERVICE_ERROR, exception.getMessage());
+    }
+
     @ExceptionHandler(MissingRequestHeaderException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse handle(MissingRequestHeaderException exception) {
+    public ApiErrorResponse handleMissingRequestHeaderException(MissingRequestHeaderException exception) {
         ViolationError violationError = new ViolationError(
                 "Request Header: " + exception.getHeaderName(),
                 exception.getMessage(),
                 "null");
         return new ValidationErrorResponse(exception.getMessage(), List.of(violationError));
+    }
+
+    @ExceptionHandler(GenerateServiceValidationException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleGenerateServiceValidationException(GenerateServiceValidationException e) {
+        return new ApiErrorResponse(ErrorCode.SERVICE_ERROR, "Internal service error");
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
