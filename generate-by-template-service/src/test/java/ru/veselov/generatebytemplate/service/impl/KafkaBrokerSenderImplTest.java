@@ -58,11 +58,11 @@ class KafkaBrokerSenderImplTest {
                 ));
         TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID, "message", null, EventType.READY);
         Mockito.doReturn(mockCF).when(taskResultDtoKafkaTemplate)
-                .send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID, taskResultDto);
+                .send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID_STR, taskResultDto);
 
-        kafkaBrokerSender.sendResultMessage(TestUtils.TASK_ID, taskResultDto);
+        kafkaBrokerSender.sendResultMessage(TestUtils.TASK_ID_STR, taskResultDto);
 
-        Mockito.verify(taskResultDtoKafkaTemplate).send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID, taskResultDto);
+        Mockito.verify(taskResultDtoKafkaTemplate).send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID_STR, taskResultDto);
     }
 
 }

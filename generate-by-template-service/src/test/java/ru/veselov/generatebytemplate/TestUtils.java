@@ -37,7 +37,10 @@ public class TestUtils {
 
     public static final String RESULT_BUCKET = "results";
     public static final String USERNAME = "username";
-    public static final String TASK_ID = UUID.randomUUID().toString();
+
+    public static final UUID TASK_ID = UUID.randomUUID();
+
+    public static final String TASK_ID_STR = TASK_ID.toString();
     public static final String FILE_ID = UUID.randomUUID().toString();
 
     public static final String TASK_TOPIC = "task";
@@ -63,14 +66,13 @@ public class TestUtils {
     public static final LocalDate DATE = LocalDate.now();
 
     public static GeneratePassportsDto getBasicGeneratePassportsDto() {
-        return new GeneratePassportsDto(
-                SERIALS_DTOS, TEMPLATE_ID_STRING, DATE, USERNAME, TASK_ID);
+        return new GeneratePassportsDto(SERIALS_DTOS, TEMPLATE_ID_STRING, DATE);
     }
 
     public static ResultFile getBasicGeneratedResultFile() {
         return ResultFile.builder()
                 .templateId(TEMPLATE_ID_STRING)
-                .taskId(TASK_ID)
+                .taskId(TASK_ID_STR)
                 .username(USERNAME)
                 .bucket(RESULT_BUCKET)
                 .filename("my-filename.pdf")

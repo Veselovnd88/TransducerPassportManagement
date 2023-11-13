@@ -20,7 +20,7 @@ spring:
         hbm2ddl:
           auto: validate
   liquibase:
-    enabled: true
+    enabled: false
     change-log: db/changelog/db.changelog-master.yaml
 
   kafka:
@@ -36,7 +36,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka
     fetch-registry: true
     register-with-eureka: true
-    enabled: false
+    enabled: true
 
 management:
   endpoints:
@@ -48,4 +48,4 @@ management:
       probability: 1.0
 
 generate-service:
-  url: "http://generate-by-template/api/v1/generate"
+  url: "http://GENERATE-BY-TEMPLATE/api/v1/generate"

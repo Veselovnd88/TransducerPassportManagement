@@ -39,6 +39,7 @@ public class TaskServiceImpl implements TaskService {
     @Transactional
     public Task createTask(GeneratePassportsDto generatePassportsDto, String username) {
         TaskEntity taskEntity = TaskEntity.builder()
+                .templateId(UUID.fromString(generatePassportsDto.getTemplateId()))
                 .username(username)
                 .printDate(generatePassportsDto.getPrintDate())
                 .build();

@@ -74,7 +74,7 @@ class PassportServiceImplTest {
         Mockito.when(pdfService.createPdf(Mockito.any())).thenReturn(byteArrayResource);
         Mockito.when(resultFileService.save(Mockito.any(), Mockito.any())).thenReturn(returnedResult);
 
-        passportService.createPassportsPdf(generatePassportsDto);
+        passportService.createPassportsPdf(generatePassportsDto,TestUtils.TASK_ID_STR, TestUtils.USERNAME);
 
         ArgumentCaptor<ResultFile> resultFileCaptor = ArgumentCaptor.forClass(ResultFile.class);
         Assertions.assertAll(
@@ -106,7 +106,7 @@ class PassportServiceImplTest {
             Mockito.doThrow(DocxProcessingException.class)
                     .when(docxPassportService).createDocxPassports(generatePassportsDto);
 
-            passportService.createPassportsPdf(generatePassportsDto);
+            passportService.createPassportsPdf(generatePassportsDto,TestUtils.TASK_ID_STR, TestUtils.USERNAME);
 
             Assertions.assertAll(
                     () -> Mockito.verify(eventPublisher).publishErrorResultEvent(Mockito.any(), Mockito.any()),
@@ -122,7 +122,7 @@ class PassportServiceImplTest {
             Mockito.when(docxPassportService.createDocxPassports(generatePassportsDto)).thenReturn(byteArrayResource);
             Mockito.doThrow(PdfProcessingException.class).when(pdfService).createPdf(byteArrayResource);
 
-            passportService.createPassportsPdf(generatePassportsDto);
+            passportService.createPassportsPdf(generatePassportsDto,TestUtils.TASK_ID_STR, TestUtils.USERNAME);
 
             Assertions.assertAll(
                     () -> Mockito.verify(eventPublisher).publishErrorResultEvent(Mockito.any(), Mockito.any()),
@@ -138,7 +138,7 @@ class PassportServiceImplTest {
             Mockito.when(docxPassportService.createDocxPassports(generatePassportsDto)).thenReturn(byteArrayResource);
             Mockito.doThrow(ServiceUnavailableException.class).when(pdfService).createPdf(byteArrayResource);
 
-            passportService.createPassportsPdf(generatePassportsDto);
+            passportService.createPassportsPdf(generatePassportsDto,TestUtils.TASK_ID_STR, TestUtils.USERNAME);
 
             Assertions.assertAll(
                     () -> Mockito.verify(eventPublisher).publishErrorResultEvent(Mockito.any(), Mockito.any()),
@@ -155,7 +155,7 @@ class PassportServiceImplTest {
             Mockito.when(pdfService.createPdf(byteArrayResource)).thenReturn(byteArrayResource);
             Mockito.doThrow(TemplateNotFoundException.class).when(resultFileService).save(Mockito.any(), Mockito.any());
 
-            passportService.createPassportsPdf(generatePassportsDto);
+            passportService.createPassportsPdf(generatePassportsDto,TestUtils.TASK_ID_STR, TestUtils.USERNAME);
 
             Assertions.assertAll(
                     () -> Mockito.verify(docxPassportService).createDocxPassports(generatePassportsDto),
@@ -175,7 +175,7 @@ class PassportServiceImplTest {
             Mockito.when(pdfService.createPdf(byteArrayResource)).thenReturn(byteArrayResource);
             Mockito.doThrow(CommonMinioException.class).when(resultFileService).save(Mockito.any(), Mockito.any());
 
-            passportService.createPassportsPdf(generatePassportsDto);
+            passportService.createPassportsPdf(generatePassportsDto,TestUtils.TASK_ID_STR, TestUtils.USERNAME);
 
             Assertions.assertAll(
                     () -> Mockito.verify(docxPassportService).createDocxPassports(generatePassportsDto),

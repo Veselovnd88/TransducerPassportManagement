@@ -52,12 +52,12 @@ public class PassportServiceImpl implements PassportService {
 
     @Async(value = "asyncThreadPoolTaskExecutor")
     @Override
-    public void createPassportsPdf(GeneratePassportsDto generatePassportsDto) {
+    public void createPassportsPdf(GeneratePassportsDto generatePassportsDto, String taskId, String username) {
         log.info("Starting process of generating passports");
         try {
             ByteArrayResource docxPassports = docxPassportService.createDocxPassports(generatePassportsDto);
             ByteArrayResource pdfBytes = pdfService.createPdf(docxPassports);
-            ResultFile rawResultFile = createResultFile(generatePassportsDto);
+            ResultFile rawResultFile = createResultFile(generatePassportsDto, taskId, username);
             log.debug("Saving generated file to storage");
             ResultFile savedResult = resultFileService.save(pdfBytes, rawResultFile);
             resultEventPublisher.publishSuccessResultEvent(savedResult);
@@ -68,7 +68,7 @@ public class PassportServiceImpl implements PassportService {
                  DocxProcessingException |
                  TemplateNotFoundException | ServiceUnavailableException e) {
             log.error("Error occurred during generating docx and pdf file with passports");
-            resultEventPublisher.publishErrorResultEvent(generatePassportsDto.getTaskId(), e);
+            resultEventPublisher.publishErrorResultEvent(taskId, e);
         }
     }
 
@@ -77,12 +77,12 @@ public class PassportServiceImpl implements PassportService {
         return dateTimeFormatter.format(localDate);
     }
 
-    private ResultFile createResultFile(GeneratePassportsDto generatePassportsDto) {
+    private ResultFile createResultFile(GeneratePassportsDto generatePassportsDto, String taskId, String username) {
         return ResultFile.builder()
                 .filename(createFilenameFromGeneratePassportsDto(generatePassportsDto))
                 .templateId(generatePassportsDto.getTemplateId())
-                .taskId(generatePassportsDto.getTaskId())
-                .username(generatePassportsDto.getUsername())
+                .taskId(taskId)
+                .username(username)
                 .build();
     }
 

@@ -161,7 +161,6 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         SerialNumberDto serialNumberDto2 = new SerialNumberDto("456", UUID.randomUUID().toString());
         GeneratePassportsDto generatePassportsDto = Instancio.of(GeneratePassportsDto.class)
                 .ignore(Select.field("serials"))
-                .supply(Select.field(GeneratePassportsDto::getTaskId), () -> TestUtils.TASK_ID)
                 .supply(Select.field(GeneratePassportsDto::getTemplateId), () -> templateId)
                 .create();
 
@@ -185,7 +184,7 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
                 .bucket(resultBucket)
                 .filename("filename")
                 .templateEntity(templateEntity)
-                .taskId(UUID.fromString(TestUtils.TASK_ID))
+                .taskId(UUID.fromString(TestUtils.TASK_ID_STR))
                 .username(TestUtils.USERNAME)
                 .synced(true).build();
         return resultFileRepository.save(resultFileEntity);

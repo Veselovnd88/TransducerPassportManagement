@@ -46,7 +46,8 @@ class GeneratePassportControllerTest {
         webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isAccepted();
 
-        Mockito.verify(passportService).createPassportsPdf(generatePassportsDto);
+        Mockito.verify(passportService)
+                .createPassportsPdf(generatePassportsDto,TestUtils.TASK_ID_STR, TestUtils.USERNAME);
     }
 
     @Test
