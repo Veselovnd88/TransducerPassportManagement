@@ -31,12 +31,13 @@ public class GenerateServiceHttpClientImpl implements GenerateServiceHttpClient 
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set("Service-username-header", "username");
         HttpEntity<GeneratePassportsDto> postBody = new HttpEntity<>(generatePassportsDto, httpHeaders);
-        ResponseEntity<Void> answer = restTemplate.exchange(generateServiceUrl+"/"+task.getTaskId(),
+        ResponseEntity<Void> answer = restTemplate.exchange(generateServiceUrl + "/" + task.getTaskId(),
                 HttpMethod.POST, postBody, Void.class);
         if (answer.getStatusCode().equals(HttpStatus.ACCEPTED)) {
-            log.info("Send [task : {}] for perform", task.getTaskId());//TODO implement
+            log.info("[Task : {}] successfully sent for perform", task.getTaskId());
             return true;
         }
-        return false;
+        log.info("[Task {}] was not sent to generate service for reason: ", task.getTaskId());
+        throw new RuntimeException();
     }
 }
