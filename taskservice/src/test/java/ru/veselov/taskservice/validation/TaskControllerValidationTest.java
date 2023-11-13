@@ -4,6 +4,7 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.EmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -45,7 +46,7 @@ public class TaskControllerValidationTest {
     @ParameterizedTest
     @EmptySource
     @SneakyThrows
-    void shouldReturnValidationErrorForBlankOrEmptyUsernameForPerformed(String username) {
+    void shouldReturnValidationErrorForEmptyUsernameForPerformed(String username) {
         mockMvc.perform(MockMvcRequestBuilders
                         .get(TestURLsConstants.TASK + "/performed")
                         .header(TestUtils.USERNAME, username)
@@ -60,7 +61,7 @@ public class TaskControllerValidationTest {
     @ParameterizedTest
     @EmptySource
     @SneakyThrows
-    void shouldReturnValidationErrorForBlankOrEmptyUsernameForCurrent(String username) {
+    void shouldReturnValidationErrorForEmptyUsernameForCurrent(String username) {
         mockMvc.perform(MockMvcRequestBuilders
                         .get(TestURLsConstants.TASK + "/current")
                         .header(TestUtils.USERNAME, username)
@@ -70,6 +71,20 @@ public class TaskControllerValidationTest {
                         .jsonPath(TestUtils.JSON_ERROR_CODE).value(ErrorCode.ERROR_VALIDATION.toString()))
                 .andExpect(MockMvcResultMatchers
                         .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).value(TestUtils.USERNAME));
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/current", "/performed"})
+    @SneakyThrows
+    void shouldReturnValidationErrorForNoUsernameHeaderFor(String postfix) {
+        mockMvc.perform(MockMvcRequestBuilders
+                        .get(TestURLsConstants.TASK + postfix)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath(TestUtils.JSON_ERROR_CODE).value(ErrorCode.ERROR_VALIDATION.toString()))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).value(TestUtils.REQUEST_HEADER_USERNAME));
     }
 
 }

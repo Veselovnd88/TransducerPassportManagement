@@ -1,7 +1,7 @@
 package ru.veselov.taskservice.controller;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
@@ -21,7 +21,7 @@ public class TaskLaunchController {
     @PostMapping
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Task createTask(@RequestBody @Valid GeneratePassportsDto generatePassportsDto,
-                           @RequestHeader(value = "username") @NotBlank String username) {
+                           @RequestHeader(value = "username") @NotEmpty String username) {
         return taskLaunchService.startTask(generatePassportsDto, username);
     }
 

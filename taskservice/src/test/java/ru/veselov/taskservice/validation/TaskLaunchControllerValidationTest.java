@@ -158,4 +158,23 @@ class TaskLaunchControllerValidationTest {
                         .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).value(TestUtils.USERNAME));
     }
 
+    @Test
+    @SneakyThrows
+    void shouldReturnValidationErrorForNullUsernameHeader() {
+        GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
+        String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                        .post(TestURLsConstants.TASK_LAUNCH)
+                        .content(contentString)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().is4xxClientError())
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath(TestUtils.JSON_ERROR_CODE).value(ErrorCode.ERROR_VALIDATION.toString()))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).value(TestUtils.REQUEST_HEADER_USERNAME));
+    }
+
+
 }

@@ -37,6 +37,8 @@ public class TestUtils {
 
     public static final String JSON_VIOLATIONS_FIELD = "$.violations[0].fieldName";
 
+    public static final String REQUEST_HEADER_USERNAME = "Request Header: username";
+
     public static List<SerialNumberDto> SERIALS_DTOS = List.of(SERIAL_DTO_1, SERIAL_DTO_2, SERIAL_DTO_3);
 
 
