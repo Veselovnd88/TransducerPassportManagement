@@ -23,7 +23,7 @@ public class TaskLaunchController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     public Task createTask(@RequestBody @Valid GeneratePassportsDto generatePassportsDto,
                            @RequestHeader(value = AppConstants.SERVICE_USERNAME_HEADER) @NotEmpty String username) {
-        return taskLaunchService.startTask(generatePassportsDto, username);
+        return taskLaunchService.launchTask(generatePassportsDto, username);
     }
 
 }

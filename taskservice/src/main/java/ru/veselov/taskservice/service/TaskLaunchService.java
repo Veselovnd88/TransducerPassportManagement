@@ -5,6 +5,6 @@ import ru.veselov.taskservice.model.Task;
 
 public interface TaskLaunchService {
 
-    Task startTask(GeneratePassportsDto generatePassportsDto, String username);
+    Task launchTask(GeneratePassportsDto generatePassportsDto, String username);
 
 }

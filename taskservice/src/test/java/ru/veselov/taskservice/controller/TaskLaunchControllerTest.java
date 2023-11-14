@@ -18,8 +18,7 @@ import ru.veselov.taskservice.TestUtils;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.TaskLaunchService;
-
-import java.time.LocalDateTime;
+import ru.veselov.taskservice.utils.AppConstants;
 
 @ExtendWith(MockitoExtension.class)
 class TaskLaunchControllerTest {
@@ -40,21 +39,21 @@ class TaskLaunchControllerTest {
     @Test
     @SneakyThrows
     void shouldLaunchTask() {
-        Task task = new Task(TestUtils.TASK_ID, false, LocalDateTime.now(), LocalDateTime.now());
+        Task task = TestUtils.getTask();
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
-        Mockito.when(taskLaunchService.startTask(generatePassportsDto, TestUtils.USERNAME)).thenReturn(task);
+        Mockito.when(taskLaunchService.launchTask(generatePassportsDto, TestUtils.USERNAME)).thenReturn(task);
         String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)
                         .content(contentString)
-                        .header(TestUtils.USERNAME, TestUtils.USERNAME)
+                        .header(AppConstants.SERVICE_USERNAME_HEADER, TestUtils.USERNAME)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isAccepted())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
 
-        Mockito.verify(taskLaunchService).startTask(generatePassportsDto, TestUtils.USERNAME);
+        Mockito.verify(taskLaunchService).launchTask(generatePassportsDto, TestUtils.USERNAME);
     }
 
 }

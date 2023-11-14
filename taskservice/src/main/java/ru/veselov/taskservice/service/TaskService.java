@@ -10,7 +10,7 @@ public interface TaskService {
 
     Task createTask(GeneratePassportsDto generatePassportsDto, String username);
 
-    Task updateStatusToStart(UUID taskId);
+    Task updateStatusToStarted(UUID taskId);
 
     Task getTask(String taskId);
 
@@ -19,4 +19,5 @@ public interface TaskService {
     List<Task> getNotPerformedTasks(String username);
 
     void deleteTaskById(UUID taskId);
+
 }

@@ -61,7 +61,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task updateStatusToStart(UUID taskId) {
+    public Task updateStatusToStarted(UUID taskId) {
         Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
         TaskEntity taskEntity = optionalTask.orElseThrow(() -> {
             log.error(TASK_NOT_FOUND_LOG_MSG, taskId);

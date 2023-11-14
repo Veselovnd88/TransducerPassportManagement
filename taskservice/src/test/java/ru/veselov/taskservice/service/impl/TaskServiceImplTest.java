@@ -111,7 +111,7 @@ class TaskServiceImplTest {
         Mockito.when(taskRepository.findById(TestUtils.TASK_ID))
                 .thenReturn(Optional.of(notStartedTask));
 
-        taskService.updateStatusToStart(TestUtils.TASK_ID);
+        taskService.updateStatusToStarted(TestUtils.TASK_ID);
 
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Mockito.verify(taskRepository).save(taskEntityCaptor.capture()),
@@ -127,7 +127,7 @@ class TaskServiceImplTest {
         Mockito.when(taskRepository.findById(TestUtils.TASK_ID)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(
-                () -> taskService.updateStatusToStart(TestUtils.TASK_ID)
+                () -> taskService.updateStatusToStarted(TestUtils.TASK_ID)
         ).isInstanceOf(EntityNotFoundException.class);
     }
 

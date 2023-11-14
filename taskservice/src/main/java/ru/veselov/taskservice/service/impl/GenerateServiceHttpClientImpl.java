@@ -24,17 +24,22 @@ public class GenerateServiceHttpClientImpl implements GenerateServiceHttpClient 
 
     @Override
     public void sendTaskToPerform(GeneratePassportsDto generatePassportsDto, Task task, String username) {
+        HttpEntity<GeneratePassportsDto> postBody = createHttpEntity(generatePassportsDto, username);
+        ResponseEntity<Void> answer = restTemplate.exchange(generateServiceUrl + "/" + task.getTaskId(),
+                HttpMethod.POST, postBody, Void.class);
+        if (!answer.getStatusCode().equals(HttpStatus.ACCEPTED)) {
+            log.info("[Task {}] was not sent to generate service for reason: {}", task.getTaskId(), answer.getStatusCode());
+            throw new GenerateServiceException(answer.getStatusCode().toString());
+        }
+        log.info("[Task : {}] successfully sent for perform", task.getTaskId());
+    }
+
+    private HttpEntity<GeneratePassportsDto> createHttpEntity(GeneratePassportsDto generatePassportsDto,
+                                                              String username) {
         HttpHeaders httpHeaders = new HttpHeaders();
         httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         httpHeaders.set(AppConstants.SERVICE_USERNAME_HEADER, username);
-        HttpEntity<GeneratePassportsDto> postBody = new HttpEntity<>(generatePassportsDto, httpHeaders);
-        ResponseEntity<Void> answer = restTemplate.exchange(generateServiceUrl + "/" + task.getTaskId(),
-                HttpMethod.POST, postBody, Void.class);
-        if (answer.getStatusCode().equals(HttpStatus.ACCEPTED)) {
-            log.info("[Task : {}] successfully sent for perform", task.getTaskId());
-            return;
-        }
-        log.info("[Task {}] was not sent to generate service for reason: {}", task.getTaskId(), answer.getStatusCode());
-        throw new GenerateServiceException(answer.getStatusCode().toString());
+        return new HttpEntity<>(generatePassportsDto, httpHeaders);
     }
+
 }

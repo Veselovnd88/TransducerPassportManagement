@@ -35,13 +35,13 @@ class TaskLaunchServiceImplTest {
         Mockito.when(taskService.createTask(generatePassportsDto, TestUtils.USERNAME))
                 .thenReturn(task);
 
-        taskLaunchService.startTask(generatePassportsDto, TestUtils.USERNAME);
+        taskLaunchService.launchTask(generatePassportsDto, TestUtils.USERNAME);
 
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Mockito.verify(taskService).createTask(generatePassportsDto, TestUtils.USERNAME),
                 () -> Mockito.verify(generateServiceHttpClient)
                         .sendTaskToPerform(generatePassportsDto, task, TestUtils.USERNAME),
-                () -> Mockito.verify(taskService).updateStatusToStart(TestUtils.TASK_ID)
+                () -> Mockito.verify(taskService).updateStatusToStarted(TestUtils.TASK_ID)
         );
     }
 
@@ -55,10 +55,10 @@ class TaskLaunchServiceImplTest {
                 .sendTaskToPerform(Mockito.any(), Mockito.any(), Mockito.any());
 
         Assertions.assertThatThrownBy(() ->
-                taskLaunchService.startTask(generatePassportsDto, TestUtils.USERNAME)
+                taskLaunchService.launchTask(generatePassportsDto, TestUtils.USERNAME)
         ).isInstanceOf(GenerateServiceException.class);
 
-        Mockito.verify(taskService, Mockito.never()).updateStatusToStart(TestUtils.TASK_ID);
+        Mockito.verify(taskService, Mockito.never()).updateStatusToStarted(TestUtils.TASK_ID);
     }
 
 }

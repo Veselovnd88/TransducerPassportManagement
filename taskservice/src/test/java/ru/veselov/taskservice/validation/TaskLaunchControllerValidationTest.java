@@ -22,6 +22,7 @@ import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.dto.SerialNumberDto;
 import ru.veselov.taskservice.exception.error.ErrorCode;
 import ru.veselov.taskservice.service.TaskLaunchService;
+import ru.veselov.taskservice.utils.AppConstants;
 
 import java.util.Collections;
 import java.util.List;
@@ -148,7 +149,7 @@ class TaskLaunchControllerValidationTest {
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)
                         .content(contentString)
-                        .header(TestUtils.USERNAME, username)
+                        .header(AppConstants.SERVICE_USERNAME_HEADER, username)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
@@ -173,8 +174,8 @@ class TaskLaunchControllerValidationTest {
                 .andExpect(MockMvcResultMatchers
                         .jsonPath(TestUtils.JSON_ERROR_CODE).value(ErrorCode.ERROR_VALIDATION.toString()))
                 .andExpect(MockMvcResultMatchers
-                        .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).value(TestUtils.REQUEST_HEADER_USERNAME));
+                        .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD)
+                        .value(Matchers.endsWith(AppConstants.SERVICE_USERNAME_HEADER)));
     }
-
 
 }

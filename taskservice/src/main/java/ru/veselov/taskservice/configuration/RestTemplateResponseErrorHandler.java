@@ -56,6 +56,7 @@ public class RestTemplateResponseErrorHandler implements ResponseErrorHandler {
                 throw new GenerateServiceException(GENERATE_SERVICE_ERROR);
             }
         } catch (IOException e) {
+            log.error("IO Exception occurred in RestTemplateErrorHandler");
             throw new ErrorHandlingException(e.getMessage(), e);
         }
     }

@@ -19,11 +19,11 @@ public class TaskLaunchServiceImpl implements TaskLaunchService {
     private final GenerateServiceHttpClient generateServiceHttpClient;
 
     @Override
-    public Task startTask(GeneratePassportsDto generatePassportsDto, String username) {
+    public Task launchTask(GeneratePassportsDto generatePassportsDto, String username) {
         Task createdTask = taskService.createTask(generatePassportsDto, username);
         generateServiceHttpClient.sendTaskToPerform(generatePassportsDto, createdTask, username);
-        Task startedTask = taskService.updateStatusToStart(createdTask.getTaskId());
-        log.info("Task [id: {}] was successfully started", createdTask.getTaskId());
+        Task startedTask = taskService.updateStatusToStarted(createdTask.getTaskId());
+        log.info("Task [id: {}] was successfully launched", createdTask.getTaskId());
         return startedTask;
         //TODO implement scheduled service for deleting not started tasks
     }
