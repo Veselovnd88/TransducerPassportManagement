@@ -11,9 +11,10 @@ spring:
     password: admin
     driver-class-name: org.postgresql.Driver
   jpa:
+    open-in-view: false
     properties:
       hibernate:
-        dialect: org.hibernate.dialect.PostgreSQLDialect
+        #dialect: org.hibernate.dialect.PostgreSQLDialect
         show_sql: true
         format_sql: false
         hbm2ddl:
@@ -45,3 +46,6 @@ logging:
   level:
     org.apache.kafka: OFF
     org.springframework.kafka: OFF
+
+generate-service:
+  url: "http://localhost:"

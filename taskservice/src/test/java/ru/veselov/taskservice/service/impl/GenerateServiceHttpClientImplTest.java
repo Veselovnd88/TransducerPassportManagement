@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.util.ReflectionTestUtils;
-import org.springframework.util.SerializationUtils;
 import org.springframework.web.client.RestTemplate;
 import ru.veselov.taskservice.TestUtils;
 import ru.veselov.taskservice.configuration.RestTemplateResponseErrorHandler;
@@ -27,6 +26,8 @@ import java.util.Collections;
 
 @WireMockTest(httpPort = 30001)
 class GenerateServiceHttpClientImplTest {
+
+    private static final String WIREMOCK_URL = "/" + TestUtils.TASK_ID_STR;
 
     GenerateServiceHttpClientImpl generateServiceHttpClient;
 
@@ -43,7 +44,7 @@ class GenerateServiceHttpClientImplTest {
 
     @Test
     void shouldSendTaskToPerform() {
-        WireMock.stubFor(WireMock.post("/" + TestUtils.TASK_ID_STR).willReturn(WireMock.aResponse().withStatus(202)));
+        WireMock.stubFor(WireMock.post(WIREMOCK_URL).willReturn(WireMock.aResponse().withStatus(202)));
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         Task task = TestUtils.getTask();
 
@@ -55,7 +56,7 @@ class GenerateServiceHttpClientImplTest {
     void shouldThrowExceptionFor4xxStatus() {
         ValidationErrorResponse validationErrorResponse = new ValidationErrorResponse("1", Collections.emptyList());
         byte[] responseBytes = jsonStringFromResponseObject(validationErrorResponse).getBytes();
-        WireMock.stubFor(WireMock.post("/" + TestUtils.TASK_ID_STR).willReturn(WireMock.aResponse().withStatus(400)
+        WireMock.stubFor(WireMock.post(WIREMOCK_URL).willReturn(WireMock.aResponse().withStatus(400)
                 .withResponseBody(Body.fromJsonBytes(responseBytes))));
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         Task task = TestUtils.getTask();
@@ -67,7 +68,18 @@ class GenerateServiceHttpClientImplTest {
 
     @Test
     void shouldThrowExceptionFor5xxStatus() {
-        WireMock.stubFor(WireMock.post("/" + TestUtils.TASK_ID_STR).willReturn(WireMock.aResponse().withStatus(500)));
+        WireMock.stubFor(WireMock.post(WIREMOCK_URL).willReturn(WireMock.aResponse().withStatus(500)));
+        GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
+        Task task = TestUtils.getTask();
+
+        Assertions.assertThatThrownBy(() ->
+                        generateServiceHttpClient.sendTaskToPerform(generatePassportsDto, task, TestUtils.USERNAME))
+                .isInstanceOf(GenerateServiceException.class);
+    }
+
+    @Test
+    void shouldThrowExceptionForNotAcceptedStatus() {
+        WireMock.stubFor(WireMock.post(WIREMOCK_URL).willReturn(WireMock.aResponse().withStatus(500)));
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         Task task = TestUtils.getTask();
 

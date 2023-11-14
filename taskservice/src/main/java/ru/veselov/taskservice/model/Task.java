@@ -1,5 +1,6 @@
 package ru.veselov.taskservice.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -23,6 +24,7 @@ public class Task {
 
     private LocalDateTime createdAt;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
     private LocalDateTime performedAt;
 
 }

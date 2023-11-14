@@ -31,7 +31,7 @@ public class GenerateServiceHttpClientImpl implements GenerateServiceHttpClient 
             log.info("[Task {}] was not sent to generate service for reason: {}", task.getTaskId(), answer.getStatusCode());
             throw new GenerateServiceException(answer.getStatusCode().toString());
         }
-        log.info("[Task : {}] successfully sent for perform", task.getTaskId());
+        log.info("[Task : {}] successfully sent to perform", task.getTaskId());
     }
 
     private HttpEntity<GeneratePassportsDto> createHttpEntity(GeneratePassportsDto generatePassportsDto,
