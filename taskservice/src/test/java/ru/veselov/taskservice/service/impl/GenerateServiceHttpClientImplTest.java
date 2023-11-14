@@ -1,8 +1,13 @@
 package ru.veselov.taskservice.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.json.JsonMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Body;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
+import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -38,7 +43,7 @@ class GenerateServiceHttpClientImplTest {
 
     @Test
     void shouldSendTaskToPerform() {
-        WireMock.stubFor(WireMock.post("/").willReturn(WireMock.aResponse().withStatus(200)));
+        WireMock.stubFor(WireMock.post("/" + TestUtils.TASK_ID_STR).willReturn(WireMock.aResponse().withStatus(202)));
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         Task task = TestUtils.getTask();
 
@@ -46,10 +51,11 @@ class GenerateServiceHttpClientImplTest {
     }
 
     @Test
+    @SneakyThrows
     void shouldThrowExceptionFor4xxStatus() {
         ValidationErrorResponse validationErrorResponse = new ValidationErrorResponse("1", Collections.emptyList());
-        byte[] responseBytes = SerializationUtils.serialize(validationErrorResponse);
-        WireMock.stubFor(WireMock.post("/").willReturn(WireMock.aResponse().withStatus(400)
+        byte[] responseBytes = jsonStringFromResponseObject(validationErrorResponse).getBytes();
+        WireMock.stubFor(WireMock.post("/" + TestUtils.TASK_ID_STR).willReturn(WireMock.aResponse().withStatus(400)
                 .withResponseBody(Body.fromJsonBytes(responseBytes))));
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         Task task = TestUtils.getTask();
@@ -61,13 +67,18 @@ class GenerateServiceHttpClientImplTest {
 
     @Test
     void shouldThrowExceptionFor5xxStatus() {
-        WireMock.stubFor(WireMock.post("/").willReturn(WireMock.aResponse().withStatus(500)));
+        WireMock.stubFor(WireMock.post("/" + TestUtils.TASK_ID_STR).willReturn(WireMock.aResponse().withStatus(500)));
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         Task task = TestUtils.getTask();
 
         Assertions.assertThatThrownBy(() ->
                         generateServiceHttpClient.sendTaskToPerform(generatePassportsDto, task, TestUtils.USERNAME))
                 .isInstanceOf(GenerateServiceException.class);
+    }
+
+    private String jsonStringFromResponseObject(ValidationErrorResponse validationErrorResponse) throws JsonProcessingException {
+        ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
+        return objectMapper.writeValueAsString(validationErrorResponse);
     }
 
 }
