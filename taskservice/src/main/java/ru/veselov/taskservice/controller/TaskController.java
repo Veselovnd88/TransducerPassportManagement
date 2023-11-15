@@ -7,6 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.TaskService;
+import ru.veselov.taskservice.utils.AppConstants;
 
 import java.util.List;
 
@@ -24,12 +25,14 @@ public class TaskController {
     }
 
     @GetMapping("/performed")
-    public List<Task> getPerformedTasks(@RequestHeader(name = "username") @NotEmpty String username) {
+    public List<Task> getPerformedTasks(@RequestHeader(value = AppConstants.SERVICE_USERNAME_HEADER)
+                                        @NotEmpty String username) {
         return taskService.getPerformedTasks(username);
     }
 
     @GetMapping("/current")
-    public List<Task> getCurrentTasks(@RequestHeader(name = "username") @NotEmpty String username) {
+    public List<Task> getCurrentTasks(@RequestHeader(value = AppConstants.SERVICE_USERNAME_HEADER)
+                                      @NotEmpty String username) {
         return taskService.getNotPerformedTasks(username);
     }
 

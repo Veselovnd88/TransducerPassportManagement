@@ -1,6 +1,7 @@
 package ru.veselov.taskservice.validation;
 
 import lombok.SneakyThrows;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ArgumentsSource;
 import org.junit.jupiter.params.provider.EmptySource;
@@ -18,6 +19,7 @@ import ru.veselov.taskservice.WrongAndNullUUIDArgumentProvider;
 import ru.veselov.taskservice.controller.TaskController;
 import ru.veselov.taskservice.exception.error.ErrorCode;
 import ru.veselov.taskservice.service.TaskService;
+import ru.veselov.taskservice.utils.AppConstants;
 
 @WebMvcTest(TaskController.class)
 public class TaskControllerValidationTest {
@@ -34,7 +36,7 @@ public class TaskControllerValidationTest {
     void shouldReturnValidationErrorForWrongTaskId(String taskId) {
         mockMvc.perform(MockMvcRequestBuilders
                         .get(TestURLsConstants.TASK + "/" + taskId)
-                        .header(TestUtils.USERNAME, TestUtils.USERNAME)
+                        .header(AppConstants.SERVICE_USERNAME_HEADER, TestUtils.USERNAME)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers
@@ -49,7 +51,7 @@ public class TaskControllerValidationTest {
     void shouldReturnValidationErrorForEmptyUsernameForPerformed(String username) {
         mockMvc.perform(MockMvcRequestBuilders
                         .get(TestURLsConstants.TASK + "/performed")
-                        .header(TestUtils.USERNAME, username)
+                        .header(AppConstants.SERVICE_USERNAME_HEADER, username)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers
@@ -64,7 +66,7 @@ public class TaskControllerValidationTest {
     void shouldReturnValidationErrorForEmptyUsernameForCurrent(String username) {
         mockMvc.perform(MockMvcRequestBuilders
                         .get(TestURLsConstants.TASK + "/current")
-                        .header(TestUtils.USERNAME, username)
+                        .header(AppConstants.SERVICE_USERNAME_HEADER, username)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().is4xxClientError())
                 .andExpect(MockMvcResultMatchers
@@ -74,7 +76,7 @@ public class TaskControllerValidationTest {
     }
 
     @ParameterizedTest
-    @ValueSource(strings = {"/current", "/performed"})
+    @ValueSource(strings = {TestURLsConstants.PERFORMED, TestURLsConstants.CURRENT})
     @SneakyThrows
     void shouldReturnValidationErrorForNoUsernameHeaderFor(String postfix) {
         mockMvc.perform(MockMvcRequestBuilders
@@ -84,7 +86,8 @@ public class TaskControllerValidationTest {
                 .andExpect(MockMvcResultMatchers
                         .jsonPath(TestUtils.JSON_ERROR_CODE).value(ErrorCode.ERROR_VALIDATION.toString()))
                 .andExpect(MockMvcResultMatchers
-                        .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).value(TestUtils.REQUEST_HEADER_USERNAME));
+                        .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD)
+                        .value(Matchers.endsWith(AppConstants.SERVICE_USERNAME_HEADER)));
     }
 
 }

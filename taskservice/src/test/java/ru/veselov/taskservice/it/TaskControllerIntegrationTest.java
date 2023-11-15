@@ -19,6 +19,7 @@ import ru.veselov.taskservice.entity.TaskEntity;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
 import ru.veselov.taskservice.testcontainers.PostgresContainersConfig;
+import ru.veselov.taskservice.utils.AppConstants;
 
 import java.util.Set;
 
@@ -46,7 +47,8 @@ public class TaskControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     @SneakyThrows
     void shouldGetTaskById() {
-        TaskEntity taskEntity = saveTaskToRepo(false);
+        TaskEntity taskEntity = saveTaskWithoutSerialsToRepo(false);
+        taskEntity.setSerials(Set.of(new SerialNumberEntity(TestUtils.SERIAL_ID, "123")));
         mockMvc.perform(MockMvcRequestBuilders.get(TestURLsConstants.TASK + "/" + taskEntity.getTaskId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
@@ -59,15 +61,42 @@ public class TaskControllerIntegrationTest extends PostgresContainersConfig {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.performedAt").doesNotExist());
     }
 
-    private TaskEntity saveTaskToRepo(boolean performed) {
+    @Test
+    @SneakyThrows
+    void shouldGetPerformedTasksForUsername() {
+        TaskEntity performedTask = saveTaskWithoutSerialsToRepo(true);
+        saveTaskWithoutSerialsToRepo(false);//not performed task
+        mockMvc.perform(MockMvcRequestBuilders.get(TestURLsConstants.TASK + TestURLsConstants.PERFORMED)
+                        .header(AppConstants.SERVICE_USERNAME_HEADER, TestUtils.USERNAME))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].taskId").value(performedTask.getTaskId().toString()));
+    }
+
+    @Test
+    @SneakyThrows
+    void shouldGetNotPerformedTasksForUsername() {
+        saveTaskWithoutSerialsToRepo(true);//performed task
+        TaskEntity notPerformedTask = saveTaskWithoutSerialsToRepo(false);
+        mockMvc.perform(MockMvcRequestBuilders.get(TestURLsConstants.TASK + TestURLsConstants.CURRENT)
+                        .header(AppConstants.SERVICE_USERNAME_HEADER, TestUtils.USERNAME))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.jsonPath("$").isArray())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.length()").value(1))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.[0].taskId")
+                        .value(notPerformedTask.getTaskId().toString()));
+    }
+
+    private TaskEntity saveTaskWithoutSerialsToRepo(boolean performed) {
         TaskEntity taskEntity = TaskEntity.builder()
                 .printDate(TestUtils.PRINT_DATE)
                 .username(TestUtils.USERNAME)
                 .templateId(TestUtils.TEMPLATE_ID)
                 .performed(performed)
-                .serials(Set.of(new SerialNumberEntity(TestUtils.SERIAL_ID, "123")))
                 .started(true)
                 .build();
         return taskRepository.save(taskEntity);
     }
+
 }

@@ -18,6 +18,7 @@ import ru.veselov.taskservice.TestURLsConstants;
 import ru.veselov.taskservice.TestUtils;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.TaskService;
+import ru.veselov.taskservice.utils.AppConstants;
 
 import java.util.List;
 
@@ -61,8 +62,8 @@ class TaskControllerTest {
         Mockito.when(taskService.getPerformedTasks(TestUtils.USERNAME)).thenReturn(List.of(task));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get(TestURLsConstants.TASK + "/performed")
-                        .header(TestUtils.USERNAME, TestUtils.USERNAME)
+                        .get(TestURLsConstants.TASK + TestURLsConstants.PERFORMED)
+                        .header(AppConstants.SERVICE_USERNAME_HEADER, TestUtils.USERNAME)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -78,8 +79,8 @@ class TaskControllerTest {
         Mockito.when(taskService.getNotPerformedTasks(TestUtils.USERNAME)).thenReturn(List.of(task));
 
         mockMvc.perform(MockMvcRequestBuilders
-                        .get(TestURLsConstants.TASK + "/current")
-                        .header(TestUtils.USERNAME, TestUtils.USERNAME)
+                        .get(TestURLsConstants.TASK + TestURLsConstants.CURRENT)
+                        .header(AppConstants.SERVICE_USERNAME_HEADER, TestUtils.USERNAME)
                         .contentType(MediaType.APPLICATION_JSON)
                         .accept(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.status().isOk())
