@@ -39,18 +39,15 @@ public class TestUtils {
 
     public static final String JSON_VIOLATIONS_FIELD = "$.violations[0].fieldName";
 
-    public static final String REQUEST_HEADER_USERNAME = "Request Header: username";
-
     public static List<SerialNumberDto> SERIALS_DTOS = List.of(SERIAL_DTO_1, SERIAL_DTO_2, SERIAL_DTO_3);
-
 
     public static GeneratePassportsDto getGeneratePassportsDto() {
         return new GeneratePassportsDto(SERIALS_DTOS, TEMPLATE_ID_STR, PRINT_DATE);
     }
 
-    public static String jsonStringFromGeneratePassportsDto(GeneratePassportsDto generatePassportsDto) throws JsonProcessingException {
+    public static String jsonStringFromObject(Object object) throws JsonProcessingException {
         ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
-        return objectMapper.writeValueAsString(generatePassportsDto);
+        return objectMapper.writeValueAsString(object);
     }
 
     public static Task getTask() {

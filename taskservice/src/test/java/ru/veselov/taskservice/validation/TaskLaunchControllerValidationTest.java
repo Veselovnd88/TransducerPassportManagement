@@ -42,7 +42,7 @@ class TaskLaunchControllerValidationTest {
     void shouldReturnValidationErrorForDtoForWrongOrNullTemplateId(String templateId) {
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         generatePassportsDto.setTemplateId(templateId);
-        String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
+        String contentString = TestUtils.jsonStringFromObject(generatePassportsDto);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)
@@ -62,7 +62,7 @@ class TaskLaunchControllerValidationTest {
     void shouldReturnValidationErrorForDtoForPrintDate() {
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         generatePassportsDto.setPrintDate(null);
-        String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
+        String contentString = TestUtils.jsonStringFromObject(generatePassportsDto);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)
@@ -82,7 +82,7 @@ class TaskLaunchControllerValidationTest {
     void shouldReturnValidationErrorForDtoForEmptySerials() {
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         generatePassportsDto.setSerials(Collections.emptyList());
-        String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
+        String contentString = TestUtils.jsonStringFromObject(generatePassportsDto);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)
@@ -102,7 +102,7 @@ class TaskLaunchControllerValidationTest {
     void shouldReturnValidationErrorForDtoForSerialWrongOrNullUid(String serialId) {
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         generatePassportsDto.setSerials(List.of(new SerialNumberDto(serialId, "1234")));
-        String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
+        String contentString = TestUtils.jsonStringFromObject(generatePassportsDto);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)
@@ -124,7 +124,7 @@ class TaskLaunchControllerValidationTest {
     void shouldReturnValidationErrorForDtoForSerialWrongNumber(String serial) {
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         generatePassportsDto.setSerials(List.of(new SerialNumberDto(TestUtils.SERIAL_ID.toString(), serial)));
-        String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
+        String contentString = TestUtils.jsonStringFromObject(generatePassportsDto);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)
@@ -144,7 +144,7 @@ class TaskLaunchControllerValidationTest {
     @SneakyThrows
     void shouldReturnValidationErrorForEmptyUsernameHeader(String username) {
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
-        String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
+        String contentString = TestUtils.jsonStringFromObject(generatePassportsDto);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)
@@ -163,7 +163,7 @@ class TaskLaunchControllerValidationTest {
     @SneakyThrows
     void shouldReturnValidationErrorForNullUsernameHeader() {
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
-        String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
+        String contentString = TestUtils.jsonStringFromObject(generatePassportsDto);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)

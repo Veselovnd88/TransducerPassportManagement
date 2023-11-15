@@ -1,9 +1,5 @@
 package ru.veselov.taskservice.service.impl;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.github.tomakehurst.wiremock.http.Body;
 import com.github.tomakehurst.wiremock.junit5.WireMockTest;
@@ -55,7 +51,7 @@ class GenerateServiceHttpClientImplTest {
     @SneakyThrows
     void shouldThrowExceptionFor4xxStatus() {
         ValidationErrorResponse validationErrorResponse = new ValidationErrorResponse("1", Collections.emptyList());
-        byte[] responseBytes = jsonStringFromResponseObject(validationErrorResponse).getBytes();
+        byte[] responseBytes = TestUtils.jsonStringFromObject(validationErrorResponse).getBytes();
         WireMock.stubFor(WireMock.post(WIREMOCK_URL).willReturn(WireMock.aResponse().withStatus(400)
                 .withResponseBody(Body.fromJsonBytes(responseBytes))));
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
@@ -86,11 +82,6 @@ class GenerateServiceHttpClientImplTest {
         Assertions.assertThatThrownBy(() ->
                         generateServiceHttpClient.sendTaskToPerform(generatePassportsDto, task, TestUtils.USERNAME))
                 .isInstanceOf(GenerateServiceException.class);
-    }
-
-    private String jsonStringFromResponseObject(ValidationErrorResponse validationErrorResponse) throws JsonProcessingException {
-        ObjectMapper objectMapper = JsonMapper.builder().addModule(new JavaTimeModule()).build();
-        return objectMapper.writeValueAsString(validationErrorResponse);
     }
 
 }

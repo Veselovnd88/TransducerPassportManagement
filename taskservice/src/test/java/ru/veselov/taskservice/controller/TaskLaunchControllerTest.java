@@ -42,7 +42,7 @@ class TaskLaunchControllerTest {
         Task task = TestUtils.getTask();
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         Mockito.when(taskLaunchService.launchTask(generatePassportsDto, TestUtils.USERNAME)).thenReturn(task);
-        String contentString = TestUtils.jsonStringFromGeneratePassportsDto(generatePassportsDto);
+        String contentString = TestUtils.jsonStringFromObject(generatePassportsDto);
 
         mockMvc.perform(MockMvcRequestBuilders
                         .post(TestURLsConstants.TASK_LAUNCH)

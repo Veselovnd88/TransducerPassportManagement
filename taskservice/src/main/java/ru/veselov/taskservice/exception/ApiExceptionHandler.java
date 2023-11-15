@@ -1,5 +1,6 @@
 package ru.veselov.taskservice.exception;
 
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,13 @@ import java.util.List;
 @RestControllerAdvice
 @Slf4j
 public class ApiExceptionHandler {
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public ApiErrorResponse handleEntityNotFoundException(EntityNotFoundException exception) {
+        return new ApiErrorResponse(ErrorCode.ERROR_NOT_FOUND, exception.getMessage());
+    }
+
 
     @ExceptionHandler(GenerateServiceException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
@@ -43,8 +51,8 @@ public class ApiExceptionHandler {
 
     @ExceptionHandler(GenerateServiceValidationException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ApiErrorResponse handleGenerateServiceValidationException(GenerateServiceValidationException e) {
-        return new ApiErrorResponse(ErrorCode.SERVICE_ERROR, "Internal service error");
+    public ApiErrorResponse handleGenerateServiceValidationException(GenerateServiceValidationException exception) {
+        return new ApiErrorResponse(ErrorCode.SERVICE_ERROR, exception.getMessage());
     }
 
     @ExceptionHandler(ConstraintViolationException.class)
