@@ -14,8 +14,6 @@ import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.GenerateServiceHttpClient;
 import ru.veselov.taskservice.service.TaskService;
 
-import java.time.LocalDateTime;
-
 @ExtendWith(MockitoExtension.class)
 class TaskLaunchServiceImplTest {
 
@@ -31,7 +29,7 @@ class TaskLaunchServiceImplTest {
     @Test
     void shouldLaunchTask() {
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
-        Task task = new Task(TestUtils.TASK_ID, false, false, TestUtils.PRINT_DATE, LocalDateTime.now(), LocalDateTime.now());
+        Task task = TestUtils.getTask();
         Mockito.when(taskService.createTask(generatePassportsDto, TestUtils.USERNAME))
                 .thenReturn(task);
 
@@ -48,7 +46,7 @@ class TaskLaunchServiceImplTest {
     @Test
     void shouldThrowExceptionIfTaskWasNotStarted() {
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
-        Task task = new Task(TestUtils.TASK_ID, false, false, TestUtils.PRINT_DATE, LocalDateTime.now(), LocalDateTime.now());
+        Task task = TestUtils.getTask();
         Mockito.when(taskService.createTask(generatePassportsDto, TestUtils.USERNAME))
                 .thenReturn(task);
         Mockito.doThrow(GenerateServiceException.class).when(generateServiceHttpClient)

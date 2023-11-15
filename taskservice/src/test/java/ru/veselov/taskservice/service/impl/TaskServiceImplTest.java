@@ -12,6 +12,7 @@ import ru.veselov.taskservice.TestUtils;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.entity.SerialNumberEntity;
 import ru.veselov.taskservice.entity.TaskEntity;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.mapper.TaskMapper;
 import ru.veselov.taskservice.mapper.TaskMapperImpl;
 import ru.veselov.taskservice.model.Task;
@@ -66,8 +67,7 @@ class TaskServiceImplTest {
                                 TestUtils.SERIAL_DTO_1.getSerial())),
                 () -> Assertions.assertThat(captured.getUsername()).isEqualTo(TestUtils.USERNAME),
                 () -> Assertions.assertThat(captured.getPrintDate()).isEqualTo(generatePassportsDto.getPrintDate()),
-                () -> Assertions.assertThat(captured.getPerformed()).isFalse(),
-                () -> Assertions.assertThat(captured.getStarted()).isFalse()
+                () -> Assertions.assertThat(captured.getStatus()).isEqualTo(TaskStatus.CREATED)
         );
     }
 
@@ -99,8 +99,7 @@ class TaskServiceImplTest {
                                 serialNumberEntity2),
                 () -> Assertions.assertThat(captured.getUsername()).isEqualTo(TestUtils.USERNAME),
                 () -> Assertions.assertThat(captured.getPrintDate()).isEqualTo(generatePassportsDto.getPrintDate()),
-                () -> Assertions.assertThat(captured.getPerformed()).isFalse(),
-                () -> Assertions.assertThat(captured.getStarted()).isFalse(),
+                () -> Assertions.assertThat(captured.getStatus()).isEqualTo(TaskStatus.CREATED),
                 () -> Assertions.assertThat(task.getTaskId()).isEqualTo(taskEntityWithUid.getTaskId())
         );
     }
@@ -117,7 +116,7 @@ class TaskServiceImplTest {
                 () -> Mockito.verify(taskRepository).save(taskEntityCaptor.capture()),
                 () -> {
                     TaskEntity captured = taskEntityCaptor.getValue();
-                    Assertions.assertThat(captured.getStarted()).isTrue();
+                    Assertions.assertThat(captured.getStatus()).isEqualTo(TaskStatus.STARTED);
                 }
         );
     }
@@ -157,14 +156,14 @@ class TaskServiceImplTest {
     @Test
     void shouldGetPerformedTasks() {
         TaskEntity taskEntity = createTaskEntityWithUid();
-        taskEntity.setPerformed(true);
-        Mockito.when(taskRepository.findlAllPerformedTasksByUsername(TestUtils.USERNAME))
+        taskEntity.setStatus(TaskStatus.PERFORMED);
+        Mockito.when(taskRepository.findAllPerformedTasksByUsername(TestUtils.USERNAME))
                 .thenReturn(List.of(taskEntity));
 
         List<Task> performedTasks = taskService.getPerformedTasks(TestUtils.USERNAME);
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(performedTasks).isNotNull().hasSize(1),
-                () -> Mockito.verify(taskRepository).findlAllPerformedTasksByUsername(TestUtils.USERNAME)
+                () -> Mockito.verify(taskRepository).findAllPerformedTasksByUsername(TestUtils.USERNAME)
         );
     }
 

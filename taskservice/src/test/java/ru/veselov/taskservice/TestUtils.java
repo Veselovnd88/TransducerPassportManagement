@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.dto.SerialNumberDto;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.model.Task;
 
 import java.time.LocalDate;
@@ -52,7 +53,7 @@ public class TestUtils {
 
     public static Task getTask() {
         return new Task(TestUtils.TASK_ID,
-                false, false, TestUtils.PRINT_DATE, LocalDateTime.now(), LocalDateTime.now());
+                TaskStatus.CREATED, TestUtils.PRINT_DATE, LocalDateTime.now(), LocalDateTime.now());
     }
 
     private TestUtils() {

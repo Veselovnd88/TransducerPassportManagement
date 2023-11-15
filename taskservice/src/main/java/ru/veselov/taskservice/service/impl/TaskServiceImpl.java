@@ -9,6 +9,7 @@ import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.dto.SerialNumberDto;
 import ru.veselov.taskservice.entity.SerialNumberEntity;
 import ru.veselov.taskservice.entity.TaskEntity;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.mapper.TaskMapper;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
@@ -67,7 +68,7 @@ public class TaskServiceImpl implements TaskService {
             log.error(TASK_NOT_FOUND_LOG_MSG, taskId);
             return new EntityNotFoundException(TASK_NOT_FOUND_EXCEPTION_MSK.formatted(taskId));
         });
-        taskEntity.setStarted(true);
+        taskEntity.setStatus(TaskStatus.STARTED);
         TaskEntity updated = taskRepository.save(taskEntity);
         log.info("Task with [id: {}] updated with started=true status", taskId);
         return taskMapper.toModel(updated);
@@ -85,7 +86,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> getPerformedTasks(String username) {
-        return taskMapper.toModels(taskRepository.findlAllPerformedTasksByUsername(username));
+        return taskMapper.toModels(taskRepository.findAllPerformedTasksByUsername(username));
     }
 
     @Override

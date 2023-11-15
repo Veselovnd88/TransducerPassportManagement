@@ -28,15 +28,12 @@ public class TaskEntity {
     private String username;
 
     @Builder.Default
-    @Column(name = "performed")
-    private Boolean performed = false;
+    @Column(name = "status")
+    @Enumerated(EnumType.STRING)
+    private TaskStatus status = TaskStatus.CREATED;
 
     @Column(name = "performed_at")
     private LocalDateTime performedAt;
-
-    @Builder.Default
-    @Column(name = "started")
-    private Boolean started = false;
 
     @Column(name = "template_id")
     private UUID templateId;
@@ -74,14 +71,14 @@ public class TaskEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TaskEntity that = (TaskEntity) o;
-        return Objects.equals(username, that.username) && Objects.equals(performed, that.performed)
-                && Objects.equals(performedAt, that.performedAt) && Objects.equals(started, that.started)
+        return Objects.equals(username, that.username) && status == that.status
+                && Objects.equals(performedAt, that.performedAt)
                 && Objects.equals(templateId, that.templateId) && Objects.equals(printDate, that.printDate)
-                && Objects.equals(serials, that.serials);
+                && Objects.equals(createdAt, that.createdAt);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, performed, performedAt, started, templateId, printDate, serials);
+        return Objects.hash(username, status, performedAt, templateId, printDate, createdAt);
     }
 }

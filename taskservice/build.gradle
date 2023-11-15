@@ -29,6 +29,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.cloud:spring-cloud-starter-netflix-eureka-client'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.mapstruct:mapstruct:1.5.5.Final'
     implementation 'org.springframework.cloud:spring-cloud-starter-config'
     implementation 'org.liquibase:liquibase-core'
@@ -50,6 +51,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testImplementation 'org.instancio:instancio-junit:3.5.0'
     testImplementation 'com.github.tomakehurst:wiremock:3.0.1'
+    testImplementation 'io.projectreactor:reactor-test'
 
 }
 

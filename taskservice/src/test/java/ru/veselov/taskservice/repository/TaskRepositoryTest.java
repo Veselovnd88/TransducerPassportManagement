@@ -9,6 +9,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import ru.veselov.taskservice.TestUtils;
 import ru.veselov.taskservice.entity.SerialNumberEntity;
 import ru.veselov.taskservice.entity.TaskEntity;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.testcontainers.PostgresContainersConfig;
 
 import java.util.List;
@@ -73,21 +74,21 @@ class TaskRepositoryTest extends PostgresContainersConfig {
     @Test
     void shouldGetPerformedTasksFromRepository() {
         TaskEntity performedTask = createTaskentity();
-        performedTask.setPerformed(true);
+        performedTask.setStatus(TaskStatus.PERFORMED);
         SerialNumberEntity serialNumberEntity = new SerialNumberEntity(TestUtils.SERIAL_ID, TestUtils.SERIAL);
         performedTask.addSerialNumber(serialNumberEntity);
         taskRepository.save(performedTask);
         TaskEntity notPerformedTask = createTaskentity();
         taskRepository.save(notPerformedTask);
 
-        List<TaskEntity> performedTasks = taskRepository.findlAllPerformedTasksByUsername(TestUtils.USERNAME);
+        List<TaskEntity> performedTasks = taskRepository.findAllPerformedTasksByUsername(TestUtils.USERNAME);
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(performedTasks).isNotNull().hasSize(1),
                 () -> {
                     assert performedTasks != null;
                     Assertions.assertThat(performedTasks.get(0)).isNotNull();
                     TaskEntity savedTask = performedTasks.get(0);
-                    Assertions.assertThat(savedTask.getPerformed()).isTrue();
+                    Assertions.assertThat(savedTask.getStatus()).isEqualTo(TaskStatus.PERFORMED);
                 }
         );
     }
@@ -95,7 +96,7 @@ class TaskRepositoryTest extends PostgresContainersConfig {
     @Test
     void shouldGetNotPerformedTasksFromRepository() {
         TaskEntity performedTask = createTaskentity();
-        performedTask.setPerformed(true);
+        performedTask.setStatus(TaskStatus.PERFORMED);
         SerialNumberEntity serialNumberEntity = new SerialNumberEntity(TestUtils.SERIAL_ID, TestUtils.SERIAL);
         performedTask.addSerialNumber(serialNumberEntity);
         taskRepository.save(performedTask);
@@ -109,7 +110,7 @@ class TaskRepositoryTest extends PostgresContainersConfig {
                     assert notPerformedTasks != null;
                     Assertions.assertThat(notPerformedTasks.get(0)).isNotNull();
                     TaskEntity savedTask = notPerformedTasks.get(0);
-                    Assertions.assertThat(savedTask.getPerformed()).isFalse();
+                    Assertions.assertThat(savedTask.getStatus()).isEqualTo(TaskStatus.CREATED);
                 }
         );
     }
