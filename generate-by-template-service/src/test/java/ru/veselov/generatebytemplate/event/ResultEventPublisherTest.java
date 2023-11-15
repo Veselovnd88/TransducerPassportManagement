@@ -51,12 +51,12 @@ class ResultEventPublisherTest {
 
     @Test
     void publishErrorResultEvent() {
-        resultEventPublisher.publishErrorResultEvent(TestUtils.TASK_ID, new Exception(MESSAGE));
+        resultEventPublisher.publishErrorResultEvent(TestUtils.TASK_ID_STR, new Exception(MESSAGE));
 
         Mockito.verify(applicationEventPublisher).publishEvent(eventArgumentCaptor.capture());
         ErrorResultEvent captured = eventArgumentCaptor.getValue();
         org.junit.jupiter.api.Assertions.assertAll(
-                () -> Assertions.assertThat(captured.getTaskId()).isEqualTo(UUID.fromString(TestUtils.TASK_ID)),
+                () -> Assertions.assertThat(captured.getTaskId()).isEqualTo(UUID.fromString(TestUtils.TASK_ID_STR)),
                 () -> Assertions.assertThat(captured.getErrorMessage()).isEqualTo(MESSAGE),
                 () -> Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.ERROR),
                 () -> Assertions.assertThat(captured.getMessage()).isNotBlank()

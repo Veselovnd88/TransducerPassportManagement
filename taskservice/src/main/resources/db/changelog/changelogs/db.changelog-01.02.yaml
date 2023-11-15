@@ -1,0 +1,19 @@
+databaseChangeLog:
+  - changeSet:
+      id: 'task-service-01-02'
+      author: 'veselov.nikolay'
+      labels: 'task-service-01-02, task serial joining'
+      comment: 'create serial number and task joining table'
+      created: '2023-11-07'
+      changes:
+        - sqlFile:
+            dbms: postgresql
+            encoding: utf8
+            endDelimiter: GO
+            path: script/01-02-create-task-serial-table.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+      rollback:
+        - dropTable:
+            tableName: 'task_serial'

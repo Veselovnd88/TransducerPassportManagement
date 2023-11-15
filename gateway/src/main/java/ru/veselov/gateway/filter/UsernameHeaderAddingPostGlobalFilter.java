@@ -24,7 +24,6 @@ public class UsernameHeaderAddingPostGlobalFilter implements GlobalFilter, Order
         log.info("Added username header: {}", exchange.getRequest());
         Mono<ServerHttpRequest> username = map.map(x -> exchange.getRequest().mutate().header("username", x).build());
         return username.flatMap(x -> chain.filter(exchange.mutate().request(x).build()));
-
     }
 
     @Override

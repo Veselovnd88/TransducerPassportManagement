@@ -1,0 +1,18 @@
+server:
+  port: 7186
+
+spring:
+  application:
+    name: task-service
+  profiles:
+    active: local
+
+  config:
+    import: "optional:configserver:http://localhost:8071"
+  cloud:
+    config:
+      enabled: false
+
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.yaml

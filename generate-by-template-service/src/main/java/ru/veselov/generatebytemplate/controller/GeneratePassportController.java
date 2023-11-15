@@ -15,12 +15,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
-import ru.veselov.generatebytemplate.service.ResultFileService;
 import ru.veselov.generatebytemplate.service.PassportService;
+import ru.veselov.generatebytemplate.service.ResultFileService;
 
 @RestController
 @RequestMapping("api/v1/generate")
@@ -33,10 +34,12 @@ public class GeneratePassportController {
 
     private final ResultFileService resultFileService;
 
-    @PostMapping(produces = MediaType.APPLICATION_PDF_VALUE)
+    @PostMapping("/{taskId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void createPassportsPdf(@RequestBody @Valid GeneratePassportsDto generatePassportsDto) {
-        passportService.createPassportsPdf(generatePassportsDto);
+    public void createPassportsPdf(@RequestHeader("Service-username-header") String username,//TODO validate and make API exception handler
+                                   @RequestBody @Valid GeneratePassportsDto generatePassportsDto,
+                                   @PathVariable @UUID String taskId) {
+        passportService.createPassportsPdf(generatePassportsDto, taskId, username);
     }
 
     @GetMapping(value = "/result/{resultId}", produces = MediaType.APPLICATION_PDF_VALUE)

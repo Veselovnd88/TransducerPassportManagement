@@ -1,0 +1,51 @@
+server:
+  port: 7186
+
+spring:
+  application:
+    name: task-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5440/TaskDB
+    username: admin
+    password: admin
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        #dialect: org.hibernate.dialect.PostgreSQLDialect :PostgreSQLDialect does not need to be specified explicitly using 'hibernate.dialect'
+        show_sql: true
+        format_sql: false
+        hbm2ddl:
+          auto: validate
+  liquibase:
+    enabled: true
+    change-log: db/changelog/db.changelog-master.yaml
+
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: task
+      auto-offset-reset: earliest
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+    fetch-registry: true
+    register-with-eureka: true
+    enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh, health
+  tracing:
+    sampling:
+      probability: 1.0
+
+generate-service:
+  url: "http://GENERATE-BY-TEMPLATE/api/v1/generate"

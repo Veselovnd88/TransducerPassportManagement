@@ -133,7 +133,7 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
         ResultFileEntity resultFileEntity = Instancio.of(ResultFileEntity.class)
                 .set(Select.field(TEMPLATE_ENTITY_FIELD), savedTemplate)
                 .set(Select.field(SYNCED_FIELD), sync)
-                .set(Select.field(TASK_ID_FIELD), UUID.fromString(TestUtils.TASK_ID))
+                .set(Select.field(TASK_ID_FIELD), UUID.fromString(TestUtils.TASK_ID_STR))
                 .create();
         resultFileEntity.setCreatedAt(createdAt);
         resultFileRepository.save(resultFileEntity);
