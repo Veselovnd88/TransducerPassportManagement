@@ -10,6 +10,7 @@ CREATE TABLE task
     status       VARCHAR(20) NOT NULL,
     template_id  uuid        NOT NULL,
     print_date   DATE        NOT NULL,
+    file_id      UUID,
     created_at   TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     performed_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT task_pk PRIMARY KEY (task_id)

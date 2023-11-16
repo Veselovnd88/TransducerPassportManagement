@@ -42,6 +42,10 @@ public class TestUtils {
 
     public static final UUID SUB_ID = UUID.randomUUID();
 
+    public static final UUID FILE_ID = UUID.randomUUID();
+
+    public static final String FILE_ID_STR = FILE_ID.toString();
+
     public static final String JSON_ERROR_CODE = "$.errorCode";
 
     public static final String JSON_VIOLATIONS_FIELD = "$.violations[0].fieldName";
@@ -59,7 +63,7 @@ public class TestUtils {
 
     public static Task getTask() {
         return new Task(TestUtils.TASK_ID,
-                TaskStatus.CREATED, TestUtils.PRINT_DATE, LocalDateTime.now(), LocalDateTime.now());
+                TaskStatus.CREATED, TestUtils.PRINT_DATE, FILE_ID_STR, LocalDateTime.now(), LocalDateTime.now());
     }
 
     public static SubscriptionData getSubscriptionData() {

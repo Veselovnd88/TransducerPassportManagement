@@ -21,6 +21,9 @@ public class Task {
 
     private LocalDate printDate;
 
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String fileId;
+
     private LocalDateTime createdAt;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)

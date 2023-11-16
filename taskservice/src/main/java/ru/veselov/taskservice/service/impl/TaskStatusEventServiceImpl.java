@@ -4,10 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.GetMapping;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.events.SubscriptionData;
+import ru.veselov.taskservice.events.SubscriptionsStorage;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.SubscriptionService;
 import ru.veselov.taskservice.service.TaskService;
@@ -27,26 +29,20 @@ public class TaskStatusEventServiceImpl implements TaskStatusEventService {
     @Override
     public Flux<ServerSentEvent<String>> createSubscription(String taskId) {
         return Flux.create(fluxsink -> {
-            UUID subId = UUID.randomUUID();
-            SubscriptionData subscriptionData = new SubscriptionData(subId, taskId, fluxsink);
             log.info("Create status stream for task: {}", taskId);
-            fluxsink.onCancel(removeSubscription(subId));
+            UUID subId = UUID.randomUUID();
             fluxsink.onDispose(removeSubscription(subId));
+            SubscriptionData subscriptionData = new SubscriptionData(subId, taskId, fluxsink);
             subscriptionService.saveSubscription(subscriptionData);
-            //Task task = taskService.getTask(taskId);
-            Task task = new Task();//FIXME
-            task.setTaskId(UUID.randomUUID());//FIXME
-            task.setStatus(TaskStatus.STARTED);
-            ServerSentEvent<String> connectEvent = ServerSentEvent
-                    .builder("Task: %s status is: %s".formatted(task.getTaskId(), task.getStatus()))
-                    .event(task.getStatus().toString())
+            ServerSentEvent<String> initEvent = ServerSentEvent
+                    .builder("Connected to stream of status events for task : %s".formatted(taskId))
                     .build();
-            fluxsink.next(connectEvent);
+            fluxsink.next(initEvent);
         });
     }
 
     private Disposable removeSubscription(UUID subId) {
-        log.info("Disposed");
         return () -> subscriptionService.removeSubscription(subId);
     }
+
 }
