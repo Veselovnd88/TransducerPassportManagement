@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import ru.veselov.taskservice.events.SubscriptionData;
 import ru.veselov.taskservice.events.SubscriptionsStorage;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +25,11 @@ public class SubscriptionsStorageImpl implements SubscriptionsStorage {
     @Override
     public void removeSubscription(UUID subId) {
         subscriptionMap.remove(subId);
+    }
+
+    @Override
+    public List<SubscriptionData> findSubscriptionsByTask(String taskId) {
+        return subscriptionMap.values().stream().filter(sub -> sub.getTaskId().equals(taskId)).toList();
     }
 
     @Override

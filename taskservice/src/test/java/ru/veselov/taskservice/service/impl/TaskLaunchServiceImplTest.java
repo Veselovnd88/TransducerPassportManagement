@@ -9,6 +9,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import ru.veselov.taskservice.TestUtils;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.exception.GenerateServiceException;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.GenerateServiceHttpClient;
@@ -39,7 +40,7 @@ class TaskLaunchServiceImplTest {
                 () -> Mockito.verify(taskService).createTask(generatePassportsDto, TestUtils.USERNAME),
                 () -> Mockito.verify(generateServiceHttpClient)
                         .sendTaskToPerform(generatePassportsDto, task, TestUtils.USERNAME),
-                () -> Mockito.verify(taskService).updateStatusToStarted(TestUtils.TASK_ID)
+                () -> Mockito.verify(taskService).updateStatus(TestUtils.TASK_ID, TaskStatus.STARTED)
         );
     }
 
@@ -56,7 +57,7 @@ class TaskLaunchServiceImplTest {
                 taskLaunchService.launchTask(generatePassportsDto, TestUtils.USERNAME)
         ).isInstanceOf(GenerateServiceException.class);
 
-        Mockito.verify(taskService, Mockito.never()).updateStatusToStarted(TestUtils.TASK_ID);
+        Mockito.verify(taskService, Mockito.never()).updateStatus(TestUtils.TASK_ID, TaskStatus.STARTED);
     }
 
 }

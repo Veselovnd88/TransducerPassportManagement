@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.test.annotation.DirtiesContext;
@@ -26,17 +27,18 @@ class TaskStatusSseControllerTest {
 
     @Test
     void shouldReturnFluxWithSSEStatuses() {
-        FluxExchangeResult<ServerSentEvent> fluxResult = webTestClient.get()
+        FluxExchangeResult<ServerSentEvent<String>> fluxResult = webTestClient.get()
                 .uri("/api/v1/task/status-stream/" + TestUtils.TASK_ID_STR)
                 .exchange().expectStatus().is2xxSuccessful()
                 .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM_VALUE)
-                .returnResult(ServerSentEvent.class);
+                .returnResult(new ParameterizedTypeReference<>() {
+                });
 
-        Flux<ServerSentEvent> responseBody = fluxResult.getResponseBody();
+        Flux<ServerSentEvent<String>> responseBody = fluxResult.getResponseBody();
         StepVerifier.create(responseBody)
                 .expectNextMatches(x -> {
                     assert x.data() != null;
-                    return ((String) x.data()).startsWith("Connected");
+                    return x.data().startsWith("Connected");
                 })
                 .thenCancel().verify();
     }

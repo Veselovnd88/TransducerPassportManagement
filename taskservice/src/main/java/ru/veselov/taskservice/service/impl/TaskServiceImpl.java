@@ -14,6 +14,7 @@ import ru.veselov.taskservice.mapper.TaskMapper;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
+import ru.veselov.taskservice.service.SubscriptionService;
 import ru.veselov.taskservice.service.TaskService;
 
 import java.util.List;
@@ -33,6 +34,8 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     private final SerialNumberRepository serialNumberRepository;
+
+    private final SubscriptionService subscriptionService;
 
     private final TaskMapper taskMapper;
 
@@ -62,15 +65,15 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task updateStatusToStarted(UUID taskId) {
+    public Task updateStatus(UUID taskId, TaskStatus status) {
         Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
         TaskEntity taskEntity = optionalTask.orElseThrow(() -> {
             log.error(TASK_NOT_FOUND_LOG_MSG, taskId);
             return new EntityNotFoundException(TASK_NOT_FOUND_EXCEPTION_MSK.formatted(taskId));
         });
-        taskEntity.setStatus(TaskStatus.STARTED);
+        taskEntity.setStatus(status);
         TaskEntity updated = taskRepository.save(taskEntity);
-        log.info("Task with [id: {}] updated with started=true status", taskId);
+        log.info("Task with [id: {}] updated with {} status", status, taskId);
         return taskMapper.toModel(updated);
     }
 
@@ -81,6 +84,9 @@ public class TaskServiceImpl implements TaskService {
             log.info(TASK_NOT_FOUND_LOG_MSG, taskId);
             return new EntityNotFoundException(TASK_NOT_FOUND_EXCEPTION_MSK.formatted(taskId));
         }); //if value!=null -> return value, else - throw supplier.get()-> supplier is lambda
+        if (taskEntity.getStatus().equals(TaskStatus.PERFORMED)) {
+            subscriptionService.completeSubscriptionsByTask(taskId);
+        }
         return taskMapper.toModel(taskEntity);
     }
 

@@ -18,6 +18,7 @@ import ru.veselov.taskservice.mapper.TaskMapperImpl;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
+import ru.veselov.taskservice.service.SubscriptionService;
 
 import java.util.List;
 import java.util.Optional;
@@ -31,6 +32,9 @@ class TaskServiceImplTest {
 
     @Mock
     SerialNumberRepository serialNumberRepository;
+
+    @Mock
+    SubscriptionService subscriptionService;
 
     @InjectMocks
     TaskServiceImpl taskService;
@@ -110,7 +114,7 @@ class TaskServiceImplTest {
         Mockito.when(taskRepository.findById(TestUtils.TASK_ID))
                 .thenReturn(Optional.of(notStartedTask));
 
-        taskService.updateStatusToStarted(TestUtils.TASK_ID);
+        taskService.updateStatus(TestUtils.TASK_ID, TaskStatus.STARTED);
 
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Mockito.verify(taskRepository).save(taskEntityCaptor.capture()),
@@ -126,13 +130,13 @@ class TaskServiceImplTest {
         Mockito.when(taskRepository.findById(TestUtils.TASK_ID)).thenReturn(Optional.empty());
 
         Assertions.assertThatThrownBy(
-                () -> taskService.updateStatusToStarted(TestUtils.TASK_ID)
+                () -> taskService.updateStatus(TestUtils.TASK_ID, TaskStatus.STARTED)
         ).isInstanceOf(EntityNotFoundException.class);
     }
 
     @Test
-    void shouldGetTask() {
-        TaskEntity savedTask = createTaskEntityWithUid();
+    void shouldGetTaskAndDontCompleteSubscriptions() {
+        TaskEntity savedTask = createTaskEntityWithUid();//STARTED STATUS
         Mockito.when(taskRepository.findById(TestUtils.TASK_ID)).thenReturn(Optional.of(savedTask));
         Task task = taskService.getTask(TestUtils.TASK_ID_STR);
         org.junit.jupiter.api.Assertions.assertAll(
@@ -141,7 +145,25 @@ class TaskServiceImplTest {
                 () -> {
                     assert task != null;
                     Assertions.assertThat(task.getTaskId()).isEqualTo(savedTask.getTaskId());
-                }
+                },
+                () -> Mockito.verifyNoInteractions(subscriptionService)
+        );
+    }
+
+    @Test
+    void shouldGetTaskAndCompleteSubscriptions() {
+        TaskEntity savedTask = createTaskEntityWithUid();//STARTED STATUS
+        savedTask.setStatus(TaskStatus.PERFORMED);
+        Mockito.when(taskRepository.findById(TestUtils.TASK_ID)).thenReturn(Optional.of(savedTask));
+        Task task = taskService.getTask(TestUtils.TASK_ID_STR);
+        org.junit.jupiter.api.Assertions.assertAll(
+                () -> Mockito.verify(taskRepository).findById(TestUtils.TASK_ID),
+                () -> Assertions.assertThat(task).isNotNull(),
+                () -> {
+                    assert task != null;
+                    Assertions.assertThat(task.getTaskId()).isEqualTo(savedTask.getTaskId());
+                },
+                () -> Mockito.verify(subscriptionService).completeSubscriptionsByTask(TestUtils.TASK_ID_STR)
         );
     }
 

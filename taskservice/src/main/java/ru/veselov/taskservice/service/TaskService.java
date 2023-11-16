@@ -1,6 +1,7 @@
 package ru.veselov.taskservice.service;
 
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.model.Task;
 
 import java.util.List;
@@ -10,7 +11,7 @@ public interface TaskService {
 
     Task createTask(GeneratePassportsDto generatePassportsDto, String username);
 
-    Task updateStatusToStarted(UUID taskId);
+    Task updateStatus(UUID taskId, TaskStatus status);
 
     Task getTask(String taskId);
 
