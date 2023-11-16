@@ -19,13 +19,11 @@ public class SubscriptionsStorageImpl implements SubscriptionsStorage {
     @Override
     public void saveSubscription(SubscriptionData subscription) {
         subscriptionMap.put(subscription.getSubId(), subscription);
-        log.info("[Subscription: {}] saved in storage", subscription.getSubId());
     }
 
     @Override
     public void removeSubscription(UUID subId) {
         subscriptionMap.remove(subId);
-        log.info("[Subscription: {}] removed from storage", subId);
     }
 
     @Override

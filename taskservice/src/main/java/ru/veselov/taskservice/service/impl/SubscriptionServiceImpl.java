@@ -19,12 +19,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     @Override
     public void saveSubscription(SubscriptionData subscription) {
         subscriptionsStorage.saveSubscription(subscription);
-        log.info("Subscription for [task: {}] status saved in storage", subscription.getTaskId());
+        log.info("[Subscription for task: {}] status saved in storage", subscription.getTaskId());
     }
 
     @Override
     public void removeSubscription(UUID subId) {
         subscriptionsStorage.removeSubscription(subId);
+        log.info("[Subscription: {}] removed from storage", subId);
     }
 
 }

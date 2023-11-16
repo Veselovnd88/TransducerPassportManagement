@@ -4,9 +4,12 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.mockito.Mockito;
+import reactor.core.publisher.FluxSink;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.dto.SerialNumberDto;
 import ru.veselov.taskservice.entity.TaskStatus;
+import ru.veselov.taskservice.events.SubscriptionData;
 import ru.veselov.taskservice.model.Task;
 
 import java.time.LocalDate;
@@ -34,7 +37,10 @@ public class TestUtils {
     public static final SerialNumberDto SERIAL_DTO_2 = new SerialNumberDto(UUID.randomUUID().toString(), "2");
 
     public static final SerialNumberDto SERIAL_DTO_3 = new SerialNumberDto(UUID.randomUUID().toString(), "3");
+
     public static final String TASK_ID_STR = TASK_ID.toString();
+
+    public static final UUID SUB_ID = UUID.randomUUID();
 
     public static final String JSON_ERROR_CODE = "$.errorCode";
 
@@ -54,6 +60,10 @@ public class TestUtils {
     public static Task getTask() {
         return new Task(TestUtils.TASK_ID,
                 TaskStatus.CREATED, TestUtils.PRINT_DATE, LocalDateTime.now(), LocalDateTime.now());
+    }
+
+    public static SubscriptionData getSubscriptionData() {
+        return new SubscriptionData(SUB_ID, TASK_ID_STR, Mockito.mock(FluxSink.class));
     }
 
     private TestUtils() {

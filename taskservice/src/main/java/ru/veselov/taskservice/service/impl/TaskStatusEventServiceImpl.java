@@ -6,6 +6,7 @@ import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.events.SubscriptionData;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.SubscriptionService;
@@ -31,17 +32,21 @@ public class TaskStatusEventServiceImpl implements TaskStatusEventService {
             log.info("Create status stream for task: {}", taskId);
             fluxsink.onCancel(removeSubscription(subId));
             fluxsink.onDispose(removeSubscription(subId));
-            Task task = taskService.getTask(taskId);
+            subscriptionService.saveSubscription(subscriptionData);
+            //Task task = taskService.getTask(taskId);
+            Task task = new Task();//FIXME
+            task.setTaskId(UUID.randomUUID());//FIXME
+            task.setStatus(TaskStatus.STARTED);
             ServerSentEvent<String> connectEvent = ServerSentEvent
                     .builder("Task: %s status is: %s".formatted(task.getTaskId(), task.getStatus()))
                     .event(task.getStatus().toString())
                     .build();
             fluxsink.next(connectEvent);
-            subscriptionService.saveSubscription(subscriptionData);
         });
     }
 
     private Disposable removeSubscription(UUID subId) {
+        log.info("Disposed");
         return () -> subscriptionService.removeSubscription(subId);
     }
 }
