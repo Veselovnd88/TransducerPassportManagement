@@ -38,13 +38,14 @@ public class TaskStatusEventListener {
             Task task = taskMapper.toModel(taskEntity);
             StatusStreamMessage statusStreamMessage = getStreamMessage(taskId, task);
             subscriptionService.sendMessageToSubscriptionsByTask(statusStreamMessage, EventType.UPDATED);
-            if (task.getStatus().equals(TaskStatus.PERFORMED)) {
-                subscriptionService.completeSubscriptionsByTask(taskId);
+            TaskStatus taskStatus = task.getStatus();
+            if (taskStatus.equals(TaskStatus.PERFORMED) || taskStatus.equals(TaskStatus.FAILED)) {
+                subscriptionService.completeSubscriptionsByTask(task);
             }
         } else {
             StatusStreamMessage statusStreamMessage = getErrorStreamMessage(taskId);
             log.error("[Task {}] not found, closing event stream", taskId);
-            subscriptionService.sendErrorMessageToSubscriptionsByTask(statusStreamMessage, EventType.ERROR);
+            subscriptionService.sendErrorMessageToSubscriptionsByTask(statusStreamMessage);
         }
     }
 

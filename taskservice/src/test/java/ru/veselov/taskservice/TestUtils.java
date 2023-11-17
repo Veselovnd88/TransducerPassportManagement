@@ -9,6 +9,7 @@ import reactor.core.publisher.FluxSink;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.dto.SerialNumberDto;
 import ru.veselov.taskservice.entity.TaskStatus;
+import ru.veselov.taskservice.events.StatusStreamMessage;
 import ru.veselov.taskservice.events.SubscriptionData;
 import ru.veselov.taskservice.model.Task;
 
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
+@SuppressWarnings("uncheked")
 public class TestUtils {
 
     public static final String USERNAME = "username";
@@ -68,6 +70,14 @@ public class TestUtils {
 
     public static SubscriptionData getSubscriptionData() {
         return new SubscriptionData(SUB_ID, TASK_ID_STR, Mockito.mock(FluxSink.class));
+    }
+
+    public static StatusStreamMessage getStatusStreamMessage() {
+        StatusStreamMessage statusStreamMessage = new StatusStreamMessage();
+        statusStreamMessage.setMessage("message");
+        statusStreamMessage.setTask(getTask());
+        statusStreamMessage.setTaskId(TASK_ID_STR);
+        return statusStreamMessage;
     }
 
     private TestUtils() {

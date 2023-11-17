@@ -18,7 +18,6 @@ import ru.veselov.taskservice.mapper.TaskMapperImpl;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
-import ru.veselov.taskservice.service.SubscriptionService;
 
 import java.util.List;
 import java.util.Optional;
@@ -32,9 +31,6 @@ class TaskServiceImplTest {
 
     @Mock
     SerialNumberRepository serialNumberRepository;
-
-    @Mock
-    SubscriptionService subscriptionService;
 
     @InjectMocks
     TaskServiceImpl taskService;
@@ -145,8 +141,7 @@ class TaskServiceImplTest {
                 () -> {
                     assert task != null;
                     Assertions.assertThat(task.getTaskId()).isEqualTo(savedTask.getTaskId());
-                },
-                () -> Mockito.verifyNoInteractions(subscriptionService)
+                }
         );
     }
 
@@ -162,8 +157,7 @@ class TaskServiceImplTest {
                 () -> {
                     assert task != null;
                     Assertions.assertThat(task.getTaskId()).isEqualTo(savedTask.getTaskId());
-                },
-                () -> Mockito.verify(subscriptionService).completeSubscriptionsByTask(TestUtils.TASK_ID_STR)
+                }
         );
     }
 

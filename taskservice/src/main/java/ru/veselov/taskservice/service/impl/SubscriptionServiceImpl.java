@@ -8,6 +8,7 @@ import ru.veselov.taskservice.events.EventType;
 import ru.veselov.taskservice.events.StatusStreamMessage;
 import ru.veselov.taskservice.events.SubscriptionData;
 import ru.veselov.taskservice.events.SubscriptionsStorage;
+import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.SubscriptionService;
 
 import java.util.List;
@@ -33,11 +34,12 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void completeSubscriptionsByTask(String taskId) {
+    public void completeSubscriptionsByTask(Task task) {
+        String taskId = task.getTaskId().toString();
         List<SubscriptionData> subscriptionsByTask = subscriptionsStorage.findSubscriptionsByTask(taskId);
         if (!subscriptionsByTask.isEmpty()) {
             subscriptionsByTask.forEach(sub -> sub.getFluxSink().complete());
-            log.info("Subscriptions for status [task: {}] completed, task already performed", taskId);
+            log.info("Subscriptions for [task: {}] completed, task has [status: {}]", taskId, task.getStatus());
         }
     }
 
@@ -56,13 +58,13 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void sendErrorMessageToSubscriptionsByTask(StatusStreamMessage streamMessage, EventType eventType) {
+    public void sendErrorMessageToSubscriptionsByTask(StatusStreamMessage streamMessage) {
         String taskId = streamMessage.getTaskId();
         List<SubscriptionData> subscriptionsByTask = subscriptionsStorage
                 .findSubscriptionsByTask(taskId);
         if (!subscriptionsByTask.isEmpty()) {
             ServerSentEvent<StatusStreamMessage> serverSentEvent = ServerSentEvent.builder(streamMessage)
-                    .event(eventType.toString()).build();
+                    .event(EventType.ERROR.toString()).build();
             subscriptionsByTask.forEach(sub -> {
                 sub.getFluxSink().next(serverSentEvent);
                 sub.getFluxSink().complete();

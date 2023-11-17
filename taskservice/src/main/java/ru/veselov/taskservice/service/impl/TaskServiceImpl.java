@@ -84,9 +84,6 @@ public class TaskServiceImpl implements TaskService {
             log.info(TASK_NOT_FOUND_LOG_MSG, taskId);
             return new EntityNotFoundException(TASK_NOT_FOUND_EXCEPTION_MSK.formatted(taskId));
         }); //if value!=null -> return value, else - throw supplier.get()-> supplier is lambda
-        if (taskEntity.getStatus().equals(TaskStatus.PERFORMED)) {
-            subscriptionService.completeSubscriptionsByTask(taskId);
-        }
         return taskMapper.toModel(taskEntity);
     }
 
