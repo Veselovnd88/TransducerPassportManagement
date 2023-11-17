@@ -6,6 +6,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.FluxSink;
+import ru.veselov.taskservice.model.Task;
 
 import java.util.UUID;
 
@@ -19,6 +20,6 @@ public class SubscriptionData {
 
     private String taskId;
 
-    private FluxSink<ServerSentEvent<String>> fluxSink;
+    private FluxSink<ServerSentEvent<Task>> fluxSink;
 
 }

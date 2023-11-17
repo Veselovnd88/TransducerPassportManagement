@@ -3,17 +3,15 @@ package ru.veselov.taskservice.service.impl;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
+import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.events.EventType;
 import ru.veselov.taskservice.events.SubscriptionData;
+import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.SubscriptionService;
 
 @ExtendWith(MockitoExtension.class)
@@ -30,11 +28,10 @@ class TaskStatusEventServiceImplTest {
 
     @Test
     void shouldReturnAdnSaveFluxSubscription() {
-        Flux<ServerSentEvent<String>> eventStream = taskStatusEventService.createSubscription(TestUtils.TASK_ID_STR);
-
+        Flux<ServerSentEvent<Task>> eventStream = taskStatusEventService.createSubscription(TestUtils.TASK_ID_STR);
         StepVerifier.create(eventStream.take(1)).expectNextMatches(event -> {
-                    assert event.data() != null;
-                    return event.data().startsWith("Connected");
+                    assert event.event() != null;
+                    return event.event().equals(EventType.CONNECTED.toString());
                 })
                 .verifyComplete();
         org.junit.jupiter.api.Assertions.assertAll(
@@ -48,7 +45,7 @@ class TaskStatusEventServiceImplTest {
 
     @Test
     void shouldRemoveSubscriptionOnDispose() {
-        Flux<ServerSentEvent<String>> eventStream = taskStatusEventService.createSubscription(TestUtils.TASK_ID_STR);
+        Flux<ServerSentEvent<Task>> eventStream = taskStatusEventService.createSubscription(TestUtils.TASK_ID_STR);
 
         eventStream.subscribe().dispose();
 

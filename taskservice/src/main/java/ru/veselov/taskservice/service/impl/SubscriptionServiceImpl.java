@@ -4,9 +4,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
-import ru.veselov.taskservice.entity.TaskStatus;
+import ru.veselov.taskservice.events.EventType;
 import ru.veselov.taskservice.events.SubscriptionData;
 import ru.veselov.taskservice.events.SubscriptionsStorage;
+import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.SubscriptionService;
 
 import java.util.List;
@@ -38,16 +39,22 @@ public class SubscriptionServiceImpl implements SubscriptionService {
             subscriptionsByTask.forEach(sub -> sub.getFluxSink().complete());
             log.info("Subscriptions for status [task: {}] completed, task already performed", taskId);
         }
-
     }
 
     @Override
-    public void doNextSubscriptionsByTask(String taskId, TaskStatus status) {
-        List<SubscriptionData> subscriptionsByTask = subscriptionsStorage.findSubscriptionsByTask(taskId);
+    public void doNextSubscriptionsByTask(Task task, EventType eventType) {
+        String taskId = task.getTaskId().toString();
+        List<SubscriptionData> subscriptionsByTask = subscriptionsStorage
+                .findSubscriptionsByTask(taskId);
         if (!subscriptionsByTask.isEmpty()) {
-            ServerSentEvent<String> serverSentEvent = ServerSentEvent.builder("Task change status for task: %s, status is %s"
-                    .formatted(taskId, status)).event(status.toString()).build();
+            ServerSentEvent<Task> serverSentEvent = ServerSentEvent.builder(task)
+                    .event(eventType.toString())
+                    .comment("Task %s changed status, status is %s".formatted(taskId, task.getStatus()))
+                    .build();
             subscriptionsByTask.forEach(sub -> sub.getFluxSink().next(serverSentEvent));
+            log.info("Event sent for {} subscriptions of task :{}, status: {}",
+                    subscriptionsByTask.size(), taskId, task.getStatus());
         }
     }
+
 }

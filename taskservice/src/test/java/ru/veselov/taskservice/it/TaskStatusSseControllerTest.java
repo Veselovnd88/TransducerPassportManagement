@@ -14,12 +14,13 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.events.EventType;
+import ru.veselov.taskservice.model.Task;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @DirtiesContext
 @ActiveProfiles("test")
-@SuppressWarnings("rawtypes")
 class TaskStatusSseControllerTest {
 
     @Autowired
@@ -27,18 +28,18 @@ class TaskStatusSseControllerTest {
 
     @Test
     void shouldReturnFluxWithSSEStatuses() {
-        FluxExchangeResult<ServerSentEvent<String>> fluxResult = webTestClient.get()
+        FluxExchangeResult<ServerSentEvent<Task>> fluxResult = webTestClient.get()
                 .uri("/api/v1/task/status-stream/" + TestUtils.TASK_ID_STR)
                 .exchange().expectStatus().is2xxSuccessful()
                 .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM_VALUE)
                 .returnResult(new ParameterizedTypeReference<>() {
                 });
 
-        Flux<ServerSentEvent<String>> responseBody = fluxResult.getResponseBody();
+        Flux<ServerSentEvent<Task>> responseBody = fluxResult.getResponseBody();
         StepVerifier.create(responseBody)
                 .expectNextMatches(x -> {
-                    assert x.data() != null;
-                    return x.data().startsWith("Connected");
+                    assert x.event() != null;
+                    return x.event().equals(EventType.CONNECTED.toString());
                 })
                 .thenCancel().verify();
     }

@@ -4,12 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import ru.veselov.taskservice.entity.TaskStatus;
+import ru.veselov.taskservice.events.EventType;
 import ru.veselov.taskservice.events.SubscriptionData;
-import ru.veselov.taskservice.events.SubscriptionsStorage;
+import ru.veselov.taskservice.events.TaskStatusEventPublisher;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.SubscriptionService;
 import ru.veselov.taskservice.service.TaskService;
@@ -26,18 +26,26 @@ public class TaskStatusEventServiceImpl implements TaskStatusEventService {
 
     private final TaskService taskService;
 
+    private final TaskStatusEventPublisher taskStatusEventPublisher;
+
     @Override
-    public Flux<ServerSentEvent<String>> createSubscription(String taskId) {
+    public Flux<ServerSentEvent<Task>> createSubscription(String taskId) {
         return Flux.create(fluxsink -> {
-            log.info("Create status stream for task: {}", taskId);
+            log.info("Create status event stream for task: {}", taskId);
             UUID subId = UUID.randomUUID();
             fluxsink.onDispose(removeSubscription(subId));
             SubscriptionData subscriptionData = new SubscriptionData(subId, taskId, fluxsink);
             subscriptionService.saveSubscription(subscriptionData);
-            ServerSentEvent<String> initEvent = ServerSentEvent
-                    .builder("Connected to stream of status events for task : %s".formatted(taskId))
+            Task initTaskInfo = new Task();
+            initTaskInfo.setTaskId(UUID.fromString(taskId));
+            initTaskInfo.setStatus(TaskStatus.STARTED);
+            ServerSentEvent<Task> initEvent = ServerSentEvent
+                    .builder(initTaskInfo).event(EventType.CONNECTED.toString())
+                    .comment("Task %s status event stream".formatted(taskId))
                     .build();
             fluxsink.next(initEvent);
+            log.info("Connected event sent to new subscription of task: {}", taskId);
+            taskStatusEventPublisher.publishTaskStatus(initTaskInfo, EventType.CONNECTED);
         });
     }
 
