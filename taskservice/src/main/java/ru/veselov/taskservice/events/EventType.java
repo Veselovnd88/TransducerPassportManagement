@@ -6,5 +6,7 @@ public enum EventType {
 
     UPDATED,
 
-    PERFORMED
+    PERFORMED,
+
+    ERROR
 }

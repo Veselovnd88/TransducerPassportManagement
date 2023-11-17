@@ -17,9 +17,9 @@ public class TaskStatusEventPublisherImpl implements TaskStatusEventPublisher {
 
     @Override
     public void publishTaskStatus(String taskId, EventType eventType) {
+        log.info("[Publishing event: {}] for [task: {}]", eventType, taskId);
         TaskStatusEvent event = new TaskStatusEvent(taskId, eventType);
         publisher.publishEvent(event);
-        log.info("Event: {} for task: {} published", eventType, taskId);
     }
 
 }

@@ -5,9 +5,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import ru.veselov.taskservice.events.EventType;
+import ru.veselov.taskservice.events.StatusStreamMessage;
 import ru.veselov.taskservice.events.SubscriptionData;
 import ru.veselov.taskservice.events.SubscriptionsStorage;
-import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.SubscriptionService;
 
 import java.util.List;
@@ -42,19 +42,35 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    public void doNextSubscriptionsByTask(Task task, EventType eventType) {
-        String taskId = task.getTaskId().toString();
+    public void sendMessageToSubscriptionsByTask(StatusStreamMessage streamMessage, EventType eventType) {
+        String taskId = streamMessage.getTaskId();
         List<SubscriptionData> subscriptionsByTask = subscriptionsStorage
                 .findSubscriptionsByTask(taskId);
         if (!subscriptionsByTask.isEmpty()) {
-            ServerSentEvent<Task> serverSentEvent = ServerSentEvent.builder(task)
-                    .event(eventType.toString())
-                    .comment("Task %s changed status, status is %s".formatted(taskId, task.getStatus()))
-                    .build();
+            ServerSentEvent<StatusStreamMessage> serverSentEvent = ServerSentEvent.builder(streamMessage)
+                    .event(eventType.toString()).build();
             subscriptionsByTask.forEach(sub -> sub.getFluxSink().next(serverSentEvent));
-            log.info("Event sent for {} subscriptions of task :{}, status: {}",
-                    subscriptionsByTask.size(), taskId, task.getStatus());
+            log.info("Event sent for [{} subscriptions] of [task :{}], [status: {}]",
+                    subscriptionsByTask.size(), taskId, streamMessage.getTask().getStatus());
+        }
+    }
+
+    @Override
+    public void sendErrorMessageToSubscriptionsByTask(StatusStreamMessage streamMessage, EventType eventType) {
+        String taskId = streamMessage.getTaskId();
+        List<SubscriptionData> subscriptionsByTask = subscriptionsStorage
+                .findSubscriptionsByTask(taskId);
+        if (!subscriptionsByTask.isEmpty()) {
+            ServerSentEvent<StatusStreamMessage> serverSentEvent = ServerSentEvent.builder(streamMessage)
+                    .event(eventType.toString()).build();
+            subscriptionsByTask.forEach(sub -> {
+                sub.getFluxSink().next(serverSentEvent);
+                sub.getFluxSink().complete();
+            });
+            log.info("Sent error message, connection closed for [{} subscriptions] of [task :{}], [message: {}]",
+                    subscriptionsByTask.size(), taskId, streamMessage.getMessage());
         }
     }
 
 }
+

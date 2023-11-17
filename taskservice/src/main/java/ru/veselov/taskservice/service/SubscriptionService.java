@@ -1,8 +1,8 @@
 package ru.veselov.taskservice.service;
 
 import ru.veselov.taskservice.events.EventType;
+import ru.veselov.taskservice.events.StatusStreamMessage;
 import ru.veselov.taskservice.events.SubscriptionData;
-import ru.veselov.taskservice.model.Task;
 
 import java.util.UUID;
 
@@ -14,6 +14,8 @@ public interface SubscriptionService {
 
     void completeSubscriptionsByTask(String taskId);
 
-    void doNextSubscriptionsByTask(Task task, EventType eventType);
+    void sendMessageToSubscriptionsByTask(StatusStreamMessage message, EventType eventType);
+
+    void sendErrorMessageToSubscriptionsByTask(StatusStreamMessage message, EventType eventType);
 
 }

@@ -2,10 +2,10 @@ package ru.veselov.taskservice.service;
 
 import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
-import ru.veselov.taskservice.model.Task;
+import ru.veselov.taskservice.events.StatusStreamMessage;
 
 public interface TaskStatusEventService {
 
-    Flux<ServerSentEvent<Task>> createSubscription(String taskId);
+    Flux<ServerSentEvent<StatusStreamMessage>> createSubscription(String taskId);
 
 }

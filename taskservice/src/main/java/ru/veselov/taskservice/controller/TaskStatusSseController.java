@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
-import ru.veselov.taskservice.model.Task;
+import ru.veselov.taskservice.events.StatusStreamMessage;
 import ru.veselov.taskservice.service.TaskStatusEventService;
 
 @RestController
@@ -21,7 +21,7 @@ public class TaskStatusSseController {
     private final TaskStatusEventService taskStatusEventService;
 
     @GetMapping(value = "/{taskId}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public Flux<ServerSentEvent<Task>> getStatusStream(@PathVariable("taskId") String taskId) {
+    public Flux<ServerSentEvent<StatusStreamMessage>> getStatusStream(@PathVariable("taskId") String taskId) {
         return taskStatusEventService.createSubscription(taskId);
     }
 
