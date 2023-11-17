@@ -4,6 +4,6 @@ import ru.veselov.taskservice.model.Task;
 
 public interface TaskStatusEventPublisher {
 
-    void publishTaskStatus(Task task, EventType eventType);
+    void publishTaskStatus(String taskId, EventType eventType);
 
 }

@@ -12,7 +12,7 @@ CREATE TABLE task
     print_date   DATE        NOT NULL,
     file_id      UUID,
     created_at   TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    performed_at TIMESTAMP WITHOUT TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+    performed_at TIMESTAMP WITHOUT TIME ZONE,
     CONSTRAINT task_pk PRIMARY KEY (task_id)
 )
     GO

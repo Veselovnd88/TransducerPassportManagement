@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import ru.veselov.taskservice.events.EventType;
 import ru.veselov.taskservice.events.TaskStatusEvent;
 import ru.veselov.taskservice.events.TaskStatusEventPublisher;
-import ru.veselov.taskservice.model.Task;
 
 @Service
 @RequiredArgsConstructor
@@ -17,10 +16,10 @@ public class TaskStatusEventPublisherImpl implements TaskStatusEventPublisher {
     private final ApplicationEventPublisher publisher;
 
     @Override
-    public void publishTaskStatus(Task task, EventType eventType) {
-        TaskStatusEvent event = new TaskStatusEvent(task, eventType);
+    public void publishTaskStatus(String taskId, EventType eventType) {
+        TaskStatusEvent event = new TaskStatusEvent(taskId, eventType);
         publisher.publishEvent(event);
-        log.info("Event: {} for task: {} published", task.getTaskId(), eventType);
+        log.info("Event: {} for task: {} published", eventType, taskId);
     }
 
 }

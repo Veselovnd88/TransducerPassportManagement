@@ -55,7 +55,7 @@ public class TaskEntity {
     @Column(name = "template_id")
     private UUID templateId;
 
-    @Column(name = "printDate")
+    @Column(name = "print_date")
     private LocalDate printDate;
 
     @Column(name = "file_id")

@@ -11,7 +11,7 @@ import ru.veselov.taskservice.model.Task;
 @AllArgsConstructor
 public class TaskStatusEvent {
 
-    private Task task;
+    private String taskId;
 
     private EventType eventType;
 

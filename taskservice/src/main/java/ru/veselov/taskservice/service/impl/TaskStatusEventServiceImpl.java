@@ -36,21 +36,26 @@ public class TaskStatusEventServiceImpl implements TaskStatusEventService {
             fluxsink.onDispose(removeSubscription(subId));
             SubscriptionData subscriptionData = new SubscriptionData(subId, taskId, fluxsink);
             subscriptionService.saveSubscription(subscriptionData);
-            Task initTaskInfo = new Task();
-            initTaskInfo.setTaskId(UUID.fromString(taskId));
-            initTaskInfo.setStatus(TaskStatus.STARTED);
-            ServerSentEvent<Task> initEvent = ServerSentEvent
-                    .builder(initTaskInfo).event(EventType.CONNECTED.toString())
-                    .comment("Task %s status event stream".formatted(taskId))
-                    .build();
+            ServerSentEvent<Task> initEvent = createInitSSE(taskId);
             fluxsink.next(initEvent);
             log.info("Connected event sent to new subscription of task: {}", taskId);
-            taskStatusEventPublisher.publishTaskStatus(initTaskInfo, EventType.CONNECTED);
+            taskStatusEventPublisher.publishTaskStatus(taskId, EventType.CONNECTED);
         });
     }
 
     private Disposable removeSubscription(UUID subId) {
         return () -> subscriptionService.removeSubscription(subId);
+    }
+
+    private ServerSentEvent<Task> createInitSSE(String taskId) {
+        Task initTaskInfo = new Task();
+        initTaskInfo.setTaskId(UUID.fromString(taskId));
+        initTaskInfo.setStatus(TaskStatus.STARTED);
+        return ServerSentEvent
+                .builder(initTaskInfo).event(EventType.CONNECTED.toString())
+                .comment("Task %s status event stream".formatted(taskId))
+                .build();
+
     }
 
 }
