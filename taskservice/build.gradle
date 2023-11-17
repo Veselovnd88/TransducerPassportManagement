@@ -37,6 +37,7 @@ dependencies {
     implementation 'io.zipkin.reporter2:zipkin-reporter-brave'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'commons-io:commons-io:2.15.0'
+    implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.6.1'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'

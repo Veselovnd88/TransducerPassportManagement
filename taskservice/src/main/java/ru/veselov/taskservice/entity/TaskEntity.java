@@ -1,5 +1,6 @@
 package ru.veselov.taskservice.entity;
 
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -19,6 +20,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -45,8 +47,9 @@ public class TaskEntity {
     private String username;
 
     @Builder.Default
-    @Column(name = "status")
+    @Column(name = "status", columnDefinition = "task_status_enum")
     @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class) //io.hypersistence:hypersistence-utils-hibernate-62:3.6.1 type for mapping enum
     private TaskStatus status = TaskStatus.CREATED;
 
     @Column(name = "performed_at")
