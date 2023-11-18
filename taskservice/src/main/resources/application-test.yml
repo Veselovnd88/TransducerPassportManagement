@@ -63,3 +63,4 @@ mvc-executor:
 
 scheduler:
   delete-not-started-tasks: "*/3 * * * * *" # 3 seconds
+  not-started-task-lifetime: 7
