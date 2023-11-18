@@ -36,7 +36,7 @@ class TaskStatusEventServiceImplTest {
                 .createSubscription(TestUtils.TASK_ID_STR);
         StepVerifier.create(eventStream.take(1)).expectNextMatches(event -> {
                     assert event.event() != null;
-                    return event.event().equals(EventType.CONNECTED.toString());
+                    return event.event().equals(EventType.INIT.toString());
                 })
                 .verifyComplete();
         org.junit.jupiter.api.Assertions.assertAll(

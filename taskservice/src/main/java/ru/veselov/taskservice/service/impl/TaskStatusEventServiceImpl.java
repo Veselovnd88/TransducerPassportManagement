@@ -34,7 +34,7 @@ public class TaskStatusEventServiceImpl implements TaskStatusEventService {
             subscriptionService.saveSubscription(subscriptionData);
             ServerSentEvent<StatusStreamMessage> initEvent = createInitSSE(taskId);
             fluxsink.next(initEvent);
-            log.info("Connected event sent to new subscription of [task: {}]", taskId);
+            log.info("Init event sent to new subscription of [task: {}]", taskId);
             taskStatusEventPublisher.publishTaskStatus(taskId, EventType.CONNECTED);
         });
     }
@@ -48,7 +48,7 @@ public class TaskStatusEventServiceImpl implements TaskStatusEventService {
         statusStreamMessage.setTaskId(taskId);
         statusStreamMessage.setMessage("Task %s status event stream".formatted(taskId));
         return ServerSentEvent
-                .builder(statusStreamMessage).event(EventType.CONNECTED.toString())
+                .builder(statusStreamMessage).event(EventType.INIT.toString())
                 .build();
     }
 

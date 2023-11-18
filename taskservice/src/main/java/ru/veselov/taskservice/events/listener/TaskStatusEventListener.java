@@ -27,7 +27,7 @@ public class TaskStatusEventListener {
 
     private final SubscriptionService subscriptionService;
 
-    @EventListener(TaskStatusEvent.class)
+    @EventListener
     void handleTaskStatusEvent(TaskStatusEvent taskStatusEvent) {
         log.info("Handled [event: {}]", taskStatusEvent);
         String taskId = taskStatusEvent.getTaskId();

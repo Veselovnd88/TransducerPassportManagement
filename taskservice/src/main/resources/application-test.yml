@@ -50,3 +50,13 @@ logging:
 
 generate-service:
   url: "http://localhost:"
+
+async-executor:
+  core-pool-size: 5
+  max-pool-size: 10
+  queue-capacity: 5
+
+mvc-executor:
+  core-pool-size: 5
+  max-pool-size: 10
+  queue-capacity: 5
