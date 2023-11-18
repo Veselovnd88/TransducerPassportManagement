@@ -1,7 +1,26 @@
 package ru.veselov.taskservice.entity;
 
-import jakarta.persistence.*;
-import lombok.*;
+import io.hypersistence.utils.hibernate.type.basic.PostgreSQLEnumType;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.ForeignKey;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.Type;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -28,21 +47,22 @@ public class TaskEntity {
     private String username;
 
     @Builder.Default
-    @Column(name = "performed")
-    private Boolean performed = false;
+    @Column(name = "status", columnDefinition = "task_status_enum")
+    @Enumerated(EnumType.STRING)
+    @Type(PostgreSQLEnumType.class) //io.hypersistence:hypersistence-utils-hibernate-62:3.6.1 type for mapping enum
+    private TaskStatus status = TaskStatus.CREATED;
 
     @Column(name = "performed_at")
     private LocalDateTime performedAt;
 
-    @Builder.Default
-    @Column(name = "started")
-    private Boolean started = false;
-
     @Column(name = "template_id")
     private UUID templateId;
 
-    @Column(name = "printDate")
+    @Column(name = "print_date")
     private LocalDate printDate;
+
+    @Column(name = "file_id")
+    private UUID fileId;
 
     @Builder.Default
     @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
@@ -74,14 +94,12 @@ public class TaskEntity {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TaskEntity that = (TaskEntity) o;
-        return Objects.equals(username, that.username) && Objects.equals(performed, that.performed)
-                && Objects.equals(performedAt, that.performedAt) && Objects.equals(started, that.started)
-                && Objects.equals(templateId, that.templateId) && Objects.equals(printDate, that.printDate)
-                && Objects.equals(serials, that.serials);
+        return Objects.equals(username, that.username) && Objects.equals(templateId, that.templateId)
+                && Objects.equals(printDate, that.printDate) && Objects.equals(serials, that.serials);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(username, performed, performedAt, started, templateId, printDate, serials);
+        return Objects.hash(username, templateId, printDate, serials);
     }
 }

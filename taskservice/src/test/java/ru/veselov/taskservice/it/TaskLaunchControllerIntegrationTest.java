@@ -18,9 +18,10 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import ru.veselov.taskservice.TestURLsConstants;
-import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.utils.TestURLsConstants;
+import ru.veselov.taskservice.utils.TestUtils;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.it.config.RestTemplateTestConfiguration;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
@@ -80,8 +81,7 @@ public class TaskLaunchControllerIntegrationTest extends PostgresContainersConfi
                 .andExpect(MockMvcResultMatchers.status().isAccepted())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.taskId").isNotEmpty())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.started").value("true"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.performed").value("false"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(TaskStatus.STARTED.toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.printDate")
                         .value(generatePassportsDto.getPrintDate().toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.createdAt").isNotEmpty())

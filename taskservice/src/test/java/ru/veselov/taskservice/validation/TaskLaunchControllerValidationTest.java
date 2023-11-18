@@ -10,13 +10,15 @@ import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import ru.veselov.taskservice.TestURLsConstants;
-import ru.veselov.taskservice.TestUtils;
-import ru.veselov.taskservice.WrongAndNullUUIDArgumentProvider;
+import ru.veselov.taskservice.configuration.MvcTaskExecutorProps;
+import ru.veselov.taskservice.utils.TestURLsConstants;
+import ru.veselov.taskservice.utils.TestUtils;
+import ru.veselov.taskservice.utils.argumentproviders.WrongAndNullUUIDArgumentProvider;
 import ru.veselov.taskservice.controller.TaskLaunchController;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.dto.SerialNumberDto;
@@ -28,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 
 @WebMvcTest(TaskLaunchController.class)
+@Import(MvcTaskExecutorProps.class)
 class TaskLaunchControllerValidationTest {
 
     @MockBean

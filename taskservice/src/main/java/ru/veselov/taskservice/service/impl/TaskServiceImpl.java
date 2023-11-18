@@ -9,10 +9,12 @@ import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.dto.SerialNumberDto;
 import ru.veselov.taskservice.entity.SerialNumberEntity;
 import ru.veselov.taskservice.entity.TaskEntity;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.mapper.TaskMapper;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
+import ru.veselov.taskservice.service.SubscriptionService;
 import ru.veselov.taskservice.service.TaskService;
 
 import java.util.List;
@@ -32,6 +34,8 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     private final SerialNumberRepository serialNumberRepository;
+
+    private final SubscriptionService subscriptionService;
 
     private final TaskMapper taskMapper;
 
@@ -61,15 +65,15 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     @Transactional
-    public Task updateStatusToStarted(UUID taskId) {
+    public Task updateStatus(UUID taskId, TaskStatus status) {
         Optional<TaskEntity> optionalTask = taskRepository.findById(taskId);
         TaskEntity taskEntity = optionalTask.orElseThrow(() -> {
             log.error(TASK_NOT_FOUND_LOG_MSG, taskId);
             return new EntityNotFoundException(TASK_NOT_FOUND_EXCEPTION_MSK.formatted(taskId));
         });
-        taskEntity.setStarted(true);
+        taskEntity.setStatus(status);
         TaskEntity updated = taskRepository.save(taskEntity);
-        log.info("Task with [id: {}] updated with started=true status", taskId);
+        log.info("Task with [id: {}] updated with {} status", status, taskId);
         return taskMapper.toModel(updated);
     }
 
@@ -85,7 +89,7 @@ public class TaskServiceImpl implements TaskService {
 
     @Override
     public List<Task> getPerformedTasks(String username) {
-        return taskMapper.toModels(taskRepository.findlAllPerformedTasksByUsername(username));
+        return taskMapper.toModels(taskRepository.findAllPerformedTasksByUsername(username));
     }
 
     @Override

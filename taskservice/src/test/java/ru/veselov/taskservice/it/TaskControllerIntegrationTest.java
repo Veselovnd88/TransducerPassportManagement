@@ -12,10 +12,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import ru.veselov.taskservice.TestURLsConstants;
-import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.utils.TestURLsConstants;
+import ru.veselov.taskservice.utils.TestUtils;
 import ru.veselov.taskservice.entity.SerialNumberEntity;
 import ru.veselov.taskservice.entity.TaskEntity;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
 import ru.veselov.taskservice.testcontainers.PostgresContainersConfig;
@@ -47,14 +48,13 @@ public class TaskControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     @SneakyThrows
     void shouldGetTaskById() {
-        TaskEntity taskEntity = saveTaskWithoutSerialsToRepo(false);
+        TaskEntity taskEntity = saveTaskWithoutSerialsToRepo(TaskStatus.STARTED);
         taskEntity.setSerials(Set.of(new SerialNumberEntity(TestUtils.SERIAL_ID, "123")));
         mockMvc.perform(MockMvcRequestBuilders.get(TestURLsConstants.TASK + "/" + taskEntity.getTaskId()))
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.taskId").value(taskEntity.getTaskId().toString()))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.started").value("true"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.performed").value("false"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.status").value(TaskStatus.STARTED.toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.printDate")
                         .value(taskEntity.getPrintDate().toString()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.createdAt").exists())
@@ -64,8 +64,8 @@ public class TaskControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     @SneakyThrows
     void shouldGetPerformedTasksForUsername() {
-        TaskEntity performedTask = saveTaskWithoutSerialsToRepo(true);
-        saveTaskWithoutSerialsToRepo(false);//not performed task
+        TaskEntity performedTask = saveTaskWithoutSerialsToRepo(TaskStatus.PERFORMED);
+        saveTaskWithoutSerialsToRepo(TaskStatus.STARTED);//not performed task
         mockMvc.perform(MockMvcRequestBuilders.get(TestURLsConstants.TASK + TestURLsConstants.PERFORMED)
                         .header(AppConstants.SERVICE_USERNAME_HEADER, TestUtils.USERNAME))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -77,8 +77,8 @@ public class TaskControllerIntegrationTest extends PostgresContainersConfig {
     @Test
     @SneakyThrows
     void shouldGetNotPerformedTasksForUsername() {
-        saveTaskWithoutSerialsToRepo(true);//performed task
-        TaskEntity notPerformedTask = saveTaskWithoutSerialsToRepo(false);
+        saveTaskWithoutSerialsToRepo(TaskStatus.PERFORMED);//performed task
+        TaskEntity notPerformedTask = saveTaskWithoutSerialsToRepo(TaskStatus.STARTED);
         mockMvc.perform(MockMvcRequestBuilders.get(TestURLsConstants.TASK + TestURLsConstants.CURRENT)
                         .header(AppConstants.SERVICE_USERNAME_HEADER, TestUtils.USERNAME))
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -88,13 +88,12 @@ public class TaskControllerIntegrationTest extends PostgresContainersConfig {
                         .value(notPerformedTask.getTaskId().toString()));
     }
 
-    private TaskEntity saveTaskWithoutSerialsToRepo(boolean performed) {
+    private TaskEntity saveTaskWithoutSerialsToRepo(TaskStatus status) {
         TaskEntity taskEntity = TaskEntity.builder()
                 .printDate(TestUtils.PRINT_DATE)
                 .username(TestUtils.USERNAME)
                 .templateId(TestUtils.TEMPLATE_ID)
-                .performed(performed)
-                .started(true)
+                .status(status)
                 .build();
         return taskRepository.save(taskEntity);
     }

@@ -19,10 +19,11 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import ru.veselov.taskservice.TestURLsConstants;
-import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.utils.TestURLsConstants;
+import ru.veselov.taskservice.utils.TestUtils;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.entity.TaskEntity;
+import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.exception.error.ErrorCode;
 import ru.veselov.taskservice.exception.error.ValidationErrorResponse;
 import ru.veselov.taskservice.exception.error.ViolationError;
@@ -98,7 +99,7 @@ public class ExceptionHandlerIntegrationWithWiremockTest extends PostgresContain
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(savedTasks).isNotEmpty().hasSize(1),
                 () -> Assertions.assertThat(savedTasks.get(0)).isNotNull(),
-                () -> Assertions.assertThat(savedTasks.get(0).getStarted()).isFalse()
+                () -> Assertions.assertThat(savedTasks.get(0).getStatus()).isEqualTo(TaskStatus.CREATED)
         );
     }
 
@@ -125,7 +126,7 @@ public class ExceptionHandlerIntegrationWithWiremockTest extends PostgresContain
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(savedTasks).isNotEmpty().hasSize(1),
                 () -> Assertions.assertThat(savedTasks.get(0)).isNotNull(),
-                () -> Assertions.assertThat(savedTasks.get(0).getStarted()).isFalse()
+                () -> Assertions.assertThat(savedTasks.get(0).getStatus()).isEqualTo(TaskStatus.CREATED)
         );
     }
 

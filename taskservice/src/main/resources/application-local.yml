@@ -22,6 +22,7 @@ spring:
   liquibase:
     enabled: true
     change-log: db/changelog/db.changelog-master.yaml
+    #label-filter: "!stub-data"
 
   kafka:
     bootstrap-servers: localhost:9092
@@ -36,7 +37,7 @@ eureka:
       defaultZone: http://localhost:8761/eureka
     fetch-registry: true
     register-with-eureka: true
-    enabled: true
+    enabled: false
 
 management:
   endpoints:
@@ -49,3 +50,13 @@ management:
 
 generate-service:
   url: "http://GENERATE-BY-TEMPLATE/api/v1/generate"
+
+async-executor:
+  core-pool-size: 5 #this qnt of thread will be created when requests come, then request will go to queue
+  max-pool-size: 10 # will be after queue capacity
+  queue-capacity: 10 #after queue filling qnt of thread can be increased up to max pool size
+
+mvc-executor:
+  core-pool-size: 5
+  max-pool-size: 10
+  queue-capacity: 5
