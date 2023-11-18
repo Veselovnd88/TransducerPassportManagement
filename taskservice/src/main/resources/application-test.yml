@@ -60,3 +60,6 @@ mvc-executor:
   core-pool-size: 5
   max-pool-size: 10
   queue-capacity: 5
+
+scheduler:
+  delete-not-started-tasks: "*/3 * * * * *" # 3 seconds

@@ -26,7 +26,6 @@ public class TaskLaunchServiceImpl implements TaskLaunchService {
         Task launchedTask = taskService.updateStatus(createdTask.getTaskId(), TaskStatus.STARTED);
         log.info("Task [id: {}] was successfully launched", createdTask.getTaskId());
         return launchedTask;
-        //TODO implement scheduled service for deleting not started tasks
     }
 
 }
