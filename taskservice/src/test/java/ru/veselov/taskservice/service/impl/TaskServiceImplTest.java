@@ -8,7 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.utils.TestUtils;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.entity.SerialNumberEntity;
 import ru.veselov.taskservice.entity.TaskEntity;

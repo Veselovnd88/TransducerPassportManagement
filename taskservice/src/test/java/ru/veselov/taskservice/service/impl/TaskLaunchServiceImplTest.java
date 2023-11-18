@@ -7,7 +7,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.utils.TestUtils;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.exception.GenerateServiceException;

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationEventPublisher;
-import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.utils.TestUtils;
 import ru.veselov.taskservice.events.EventType;
 import ru.veselov.taskservice.events.TaskStatusEvent;
 
@@ -30,7 +30,7 @@ class TaskStatusEventPublisherImplTest {
                 () -> {
                     TaskStatusEvent captured = eventArgumentCaptor.getValue();
                     Assertions.assertThat(captured.getTaskId()).isEqualTo(TestUtils.TASK_ID_STR);
-                    Assertions.assertThat(captured.getEventType().equals(EventType.UPDATED));
+                    Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.UPDATED);
                 }
         );
     }

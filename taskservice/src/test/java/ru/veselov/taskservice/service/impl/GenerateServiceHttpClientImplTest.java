@@ -10,13 +10,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
-import ru.veselov.taskservice.TestUtils;
 import ru.veselov.taskservice.configuration.RestTemplateResponseErrorHandler;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.exception.GenerateServiceException;
 import ru.veselov.taskservice.exception.GenerateServiceValidationException;
 import ru.veselov.taskservice.exception.error.ValidationErrorResponse;
 import ru.veselov.taskservice.model.Task;
+import ru.veselov.taskservice.utils.TestUtils;
 
 import java.util.Collections;
 
@@ -43,8 +43,9 @@ class GenerateServiceHttpClientImplTest {
         WireMock.stubFor(WireMock.post(WIREMOCK_URL).willReturn(WireMock.aResponse().withStatus(202)));
         GeneratePassportsDto generatePassportsDto = TestUtils.getGeneratePassportsDto();
         Task task = TestUtils.getTask();
-
-        generateServiceHttpClient.sendTaskToPerform(generatePassportsDto, task, TestUtils.USERNAME);
+        Assertions.assertThatNoException().isThrownBy(
+                () -> generateServiceHttpClient.sendTaskToPerform(generatePassportsDto, task, TestUtils.USERNAME)
+        );
     }
 
     @Test

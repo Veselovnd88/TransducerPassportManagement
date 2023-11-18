@@ -12,7 +12,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
-import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.utils.TestUtils;
 import ru.veselov.taskservice.events.EventType;
 import ru.veselov.taskservice.events.StatusStreamMessage;
 import ru.veselov.taskservice.events.SubscriptionData;

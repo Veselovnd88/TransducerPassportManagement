@@ -13,7 +13,7 @@ import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
-import ru.veselov.taskservice.TestUtils;
+import ru.veselov.taskservice.utils.TestUtils;
 import ru.veselov.taskservice.events.EventType;
 import ru.veselov.taskservice.model.Task;
 

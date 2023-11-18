@@ -1,4 +1,4 @@
-package ru.veselov.taskservice;
+package ru.veselov.taskservice.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-@SuppressWarnings("uncheked")
+@SuppressWarnings("unchecked")
 public class TestUtils {
 
     public static final String USERNAME = "username";

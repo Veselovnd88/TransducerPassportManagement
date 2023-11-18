@@ -6,7 +6,6 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 import ru.veselov.taskservice.entity.TaskEntity;
 import ru.veselov.taskservice.entity.TaskStatus;
-import ru.veselov.taskservice.events.EventType;
 import ru.veselov.taskservice.events.StatusStreamMessage;
 import ru.veselov.taskservice.events.TaskStatusEvent;
 import ru.veselov.taskservice.mapper.TaskMapper;
@@ -37,7 +36,7 @@ public class TaskStatusEventListener {
             TaskEntity taskEntity = taskOptional.get();
             Task task = taskMapper.toModel(taskEntity);
             StatusStreamMessage statusStreamMessage = getStreamMessage(taskId, task);
-            subscriptionService.sendMessageToSubscriptionsByTask(statusStreamMessage, EventType.UPDATED);
+            subscriptionService.sendMessageToSubscriptionsByTask(statusStreamMessage, taskStatusEvent.getEventType());
             TaskStatus taskStatus = task.getStatus();
             if (taskStatus.equals(TaskStatus.PERFORMED) || taskStatus.equals(TaskStatus.FAILED)) {
                 subscriptionService.completeSubscriptionsByTask(task);

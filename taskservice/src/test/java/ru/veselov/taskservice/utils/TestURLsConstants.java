@@ -1,4 +1,4 @@
-package ru.veselov.taskservice;
+package ru.veselov.taskservice.utils;
 
 public class TestURLsConstants {
 
