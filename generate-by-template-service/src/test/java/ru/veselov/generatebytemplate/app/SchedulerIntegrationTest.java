@@ -74,7 +74,6 @@ class SchedulerIntegrationTest extends PostgresContainersConfig {
         registry.add("scheduling.days-until-delete-unsync-result", () -> DAYS_UNTIL_DELETION);
         registry.add("scheduling.delete-result", () -> CRON_TIME);
         registry.add("scheduling.days-until-delete-result", () -> DAYS_UNTIL_DELETION);
-
     }
 
     @Test
