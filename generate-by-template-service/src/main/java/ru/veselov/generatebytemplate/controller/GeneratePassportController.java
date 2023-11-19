@@ -1,27 +1,18 @@
 package ru.veselov.generatebytemplate.controller;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotEmpty;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.validator.constraints.UUID;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.ContentDisposition;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.service.PassportService;
 import ru.veselov.generatebytemplate.service.ResultFileService;
+import ru.veselov.generatebytemplate.utils.AppConstants;
 
 @RestController
 @RequestMapping("api/v1/generate")
@@ -36,7 +27,8 @@ public class GeneratePassportController {
 
     @PostMapping("/{taskId}")
     @ResponseStatus(HttpStatus.ACCEPTED)
-    public void createPassportsPdf(@RequestHeader("Service-username-header") String username,//TODO validate and make API exception handler
+    public void createPassportsPdf(@RequestHeader(value = AppConstants.SERVICE_USERNAME_HEADER)
+                                   @NotEmpty String username,
                                    @RequestBody @Valid GeneratePassportsDto generatePassportsDto,
                                    @PathVariable @UUID String taskId) {
         passportService.createPassportsPdf(generatePassportsDto, taskId, username);

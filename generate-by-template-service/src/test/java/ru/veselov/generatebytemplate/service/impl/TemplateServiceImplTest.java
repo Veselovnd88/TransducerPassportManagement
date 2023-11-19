@@ -18,7 +18,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.dto.TemplateDto;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.mapper.TemplateMapper;

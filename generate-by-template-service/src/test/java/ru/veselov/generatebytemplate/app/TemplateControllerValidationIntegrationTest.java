@@ -11,7 +11,7 @@ import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.controller.TemplateController;
 import ru.veselov.generatebytemplate.dto.TemplateDto;
 import ru.veselov.generatebytemplate.exception.error.ErrorCode;

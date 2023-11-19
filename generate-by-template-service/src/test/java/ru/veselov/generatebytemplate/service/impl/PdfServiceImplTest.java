@@ -11,7 +11,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.buffer.DataBuffer;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.exception.PdfProcessingException;
 import ru.veselov.generatebytemplate.service.PdfHttpClient;
 

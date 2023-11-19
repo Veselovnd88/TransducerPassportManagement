@@ -38,6 +38,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'commons-io:commons-io:2.15.0'
     implementation 'io.hypersistence:hypersistence-utils-hibernate-62:3.6.1'
+    implementation 'org.springframework.kafka:spring-kafka'
 
     compileOnly 'org.projectlombok:lombok'
     runtimeOnly 'org.postgresql:postgresql'
@@ -54,6 +55,7 @@ dependencies {
     testImplementation 'org.awaitility:awaitility:4.2.0'
     testImplementation 'com.github.tomakehurst:wiremock:3.0.1'
     testImplementation 'io.projectreactor:reactor-test'
+    testImplementation 'org.springframework.kafka:spring-kafka-test'
 
 }
 

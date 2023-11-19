@@ -27,14 +27,19 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.testcontainers.shaded.org.awaitility.Awaitility;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUrlConstants;
+import ru.veselov.generatebytemplate.utils.TestUtils;
+import ru.veselov.generatebytemplate.app.config.KafkaConsumerTestConfiguration;
+import ru.veselov.generatebytemplate.app.config.KafkaTestConsumer;
+import ru.veselov.generatebytemplate.app.config.WebClientTestConfiguration;
+import ru.veselov.generatebytemplate.app.config.WebTestClientTestConfiguration;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
 import ru.veselov.generatebytemplate.dto.TaskResultDto;
 import ru.veselov.generatebytemplate.entity.ResultFileEntity;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
-import ru.veselov.generatebytemplate.event.EventType;
+import ru.veselov.generatebytemplate.event.TaskStatus;
 import ru.veselov.generatebytemplate.repository.ResultFileRepository;
 import ru.veselov.generatebytemplate.repository.TemplateRepository;
 
@@ -46,7 +51,7 @@ import java.util.UUID;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
 @WireMockTest(httpPort = 30003)
-@Import({WebClientTestConfiguration.class, KafkaConsumerTestConfiguration.class})
+@Import({WebClientTestConfiguration.class, KafkaConsumerTestConfiguration.class, WebTestClientTestConfiguration.class})
 @EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
 @DirtiesContext
 @ActiveProfiles("test")
@@ -57,8 +62,6 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
 
     @Value("${minio.buckets.result}")
     private String resultBucket;
-
-    public static final String URL_PREFIX = "/api/v1/generate";
 
     public static final int SIDE_PORT = 30003;
 
@@ -116,13 +119,13 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(DOCX_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.GEN_URL_TASK_ID).build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isAccepted();
         Awaitility.await().pollDelay(Duration.ofSeconds(5)).until(() -> true);
         Assertions.assertThat(generatePassportsDto).isEqualTo(kafkaTestConsumer.getListenedPassportsDto());
 
         TaskResultDto listenedTaskResultDto = kafkaTestConsumer.getListenedTaskResultDto();
-        Assertions.assertThat(listenedTaskResultDto.eventType()).isEqualTo(EventType.READY);
+        Assertions.assertThat(listenedTaskResultDto.taskStatus()).isEqualTo(TaskStatus.PERFORMED);
     }
 
     @Test
@@ -131,25 +134,25 @@ public class GeneratePassportControllerIntegrationTest extends PostgresContainer
         WireMock.stubFor(WireMock.post("/").willReturn(WireMock.aResponse().withStatus(200)
                 .withBody(TestUtils.SOURCE_BYTES)));
         GeneratePassportsDto generatePassportsDto = getGeneratePassportDto(TestUtils.TEMPLATE_ID.toString());
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.GEN_URL_TASK_ID)
+                        .build())
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isAccepted();
         Awaitility.await().pollDelay(Duration.ofSeconds(5)).until(() -> true);
         TaskResultDto listenedTaskResultDto = kafkaTestConsumer.getListenedTaskResultDto();
-        Assertions.assertThat(listenedTaskResultDto.eventType()).isEqualTo(EventType.ERROR);
+        Assertions.assertThat(listenedTaskResultDto.taskStatus()).isEqualTo(TaskStatus.FAILED);
     }
 
     @Test
     @SneakyThrows
     void shouldGetResultFile() {
         ResultFileEntity resultFileEntity = saveGeneratedResultFileToRepo();
-
         GetObjectResponse getObjectResponse = Mockito.mock(GetObjectResponse.class);
         GetObjectArgs getObjectArgs = GetObjectArgs.builder().bucket(resultBucket)
                 .object(resultFileEntity.getFilename()).build();
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
         Mockito.when(minioClient.getObject(getObjectArgs)).thenReturn(getObjectResponse);
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.GEN_URL)
                         .path("/result/" + resultFileEntity.getId()).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)

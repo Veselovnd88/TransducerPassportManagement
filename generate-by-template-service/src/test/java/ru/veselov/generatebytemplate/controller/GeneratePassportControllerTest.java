@@ -11,17 +11,17 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.test.web.servlet.client.MockMvcWebTestClient;
-import ru.veselov.generatebytemplate.TestUtils;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.service.PassportService;
 import ru.veselov.generatebytemplate.service.ResultFileService;
+import ru.veselov.generatebytemplate.utils.AppConstants;
+import ru.veselov.generatebytemplate.utils.TestUrlConstants;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 
 import java.util.UUID;
 
 @ExtendWith(MockitoExtension.class)
 class GeneratePassportControllerTest {
-
-    public static final String URL_PREFIX = "/api/v1/generate";
 
     static WebTestClient webTestClient;
 
@@ -36,18 +36,22 @@ class GeneratePassportControllerTest {
 
     @BeforeEach
     void init() {
-        webTestClient = MockMvcWebTestClient.bindToController(generatePassportController).build();
+        webTestClient = MockMvcWebTestClient
+                .bindToController(generatePassportController)
+                .build();
     }
 
     @Test
     void shouldCallPassportServiceToCreatePassports() {
         GeneratePassportsDto generatePassportsDto = TestUtils.getBasicGeneratePassportsDto();
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).build())
+        webTestClient.post()
+                .uri(uriBuilder -> uriBuilder.path(TestUrlConstants.GEN_URL_TASK_ID).build())
+                .header(AppConstants.SERVICE_USERNAME_HEADER, TestUtils.USERNAME)
                 .bodyValue(generatePassportsDto).exchange().expectStatus().isAccepted();
 
         Mockito.verify(passportService)
-                .createPassportsPdf(generatePassportsDto,TestUtils.TASK_ID_STR, TestUtils.USERNAME);
+                .createPassportsPdf(generatePassportsDto, TestUtils.TASK_ID_STR, TestUtils.USERNAME);
     }
 
     @Test
@@ -56,7 +60,7 @@ class GeneratePassportControllerTest {
         ByteArrayResource byteArrayResource = new ByteArrayResource(TestUtils.SOURCE_BYTES);
         Mockito.when(resultFileService.getResultFile(resultUid))
                 .thenReturn(byteArrayResource);
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/result/" + resultUid).build())
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.GEN_URL).path("/result/" + resultUid).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_PDF)
                 .expectHeader().contentLength(byteArrayResource.contentLength());

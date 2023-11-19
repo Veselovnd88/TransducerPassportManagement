@@ -5,6 +5,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.MissingRequestHeaderException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -29,6 +30,16 @@ public class ApiExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ApiErrorResponse handleMaxPageException(PageExceedsMaximumValueException exception) {
         return new ApiErrorResponse(ErrorCode.ERROR_MAX_PAGE, exception.getMessage());
+    }
+
+    @ExceptionHandler(MissingRequestHeaderException.class)
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ApiErrorResponse handleMissingRequestHeaderException(MissingRequestHeaderException exception) {
+        ViolationError violationError = new ViolationError(
+                "Request Header: " + exception.getHeaderName(),
+                exception.getMessage(),
+                "null");
+        return new ValidationErrorResponse(exception.getMessage(), List.of(violationError));
     }
 
     @ExceptionHandler(EntityExistsException.class)

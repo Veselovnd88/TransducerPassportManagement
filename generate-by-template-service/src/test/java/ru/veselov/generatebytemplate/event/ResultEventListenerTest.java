@@ -6,7 +6,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.dto.TaskResultDto;
 import ru.veselov.generatebytemplate.service.KafkaBrokerSender;
 
@@ -34,7 +34,7 @@ class ResultEventListenerTest {
 
         resultEventListener.handleSuccessResultEvent(successResultEvent);
 
-        TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID, MESSAGE, null, EventType.READY);
+        TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID, MESSAGE, null, TaskStatus.PERFORMED);
         Mockito.verify(kafkaBrokerSender, Mockito.times(1)).sendResultMessage(TestUtils.TASK_ID_STR, taskResultDto);
     }
 
@@ -45,7 +45,7 @@ class ResultEventListenerTest {
 
         resultEventListener.handleErrorResultEvent(errorResultEvent);
 
-        TaskResultDto taskResultDto = new TaskResultDto(null, MESSAGE, ERROR_MESSAGE, EventType.ERROR);
+        TaskResultDto taskResultDto = new TaskResultDto(null, MESSAGE, ERROR_MESSAGE, TaskStatus.FAILED);
         Mockito.verify(kafkaBrokerSender).sendResultMessage(TestUtils.TASK_ID_STR, taskResultDto);
     }
 

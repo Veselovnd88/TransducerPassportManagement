@@ -10,7 +10,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.test.util.ReflectionTestUtils;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.service.DocxGeneratorService;
 import ru.veselov.generatebytemplate.service.PassportTemplateService;

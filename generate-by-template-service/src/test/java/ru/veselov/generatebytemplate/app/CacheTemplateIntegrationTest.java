@@ -19,7 +19,9 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUrlConstants;
+import ru.veselov.generatebytemplate.utils.TestUtils;
+import ru.veselov.generatebytemplate.app.config.KafkaTestConsumer;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.repository.ResultFileRepository;
@@ -35,8 +37,6 @@ import java.util.Optional;
 @ActiveProfiles("test")
 @DirtiesContext
 class CacheTemplateIntegrationTest extends PostgresContainersConfig {
-
-    public static final String URL_PREFIX = "/api/v1/template/";
 
     @Value("${minio.buckets.template}")
     String templateBucket;
@@ -81,7 +81,7 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
         Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.of(templateEntity));
 
         //first time repo should be called
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/source").
                         path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -89,7 +89,7 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
         Mockito.verify(templateRepository).findById(TestUtils.TEMPLATE_ID);
         Mockito.verify(minioClient).getObject(ArgumentMatchers.any());
         //second time should get from cache
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/source").
                         path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -111,18 +111,19 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
         Mockito.when(minioClient.getObject(Mockito.any())).thenReturn(getObjectResponse);
         Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.of(templateEntity));
         //after this request template should be in cache #1 invocation of template repository
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/source").
                         path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .expectBody(byte[].class);
         //this request should evict cache, #2 invocation for checking if exists, #3 for updating of template repository
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/upload")
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX)
+                        .path("/update/upload")
                         .path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isAccepted();
         //this request should get template from storage, #4 invocation of template repository
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/source").
                         path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -140,18 +141,18 @@ class CacheTemplateIntegrationTest extends PostgresContainersConfig {
         Mockito.when(minioClient.getObject(Mockito.any())).thenReturn(getObjectResponse);
         Mockito.when(templateRepository.findById(TestUtils.TEMPLATE_ID)).thenReturn(Optional.of(templateEntity));
         //after this request template should be in cache, #1 invocation of template repository
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/source").
                         path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
                 .expectBody(byte[].class);
         //should evict cache, #2 invocation for founding, #3 for deletion of template repository
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete")
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/delete")
                         .path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .exchange().expectStatus().isOk();
 
         //this request should get template from storage, #4 invocation not from cache
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/source").
                         path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)

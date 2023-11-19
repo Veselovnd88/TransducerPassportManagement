@@ -11,7 +11,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.entity.ResultFileEntity;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.exception.ResultFileNotFoundException;

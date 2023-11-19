@@ -8,7 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.entity.ResultFileEntity;
 import ru.veselov.generatebytemplate.model.ResultFile;
 import ru.veselov.generatebytemplate.service.ResultFileMinioService;

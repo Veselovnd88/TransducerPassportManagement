@@ -12,10 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.SendResult;
 import org.springframework.test.util.ReflectionTestUtils;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.TaskResultDto;
-import ru.veselov.generatebytemplate.event.EventType;
+import ru.veselov.generatebytemplate.event.TaskStatus;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -56,7 +56,7 @@ class KafkaBrokerSenderImplTest {
         CompletableFuture<SendResult<String, TaskResultDto>> mockCF = CompletableFuture.completedFuture(
                 new SendResult<>(Mockito.mock(ProducerRecord.class), Mockito.mock(RecordMetadata.class)
                 ));
-        TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID, "message", null, EventType.READY);
+        TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID, "message", null, TaskStatus.PERFORMED);
         Mockito.doReturn(mockCF).when(taskResultDtoKafkaTemplate)
                 .send(TestUtils.TASK_TOPIC, TestUtils.TASK_ID_STR, taskResultDto);
 

@@ -1,4 +1,4 @@
-package ru.veselov.generatebytemplate;
+package ru.veselov.generatebytemplate.utils;
 
 import ru.veselov.generatebytemplate.dto.GeneratePassportsDto;
 import ru.veselov.generatebytemplate.dto.SerialNumberDto;
@@ -64,6 +64,10 @@ public class TestUtils {
     public static final DateTimeFormatter DTF = DateTimeFormatter.ofPattern(DATE_FORMAT);
 
     public static final LocalDate DATE = LocalDate.now();
+
+    public static final String JSON_ERROR_CODE = "$.errorCode";
+
+    public static final String JSON_VIOLATIONS_FIELD = "$.violations[0].fieldName";
 
     public static GeneratePassportsDto getBasicGeneratePassportsDto() {
         return new GeneratePassportsDto(SERIALS_DTOS, TEMPLATE_ID_STRING, DATE);

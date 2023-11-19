@@ -1,6 +1,6 @@
-package ru.veselov.generatebytemplate.dto;
+package ru.veselov.taskservice.dto;
 
-import ru.veselov.generatebytemplate.event.TaskStatus;
+import ru.veselov.taskservice.entity.TaskStatus;
 
 public record TaskResultDto(String fileId, String message, String errorMessage, TaskStatus taskStatus) {
 }

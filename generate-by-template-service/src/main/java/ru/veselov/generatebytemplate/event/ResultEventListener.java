@@ -20,7 +20,7 @@ public class ResultEventListener {
                 resultEvent.getResultFileId(),
                 resultEvent.getMessage(),
                 null,
-                resultEvent.getEventType()
+                TaskStatus.PERFORMED
         );
         kafkaBrokerSender.sendResultMessage(resultEvent.getTaskId().toString(), taskResultDto);
         log.info("Send result of task to task service: " + resultEvent);
@@ -32,7 +32,7 @@ public class ResultEventListener {
                 null,
                 resultEvent.getMessage(),
                 resultEvent.getErrorMessage(),
-                resultEvent.getEventType()
+                TaskStatus.FAILED
         );
         kafkaBrokerSender.sendResultMessage(resultEvent.getTaskId().toString(), taskResultDto);
         log.info("Send error of task to task service: " + resultEvent);

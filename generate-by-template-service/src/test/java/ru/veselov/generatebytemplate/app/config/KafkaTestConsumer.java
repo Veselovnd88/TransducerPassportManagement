@@ -1,4 +1,4 @@
-package ru.veselov.generatebytemplate.app;
+package ru.veselov.generatebytemplate.app.config;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;

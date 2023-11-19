@@ -15,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
-import ru.veselov.generatebytemplate.TestUtils;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.dto.SortingParams;
 import ru.veselov.generatebytemplate.entity.TemplateEntity;
 import ru.veselov.generatebytemplate.exception.PageExceedsMaximumValueException;
