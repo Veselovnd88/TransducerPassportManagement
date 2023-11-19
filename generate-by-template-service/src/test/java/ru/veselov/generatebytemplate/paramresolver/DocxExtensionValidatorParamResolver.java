@@ -6,6 +6,8 @@ import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import ru.veselov.generatebytemplate.validator.DocxExtensionValidator;
 
+/* Class for dependency injection in tests
+ **/
 public class DocxExtensionValidatorParamResolver implements ParameterResolver {
     @Override
     public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {

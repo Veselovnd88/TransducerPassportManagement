@@ -23,6 +23,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import ru.veselov.generatebytemplate.utils.TestUrlConstants;
 import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.app.config.KafkaTestConsumer;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
@@ -42,7 +43,6 @@ import java.util.UUID;
 @DirtiesContext
 class TemplateControllerIntegrationTest extends PostgresContainersConfig {
 
-    private static final String URL_PREFIX = "/api/v1/template/";
     private static final String TEMPLATE_NAME = "801877-filename";
     private static final String SAVED_TEMPLATE_NAME = "801877-name";
 
@@ -88,7 +88,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         Mockito.when(getObjectResponse.readAllBytes()).thenReturn(TestUtils.SOURCE_BYTES);
         Mockito.when(minioClient.getObject(Mockito.any())).thenReturn(getObjectResponse);
 
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source").
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/source").
                         path("/id/" + savedTemplateId).build())
                 .exchange().expectStatus().isOk()
                 .expectHeader().contentType(MediaType.APPLICATION_OCTET_STREAM)
@@ -109,7 +109,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
                 .filename(TestUtils.MULTIPART_FILENAME);
         multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isAccepted();
 
@@ -130,7 +130,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
                 .filename(TestUtils.MULTIPART_FILENAME);
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/upload")
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/update/upload")
                         .path("/id/" + savedTemplateId).build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isAccepted();
@@ -150,7 +150,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
     @SneakyThrows
     void shouldDeleteTemplate() {
         saveTemplateEntity();
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/delete")
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/delete")
                         .path("/id/" + savedTemplateId).build())
                 .exchange().expectStatus().isOk();
 
@@ -173,7 +173,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
         Mockito.doThrow(CommonMinioException.class).when(minioClient).putObject(Mockito.any());
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_FILE_STORAGE.toString());
@@ -191,7 +191,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES).filename(TestUtils.MULTIPART_FILENAME);
         Mockito.doThrow(CommonMinioException.class).when(minioClient).putObject(Mockito.any());
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/upload")
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/update/upload")
                         .path("/id/" + savedTemplateId).build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().is5xxServerError()
@@ -208,7 +208,7 @@ class TemplateControllerIntegrationTest extends PostgresContainersConfig {
         saveTemplateEntity();
         Mockito.doThrow(CommonMinioException.class).when(minioClient).removeObject(Mockito.any());
 
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX)
                         .path("/delete").path("/id/" + savedTemplateId).build())
                 .exchange().expectStatus().is5xxServerError()
                 .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_FILE_STORAGE.toString());

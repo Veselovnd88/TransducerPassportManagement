@@ -15,6 +15,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import org.springframework.web.reactive.function.BodyInserters;
+import ru.veselov.generatebytemplate.utils.TestUrlConstants;
 import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.app.config.KafkaTestConsumer;
 import ru.veselov.generatebytemplate.app.testcontainers.PostgresContainersConfig;
@@ -29,8 +30,6 @@ import ru.veselov.generatebytemplate.service.TemplateStorageService;
 @ActiveProfiles("test")
 @DirtiesContext
 class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
-
-    public static final String URL_PREFIX = "/api/v1/template/";
 
     @Value("${minio.buckets.template}")
     String templateBucket;
@@ -60,12 +59,12 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
 
     @Test
     void shouldReturnNotFoundError() {
-        webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/source")
+        webTestClient.get().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/source")
                         .path("/id/" + TestUtils.TEMPLATE_ID)
                         .build())
                 .exchange().expectStatus().isNotFound()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+                .expectBody().jsonPath(TestUtils.JSON_ERROR_CODE).isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }
 
     @Test
@@ -74,19 +73,19 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
         multipartBodyBuilder.part(TestUtils.MULTIPART_FILE, TestUtils.SOURCE_BYTES)
                 .filename(TestUtils.MULTIPART_FILENAME);
 
-        webTestClient.put().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/update/upload")
+        webTestClient.put().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/update/upload")
                         .path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().isNotFound()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+                .expectBody().jsonPath(TestUtils.JSON_ERROR_CODE).isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }
 
     @Test
     void shouldReturnNotFoundErrorForDelete() {
-        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(URL_PREFIX)
+        webTestClient.delete().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX)
                         .path("/delete").path("/id/" + TestUtils.TEMPLATE_ID).build())
                 .exchange().expectStatus().isNotFound()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
+                .expectBody().jsonPath(TestUtils.JSON_ERROR_CODE).isEqualTo(ErrorCode.ERROR_NOT_FOUND.toString());
     }
 
     @Test
@@ -101,11 +100,11 @@ class TemplateControllerErrorsIntegrationTest extends PostgresContainersConfig {
                 .filename(TestUtils.MULTIPART_FILENAME);
         multipartBodyBuilder.part(TestUtils.MULTIPART_DTO, templateDto);
 
-        webTestClient.post().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/upload").build())
+        webTestClient.post().uri(uriBuilder -> uriBuilder.path(TestUrlConstants.TEMPLATE_URL_PREFIX).path("/upload").build())
                 .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
                 .exchange().expectStatus().is4xxClientError()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_TEMPLATE_EXISTS.toString());
+                .expectBody().jsonPath(TestUtils.JSON_ERROR_CODE).isEqualTo(ErrorCode.ERROR_TEMPLATE_EXISTS.toString());
     }
 
     private TemplateEntity saveTemplate() {

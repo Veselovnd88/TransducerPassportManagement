@@ -1,16 +1,7 @@
 package ru.veselov.generatebytemplate.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import jakarta.persistence.*;
+import lombok.*;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -22,6 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
+@ToString(exclude = "templateEntity")
 public class ResultFileEntity extends BaseEntity {
 
     @Column(name = "filename")
@@ -47,15 +39,14 @@ public class ResultFileEntity extends BaseEntity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
         ResultFileEntity that = (ResultFileEntity) o;
-        return Objects.equals(getFilename(), that.getFilename()) && Objects.equals(getBucket(), that.getBucket())
-                && Objects.equals(getSynced(), that.getSynced())
-                && Objects.equals(getTemplateEntity(), that.getTemplateEntity());
+        return Objects.equals(filename, that.filename) && Objects.equals(bucket, that.bucket)
+                && Objects.equals(username, that.username) && Objects.equals(taskId, that.taskId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), getFilename(), getBucket(), getSynced(), getTemplateEntity());
+        return Objects.hash(filename, bucket, username, taskId);
     }
+
 }

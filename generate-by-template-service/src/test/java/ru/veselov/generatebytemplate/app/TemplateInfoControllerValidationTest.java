@@ -8,10 +8,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-import ru.veselov.generatebytemplate.utils.TestUtils;
 import ru.veselov.generatebytemplate.controller.TemplateInfoController;
 import ru.veselov.generatebytemplate.exception.error.ErrorCode;
 import ru.veselov.generatebytemplate.service.TemplateStorageService;
+import ru.veselov.generatebytemplate.utils.TestUtils;
 
 @WebMvcTest(controllers = TemplateInfoController.class)
 @AutoConfigureWebTestClient
@@ -29,14 +29,13 @@ public class TemplateInfoControllerValidationTest {
     @MockBean
     TemplateStorageService templateStorageService;
 
-
     @Test
     void shouldReturnErrorWithWrongUUID() {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/id/" + "notUUID").build())
                 .exchange().expectStatus().isBadRequest()
                 .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo(TEMPLATE_ID_FIELD);
+                .expectBody().jsonPath(TestUtils.JSON_ERROR_CODE).isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).isEqualTo(TEMPLATE_ID_FIELD);
     }
 
     @Test
@@ -47,8 +46,8 @@ public class TemplateInfoControllerValidationTest {
                         .queryParam(TestUtils.ORDER, ASC)
                         .build())
                 .exchange().expectStatus().isBadRequest()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo(TestUtils.SORT);
+                .expectBody().jsonPath(TestUtils.JSON_ERROR_CODE).isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).isEqualTo(TestUtils.SORT);
     }
 
     @Test
@@ -56,8 +55,8 @@ public class TemplateInfoControllerValidationTest {
         webTestClient.get().uri(uriBuilder -> uriBuilder.path(URL_PREFIX).path("/all")
                         .queryParam(TestUtils.PAGE, -1).build())
                 .exchange().expectStatus().isBadRequest()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo(TestUtils.PAGE);
+                .expectBody().jsonPath(TestUtils.JSON_ERROR_CODE).isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).isEqualTo(TestUtils.PAGE);
     }
 
     @Test
@@ -68,8 +67,8 @@ public class TemplateInfoControllerValidationTest {
                         .queryParam(TestUtils.ORDER, "pasc")
                         .build())
                 .exchange().expectStatus().isBadRequest()
-                .expectBody().jsonPath("$.errorCode").isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
-                .jsonPath("$.violations[0].fieldName").isEqualTo(TestUtils.ORDER);
+                .expectBody().jsonPath(TestUtils.JSON_ERROR_CODE).isEqualTo(ErrorCode.ERROR_VALIDATION.toString())
+                .jsonPath(TestUtils.JSON_VIOLATIONS_FIELD).isEqualTo(TestUtils.ORDER);
     }
 
 }
