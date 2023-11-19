@@ -19,8 +19,8 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import ru.veselov.taskservice.utils.TestURLsConstants;
-import ru.veselov.taskservice.utils.TestUtils;
+import ru.veselov.taskservice.util.TestURLsConstants;
+import ru.veselov.taskservice.util.TestUtils;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.entity.TaskEntity;
 import ru.veselov.taskservice.entity.TaskStatus;
@@ -31,7 +31,7 @@ import ru.veselov.taskservice.it.config.RestTemplateTestConfiguration;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
 import ru.veselov.taskservice.testcontainers.PostgresContainersConfig;
-import ru.veselov.taskservice.utils.AppConstants;
+import ru.veselov.taskservice.util.AppConstants;
 
 import java.util.List;
 

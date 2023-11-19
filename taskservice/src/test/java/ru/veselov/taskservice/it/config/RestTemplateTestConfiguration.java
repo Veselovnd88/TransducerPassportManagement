@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.client.RestTemplate;
-import ru.veselov.taskservice.configuration.RestTemplateResponseErrorHandler;
+import ru.veselov.taskservice.configuration.resttemplate.RestTemplateResponseErrorHandler;
 
 /*
 Configure rest template without load balancing and using eureka

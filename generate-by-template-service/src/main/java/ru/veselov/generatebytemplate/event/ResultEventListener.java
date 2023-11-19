@@ -18,7 +18,6 @@ public class ResultEventListener {
     public void handleSuccessResultEvent(SuccessResultEvent resultEvent) {
         TaskResultDto taskResultDto = new TaskResultDto(
                 resultEvent.getResultFileId(),
-                resultEvent.getMessage(),
                 null,
                 TaskStatus.PERFORMED
         );
@@ -30,7 +29,6 @@ public class ResultEventListener {
     public void handleErrorResultEvent(ErrorResultEvent resultEvent) {
         TaskResultDto taskResultDto = new TaskResultDto(
                 null,
-                resultEvent.getMessage(),
                 resultEvent.getErrorMessage(),
                 TaskStatus.FAILED
         );

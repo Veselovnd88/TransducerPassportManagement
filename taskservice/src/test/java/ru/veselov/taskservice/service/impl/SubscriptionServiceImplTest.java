@@ -6,12 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.codec.ServerSentEvent;
-import ru.veselov.taskservice.utils.TestUtils;
+import ru.veselov.taskservice.util.TestUtils;
 import ru.veselov.taskservice.entity.TaskStatus;
-import ru.veselov.taskservice.events.EventType;
-import ru.veselov.taskservice.events.StatusStreamMessage;
-import ru.veselov.taskservice.events.SubscriptionData;
-import ru.veselov.taskservice.events.SubscriptionsStorage;
+import ru.veselov.taskservice.event.EventType;
+import ru.veselov.taskservice.event.StatusStreamMessage;
+import ru.veselov.taskservice.event.SubscriptionData;
+import ru.veselov.taskservice.event.SubscriptionsStorage;
 import ru.veselov.taskservice.model.Task;
 
 import java.util.Collections;

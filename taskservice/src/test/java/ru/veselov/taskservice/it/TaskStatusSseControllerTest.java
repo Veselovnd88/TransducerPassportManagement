@@ -16,11 +16,11 @@ import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
 import ru.veselov.taskservice.entity.TaskEntity;
 import ru.veselov.taskservice.entity.TaskStatus;
-import ru.veselov.taskservice.events.EventType;
+import ru.veselov.taskservice.event.EventType;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.TaskRepository;
 import ru.veselov.taskservice.testcontainers.PostgresContainersConfig;
-import ru.veselov.taskservice.utils.TestUtils;
+import ru.veselov.taskservice.util.TestUtils;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient

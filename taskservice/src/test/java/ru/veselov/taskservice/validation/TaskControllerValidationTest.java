@@ -14,14 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import ru.veselov.taskservice.configuration.MvcTaskExecutorProps;
+import ru.veselov.taskservice.configuration.webmvc.MvcTaskExecutorProps;
 import ru.veselov.taskservice.controller.TaskController;
 import ru.veselov.taskservice.exception.error.ErrorCode;
 import ru.veselov.taskservice.service.TaskService;
-import ru.veselov.taskservice.utils.AppConstants;
-import ru.veselov.taskservice.utils.TestURLsConstants;
-import ru.veselov.taskservice.utils.TestUtils;
-import ru.veselov.taskservice.utils.argumentproviders.WrongAndNullUUIDArgumentProvider;
+import ru.veselov.taskservice.util.AppConstants;
+import ru.veselov.taskservice.util.TestURLsConstants;
+import ru.veselov.taskservice.util.TestUtils;
+import ru.veselov.taskservice.util.argumentproviders.WrongAndNullUUIDArgumentProvider;
 
 @WebMvcTest(TaskController.class)
 @Import(MvcTaskExecutorProps.class)

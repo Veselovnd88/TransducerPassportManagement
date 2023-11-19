@@ -12,10 +12,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.codec.ServerSentEvent;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
-import ru.veselov.taskservice.utils.TestUtils;
-import ru.veselov.taskservice.events.EventType;
-import ru.veselov.taskservice.events.StatusStreamMessage;
-import ru.veselov.taskservice.events.SubscriptionData;
+import ru.veselov.taskservice.util.TestUtils;
+import ru.veselov.taskservice.event.EventType;
+import ru.veselov.taskservice.event.StatusStreamMessage;
+import ru.veselov.taskservice.event.SubscriptionData;
 import ru.veselov.taskservice.service.SubscriptionService;
 
 @ExtendWith(MockitoExtension.class)

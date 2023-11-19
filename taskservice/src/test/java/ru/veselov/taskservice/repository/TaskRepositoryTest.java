@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import ru.veselov.taskservice.utils.TestUtils;
+import ru.veselov.taskservice.util.TestUtils;
 import ru.veselov.taskservice.entity.SerialNumberEntity;
 import ru.veselov.taskservice.entity.TaskEntity;
 import ru.veselov.taskservice.entity.TaskStatus;

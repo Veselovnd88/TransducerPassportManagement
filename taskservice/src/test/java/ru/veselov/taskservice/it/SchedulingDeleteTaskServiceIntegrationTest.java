@@ -14,7 +14,7 @@ import ru.veselov.taskservice.entity.TaskEntity;
 import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.repository.TaskRepository;
 import ru.veselov.taskservice.testcontainers.PostgresContainersConfig;
-import ru.veselov.taskservice.utils.TestUtils;
+import ru.veselov.taskservice.util.TestUtils;
 
 import java.time.Duration;
 import java.time.LocalDateTime;

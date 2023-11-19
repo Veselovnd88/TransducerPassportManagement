@@ -10,7 +10,7 @@ import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.exception.GenerateServiceException;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.GenerateServiceHttpClient;
-import ru.veselov.taskservice.utils.AppConstants;
+import ru.veselov.taskservice.util.AppConstants;
 
 @Service
 @RequiredArgsConstructor

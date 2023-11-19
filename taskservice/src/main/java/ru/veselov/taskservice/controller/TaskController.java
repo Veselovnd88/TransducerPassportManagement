@@ -7,7 +7,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.TaskService;
-import ru.veselov.taskservice.utils.AppConstants;
+import ru.veselov.taskservice.util.AppConstants;
 
 import java.util.List;
 

@@ -1,8 +1,8 @@
 package ru.veselov.taskservice.service;
 
-import ru.veselov.taskservice.events.EventType;
-import ru.veselov.taskservice.events.StatusStreamMessage;
-import ru.veselov.taskservice.events.SubscriptionData;
+import ru.veselov.taskservice.event.EventType;
+import ru.veselov.taskservice.event.StatusStreamMessage;
+import ru.veselov.taskservice.event.SubscriptionData;
 import ru.veselov.taskservice.model.Task;
 
 import java.util.UUID;

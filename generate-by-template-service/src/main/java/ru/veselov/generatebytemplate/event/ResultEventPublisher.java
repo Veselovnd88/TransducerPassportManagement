@@ -18,16 +18,16 @@ public class ResultEventPublisher {
     public void publishSuccessResultEvent(ResultFile resultFile) {
         SuccessResultEvent successResultEvent = new SuccessResultEvent(
                 UUID.fromString(resultFile.getTaskId()),
-                resultFile.getId().toString(),
-                "File was successfully generated");//TODO dont need?
+                resultFile.getId().toString()
+        );
         publisher.publishEvent(successResultEvent);
         log.info("SuccessResult Event published for [file: {}]", successResultEvent.getResultFileId());
     }
 
     public void publishErrorResultEvent(String taskId, Exception exception) {
         ErrorResultEvent errorResultEvent = new ErrorResultEvent(UUID.fromString(taskId),
-                exception.getMessage(),
-                "File was not generated due to error");
+                exception.getMessage()
+        );
         publisher.publishEvent(errorResultEvent);
         log.info("ErrorResult Event published for [error: {}]", errorResultEvent.getErrorMessage());
     }

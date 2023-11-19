@@ -6,10 +6,10 @@ import org.springframework.http.codec.ServerSentEvent;
 import org.springframework.stereotype.Service;
 import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
-import ru.veselov.taskservice.events.EventType;
-import ru.veselov.taskservice.events.StatusStreamMessage;
-import ru.veselov.taskservice.events.SubscriptionData;
-import ru.veselov.taskservice.events.TaskStatusEventPublisher;
+import ru.veselov.taskservice.event.EventType;
+import ru.veselov.taskservice.event.StatusStreamMessage;
+import ru.veselov.taskservice.event.SubscriptionData;
+import ru.veselov.taskservice.event.TaskStatusEventPublisher;
 import ru.veselov.taskservice.service.SubscriptionService;
 import ru.veselov.taskservice.service.TaskStatusEventService;
 

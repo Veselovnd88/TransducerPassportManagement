@@ -8,8 +8,8 @@ import org.springframework.stereotype.Service;
 import ru.veselov.taskservice.dto.TaskResultDto;
 import ru.veselov.taskservice.entity.TaskEntity;
 import ru.veselov.taskservice.entity.TaskStatus;
-import ru.veselov.taskservice.events.EventType;
-import ru.veselov.taskservice.events.TaskStatusEventPublisher;
+import ru.veselov.taskservice.event.EventType;
+import ru.veselov.taskservice.event.TaskStatusEventPublisher;
 import ru.veselov.taskservice.repository.TaskRepository;
 import ru.veselov.taskservice.service.KafkaListenerTaskResultService;
 

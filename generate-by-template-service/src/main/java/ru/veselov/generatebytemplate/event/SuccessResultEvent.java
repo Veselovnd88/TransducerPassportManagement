@@ -13,8 +13,8 @@ public class SuccessResultEvent extends ResultEvent {
 
     private String resultFileId;
 
-    public SuccessResultEvent(UUID taskId, String resultFileId, String message) {
-        super(taskId, message, EventType.READY);
+    public SuccessResultEvent(UUID taskId, String resultFileId) {
+        super(taskId, EventType.READY);
         this.resultFileId = resultFileId;
     }
 

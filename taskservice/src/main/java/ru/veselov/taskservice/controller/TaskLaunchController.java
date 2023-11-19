@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.veselov.taskservice.dto.GeneratePassportsDto;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.service.TaskLaunchService;
-import ru.veselov.taskservice.utils.AppConstants;
+import ru.veselov.taskservice.util.AppConstants;
 
 @RestController
 @RequestMapping("/api/v1/task/launch")

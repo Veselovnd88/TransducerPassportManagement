@@ -13,8 +13,6 @@ public abstract class ResultEvent {
 
     private UUID taskId;
 
-    private String message;
-
     private EventType eventType;
 
 }

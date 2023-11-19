@@ -43,8 +43,7 @@ class ResultEventPublisherTest {
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.getResultFileId()).isEqualTo(resultFile.getId().toString()),
                 () -> Assertions.assertThat(captured.getTaskId().toString()).hasToString(resultFile.getTaskId()),
-                () -> Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.READY),
-                () -> Assertions.assertThat(captured.getMessage()).isNotBlank()
+                () -> Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.READY)
         );
 
     }
@@ -58,8 +57,7 @@ class ResultEventPublisherTest {
         org.junit.jupiter.api.Assertions.assertAll(
                 () -> Assertions.assertThat(captured.getTaskId()).isEqualTo(UUID.fromString(TestUtils.TASK_ID_STR)),
                 () -> Assertions.assertThat(captured.getErrorMessage()).isEqualTo(MESSAGE),
-                () -> Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.ERROR),
-                () -> Assertions.assertThat(captured.getMessage()).isNotBlank()
+                () -> Assertions.assertThat(captured.getEventType()).isEqualTo(EventType.ERROR)
         );
 
     }

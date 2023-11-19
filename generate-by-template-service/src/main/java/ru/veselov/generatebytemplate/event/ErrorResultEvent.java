@@ -15,8 +15,8 @@ public class ErrorResultEvent extends ResultEvent {
 
     private String errorMessage;
 
-    public ErrorResultEvent(UUID taskId, String errorMessage, String message) {
-        super(taskId, message, EventType.ERROR);
+    public ErrorResultEvent(UUID taskId, String errorMessage) {
+        super(taskId, EventType.ERROR);
         this.errorMessage = errorMessage;
     }
 
