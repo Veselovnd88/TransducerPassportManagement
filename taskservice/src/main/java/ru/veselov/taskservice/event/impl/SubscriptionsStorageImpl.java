@@ -7,7 +7,6 @@ import ru.veselov.taskservice.event.SubscriptionsStorage;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,11 +29,6 @@ public class SubscriptionsStorageImpl implements SubscriptionsStorage {
     @Override
     public List<SubscriptionData> findSubscriptionsByTask(String taskId) {
         return subscriptionMap.values().stream().filter(sub -> sub.getTaskId().equals(taskId)).toList();
-    }
-
-    @Override
-    public Optional<SubscriptionData> findSubscription(UUID subId) {
-        return Optional.of(subscriptionMap.get(subId));
     }
 
 }

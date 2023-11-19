@@ -8,7 +8,5 @@ public enum EventType {
 
     UPDATED,
 
-    PERFORMED,
-
     ERROR
 }

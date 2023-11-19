@@ -11,7 +11,9 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
-
+/*
+*Configuration for async performing of notification events (sse) by listeners
+* */
 @EnableAsync
 @Configuration
 @RequiredArgsConstructor

@@ -9,4 +9,7 @@ public class TestURLsConstants {
     public static final String PERFORMED = "/performed";
 
     public static final String CURRENT = "/current";
+
+    public static final String TASK_STATUS_STREAM = "/api/v1/task/status-stream/";
+
 }

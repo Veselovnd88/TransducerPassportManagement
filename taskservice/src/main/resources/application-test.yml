@@ -62,5 +62,5 @@ mvc-executor:
   queue-capacity: 5
 
 scheduler:
-  delete-not-started-tasks: "*/3 * * * * *" # 3 seconds
+  delete-not-started-tasks: "@weekly"
   not-started-task-lifetime: 7

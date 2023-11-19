@@ -5,25 +5,33 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
 import org.springframework.http.codec.ServerSentEvent;
+import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.test.context.EmbeddedKafka;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.FluxExchangeResult;
 import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Flux;
 import reactor.test.StepVerifier;
+import ru.veselov.taskservice.dto.TaskResultDto;
 import ru.veselov.taskservice.entity.TaskEntity;
 import ru.veselov.taskservice.entity.TaskStatus;
 import ru.veselov.taskservice.event.EventType;
+import ru.veselov.taskservice.it.config.KafkaProducerTestConfiguration;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.TaskRepository;
 import ru.veselov.taskservice.testcontainers.PostgresContainersConfig;
+import ru.veselov.taskservice.util.TestURLsConstants;
 import ru.veselov.taskservice.util.TestUtils;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @AutoConfigureWebTestClient
+@EmbeddedKafka(partitions = 1, brokerProperties = {"listeners=PLAINTEXT://localhost:9092", "port=9092"})
+@Import({KafkaProducerTestConfiguration.class})
 @DirtiesContext
 @ActiveProfiles("test")
 class TaskStatusSseControllerTest extends PostgresContainersConfig {
@@ -34,6 +42,9 @@ class TaskStatusSseControllerTest extends PostgresContainersConfig {
     @Autowired
     TaskRepository taskRepository;
 
+    @Autowired
+    KafkaTemplate<String, TaskResultDto> kafkaTemplate;
+
     @AfterEach
     void clear() {
         taskRepository.deleteAll();
@@ -43,7 +54,7 @@ class TaskStatusSseControllerTest extends PostgresContainersConfig {
     void shouldReturnFluxWithSSEStatusesFoStartedTask() {
         String taskId = saveTaskToRepo(TaskStatus.STARTED);
         FluxExchangeResult<ServerSentEvent<Task>> fluxResult = webTestClient.get()
-                .uri("/api/v1/task/status-stream/" + taskId)
+                .uri(TestURLsConstants.TASK_STATUS_STREAM + taskId)
                 .exchange().expectStatus().is2xxSuccessful()
                 .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM_VALUE)
                 .returnResult(new ParameterizedTypeReference<>() {
@@ -65,7 +76,7 @@ class TaskStatusSseControllerTest extends PostgresContainersConfig {
     @Test
     void shouldSendErrorMessageIfTaskNotFound() {
         FluxExchangeResult<ServerSentEvent<Task>> fluxResult = webTestClient.get()
-                .uri("/api/v1/task/status-stream/" + TestUtils.TASK_ID_STR)
+                .uri(TestURLsConstants.TASK_STATUS_STREAM + TestUtils.TASK_ID_STR)
                 .exchange().expectStatus().is2xxSuccessful()
                 .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM_VALUE)
                 .returnResult(new ParameterizedTypeReference<>() {
@@ -88,7 +99,7 @@ class TaskStatusSseControllerTest extends PostgresContainersConfig {
     void shouldSendMessageAndCompleteSubscription() {
         String taskId = saveTaskToRepo(TaskStatus.PERFORMED);
         FluxExchangeResult<ServerSentEvent<Task>> fluxResult = webTestClient.get()
-                .uri("/api/v1/task/status-stream/" + taskId)
+                .uri(TestURLsConstants.TASK_STATUS_STREAM + taskId)
                 .exchange().expectStatus().is2xxSuccessful()
                 .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM_VALUE)
                 .returnResult(new ParameterizedTypeReference<>() {
@@ -106,6 +117,91 @@ class TaskStatusSseControllerTest extends PostgresContainersConfig {
                 })
                 .expectComplete()
                 .verify();
+    }
+
+    @Test
+    void shouldSendMessageAfterSuccessUpdateFromKafka() {
+        String taskId = saveTaskToRepo(TaskStatus.STARTED);
+        FluxExchangeResult<ServerSentEvent<Task>> fluxResult = webTestClient.get()
+                .uri(TestURLsConstants.TASK_STATUS_STREAM + taskId)
+                .exchange().expectStatus().is2xxSuccessful()
+                .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM_VALUE)
+                .returnResult(new ParameterizedTypeReference<>() {
+                });
+        TaskResultDto taskResultDto = new TaskResultDto(TestUtils.FILE_ID_STR, null, TaskStatus.PERFORMED);
+        kafkaTemplate.send("task", taskId, taskResultDto);
+        Flux<ServerSentEvent<Task>> responseBody = fluxResult.getResponseBody();
+        StepVerifier.create(responseBody)
+                .expectNextMatches(x -> {
+                    assert x.event() != null;
+                    return x.event().equals(EventType.INIT.toString());
+                })
+                .expectNextMatches(x -> {
+                    assert x.event() != null;
+                    return x.event().equals(EventType.CONNECTED.toString());
+                })
+                .expectNextMatches(x -> {
+                    assert x.event() != null;
+                    return x.event().equals(EventType.UPDATED.toString());
+                })
+                .thenCancel().verify();
+    }
+
+    @Test
+    void shouldSendMessageAfterErrorUpdateFromKafka() {
+        String taskId = saveTaskToRepo(TaskStatus.STARTED);
+        FluxExchangeResult<ServerSentEvent<Task>> fluxResult = webTestClient.get()
+                .uri(TestURLsConstants.TASK_STATUS_STREAM + taskId)
+                .exchange().expectStatus().is2xxSuccessful()
+                .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM_VALUE)
+                .returnResult(new ParameterizedTypeReference<>() {
+                });
+        TaskResultDto taskResultDto = new TaskResultDto(null, "error", TaskStatus.FAILED);
+        kafkaTemplate.send("task", taskId, taskResultDto);
+        Flux<ServerSentEvent<Task>> responseBody = fluxResult.getResponseBody();
+        StepVerifier.create(responseBody)
+                .expectNextMatches(x -> {
+                    assert x.event() != null;
+                    return x.event().equals(EventType.INIT.toString());
+                })
+                .expectNextMatches(x -> {
+                    assert x.event() != null;
+                    return x.event().equals(EventType.CONNECTED.toString());
+                })
+                .expectNextMatches(x -> {
+                    assert x.event() != null;
+                    return x.event().equals(EventType.UPDATED.toString());
+                })
+                .thenCancel().verify();
+    }
+
+    @Test
+    void shouldSendErrorAfterUpdateFromKafka() {
+        String taskId = saveTaskToRepo(TaskStatus.STARTED);
+        FluxExchangeResult<ServerSentEvent<Task>> fluxResult = webTestClient.get()
+                .uri(TestURLsConstants.TASK_STATUS_STREAM + taskId)
+                .exchange().expectStatus().is2xxSuccessful()
+                .expectHeader().contentType(MediaType.TEXT_EVENT_STREAM_VALUE)
+                .returnResult(new ParameterizedTypeReference<>() {
+                });
+        TaskResultDto taskResultDto = new TaskResultDto(null, "error", TaskStatus.FAILED);
+        taskRepository.deleteAll();
+        kafkaTemplate.send("task", taskId, taskResultDto);
+        Flux<ServerSentEvent<Task>> responseBody = fluxResult.getResponseBody();
+        StepVerifier.create(responseBody)
+                .expectNextMatches(x -> {
+                    assert x.event() != null;
+                    return x.event().equals(EventType.INIT.toString());
+                })
+                .expectNextMatches(x -> {
+                    assert x.event() != null;
+                    return x.event().equals(EventType.CONNECTED.toString());
+                })
+                .expectNextMatches(x -> {
+                    assert x.event() != null;
+                    return x.event().equals(EventType.ERROR.toString());
+                })
+                .thenCancel().verify();
     }
 
     private String saveTaskToRepo(TaskStatus status) {
