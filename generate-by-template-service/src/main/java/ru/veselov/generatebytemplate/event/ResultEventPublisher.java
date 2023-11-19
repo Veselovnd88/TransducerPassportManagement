@@ -19,7 +19,7 @@ public class ResultEventPublisher {
         SuccessResultEvent successResultEvent = new SuccessResultEvent(
                 UUID.fromString(resultFile.getTaskId()),
                 resultFile.getId().toString(),
-                "File was successfully generated");
+                "File was successfully generated");//TODO dont need?
         publisher.publishEvent(successResultEvent);
         log.info("SuccessResult Event published for [file: {}]", successResultEvent.getResultFileId());
     }

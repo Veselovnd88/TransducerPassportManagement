@@ -14,7 +14,6 @@ import ru.veselov.taskservice.mapper.TaskMapper;
 import ru.veselov.taskservice.model.Task;
 import ru.veselov.taskservice.repository.SerialNumberRepository;
 import ru.veselov.taskservice.repository.TaskRepository;
-import ru.veselov.taskservice.service.SubscriptionService;
 import ru.veselov.taskservice.service.TaskService;
 
 import java.util.List;
@@ -34,8 +33,6 @@ public class TaskServiceImpl implements TaskService {
     private final TaskRepository taskRepository;
 
     private final SerialNumberRepository serialNumberRepository;
-
-    private final SubscriptionService subscriptionService;
 
     private final TaskMapper taskMapper;
 
